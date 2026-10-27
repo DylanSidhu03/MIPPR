@@ -12,14 +12,19 @@ browser app, so it uses only operations OpenCV.js has.
 ```bash
 python -m venv .venv && .venv/bin/pip install -r prototype/requirements.txt
 cd prototype
-../.venv/bin/python -m mippr.cli PARTICLE.jpg TEMPLATE.jpg --square-mm 10 --out out/
+../.venv/bin/python -m mippr.cli PARTICLE.jpg TEMPLATE.jpg --square-mm 10 --sample-id S042 \
+    --date 2026-10-27 --operator DS --lab "Moore Institute" --setup "phone, overhead" --site "Site 3" --out out/
 ../.venv/bin/python -m pytest tests
 ```
 
 You need two photos of the 12 × 24 checkerboard: one with particles, one
-empty. The output folder gets `particles.csv` (one row per particle),
-`overlay.png` (numbered outlines) and `run.json` (settings, scale and version,
-so a run can be reproduced).
+empty. The output folder gets:
+
+- `particles.csv`: one row per particle, with the columns and review flags
+  defined in [docs/CLASSIFICATION_SPEC.md](../docs/CLASSIFICATION_SPEC.md)
+- `overlay.png`: numbered outlines on the photo
+- `run.json`: settings, scale and version, so a run can be reproduced
+- `NOTE.txt`: the statement that classification is visual only
 
 `--square-mm` is the side of one printed square. The lab's notes say 1 cm, and
 the ImageJ results imply 10.07 mm. **Measure the printed board with a ruler**:
@@ -38,16 +43,22 @@ every length scales with this number, and areas scale with its square.
    - Shift the template's brightness square by square to match the particle
      photo. In the sample, blacks were 3× brighter in one shot.
    - Take the largest colour-channel difference.
+   - Bridge the difference across each printed square edge, so a mid-tone
+     particle lying on a gridline is not cut in two.
    - Detect particles with hysteresis thresholding. Near gridlines, slivers
      under 3 px wide are ignored, because misalignment and colour fringing
      leave thin lines there.
-4. **Place the edge.** Each particle's outline is set where the difference
-   falls to half the particle's own contrast (the half-maximum rule), so bright
-   and faint particles get the same treatment.
+4. **Place the edge.** Each particle's outer outline is set where the
+   difference falls to half the particle's own contrast (the half-maximum
+   rule), so bright and faint particles get the same treatment. The interior is
+   never cut.
 5. **Measure** (`measure.py`). This is deterministic geometry with ImageJ
    conventions: area as a pixel count, Feret diameters over pixel edges. The
    outputs are:
-   - area, perimeter, convex area and convex perimeter
+   - area, convex area and convex perimeter
+   - perimeter, from a sub-pixel outline (the most accurate method in
+     `scripts/perimeter_study.py`), plus an ImageJ-compatible perimeter and
+     circularity
    - max and min Feret, and the Feret angle
    - circular equivalent diameter
    - bounding box and minimum-area rectangle
@@ -68,16 +79,21 @@ Files are in `results/fragment_area_sample/`. The comparison uses
 
   | Metric | Median difference | Middle 80% of particles |
   |---|---|---|
-  | Area | +0.0% | −1.9% to +18.8% |
-  | Max Feret | −0.2% | −2.3% to +3.2% |
-  | Min Feret | −0.1% | −2.3% to +6.2% |
+  | Area | +0.5% | −1.9% to +25.6% |
+  | Max Feret | −0.2% | −2.3% to +6.6% |
+  | Min Feret | +0.1% | −2.2% to +9.4% |
+  | Perimeter (ImageJ method) | −0.9% | −2.6% to +6.9% |
+  | Circularity (ImageJ method) | +3.0% | −0.3% to +5.8% |
 
   The large area differences are particles where ImageJ's threshold missed part
-  of the particle. The clearest case is the pale lavender fragment in A4:
-  ImageJ found 0.34 mm², MIPPR 1.83 mm².
-- **Circularity** reads about 5% higher than ImageJ, because ImageJ computes
-  perimeter differently. Pick one definition and document it before
-  validation.
+  of the particle. The clearest case is the pale lavender fragment in A4,
+  where ImageJ found 0.34 mm². MIPPR now covers almost all of it, and flags it
+  `low_contrast_outline`.
+- **Sub-pixel circularity** reads about 0.08–0.10 higher than ImageJ, because
+  ImageJ's pixel-staircase outline makes particles look less round. On shapes
+  with a known answer the sub-pixel method is the most accurate
+  (`results/perimeter_study.txt`). Which one is the headline number is a
+  provisional decision; see spec section 5.
 - **Run time** is about 5 s per photo pair on a laptop CPU.
 
 ImageJ is not ground truth either. Validation still needs hand or caliper
@@ -103,7 +119,10 @@ measurements of real particles (stage 8 / open question 6).
 - Touching particles are not split yet, though there are none in the sample.
 - There is no blur, darkness or missing-board check on input beyond a clear
   error when the board isn't found.
-- The pale or translucent particle in A4 is still only partly outlined. Clear
-  films are the expected worst case and need test photos.
+- Clear films are the expected worst case and need test photos. The pale A4
+  fragment is now outlined but flagged for review.
+- The marching-squares step behind the sub-pixel perimeter uses scikit-image.
+  The browser port will need its own version, about 60 lines, because
+  OpenCV.js doesn't include it.
 - There is no template-free mode yet. A synthetic background could be built
   from the known grid if the lab can't always shoot an empty board.

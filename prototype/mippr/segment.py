@@ -45,12 +45,36 @@ def match_template_brightness(particle, template, px_per_square, inset=0.2):
     return out
 
 
-def difference(particle, template, px_per_square, blur_sigma=1.0):
+def difference(particle, template, px_per_square, blur_sigma=1.0, bridge_px=3):
     """Per-pixel difference (largest over the three colour channels)."""
     t = match_template_brightness(particle, template, px_per_square)
     p = cv2.GaussianBlur(particle.astype(np.float32), (0, 0), blur_sigma)
     t = cv2.GaussianBlur(t, (0, 0), blur_sigma)
-    return np.abs(p - t).max(axis=2)
+    d = np.abs(p - t).max(axis=2)
+    return _bridge_gridlines(d, px_per_square, bridge_px) if bridge_px else d
+
+
+def _bridge_gridlines(d, px_per_square, half_width):
+    """Fill dips in the difference where a particle crosses a printed square edge.
+
+    On a square edge the template is a blurred mid-grey, so a mid-tone particle
+    lying across it barely differs from the template there and gets cut in two.
+    Inside a narrow strip along each edge, the difference is raised to the
+    smaller of the values just outside the strip on either side: a particle
+    that continues across the line is bridged, empty board stays empty.
+    """
+    d = d.copy()
+    h, w = d.shape
+    k = half_width + 1
+    for i in range(1, SQUARES_X):
+        x = i * px_per_square
+        across = np.minimum(d[:, x - k], d[:, x + k])[:, None]
+        d[:, x - half_width:x + half_width + 1] = np.maximum(d[:, x - half_width:x + half_width + 1], across)
+    for j in range(1, SQUARES_Y):
+        y = j * px_per_square
+        across = np.minimum(d[y - k, :], d[y + k, :])[None, :]
+        d[y - half_width:y + half_width + 1, :] = np.maximum(d[y - half_width:y + half_width + 1, :], across)
+    return d
 
 
 def grid_band(shape, px_per_square, half_width):
@@ -93,6 +117,19 @@ def _fill_holes(mask):
     return filled.astype(bool)
 
 
+def edge_level(region, diff, fraction=0.5, grow=2):
+    """Difference value at which this particle's edge is drawn: `fraction` of its contrast.
+
+    Contrast is the median over the particle's interior: the median copes with
+    uneven particles (a pale fragment with a dark speck), and leaving out the
+    outer `grow` px keeps the blurred halo from dragging it down.
+    """
+    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * grow + 1, 2 * grow + 1))
+    core = cv2.erode(region.astype(np.uint8), kernel).astype(bool)
+    contrast = np.median(diff[core]) if core.sum() >= 5 else np.percentile(diff[region], 90)
+    return fraction * float(contrast)
+
+
 def _refine_edges(mask, diff, fraction, grow=2):
     """Move each particle's edge to where the difference falls to `fraction` of its contrast.
 
@@ -106,13 +143,12 @@ def _refine_edges(mask, diff, fraction, grow=2):
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * grow + 1, 2 * grow + 1))
     for lbl in range(1, n):
         region = labels == lbl
-        # Contrast is the median over the particle's interior: the median copes
-        # with uneven particles (a pale fragment with a dark speck), and leaving
-        # out the outer 2 px keeps the blurred halo from dragging it down.
-        core = cv2.erode(region.astype(np.uint8), kernel).astype(bool)
-        contrast = np.median(diff[core]) if core.sum() >= 5 else np.percentile(diff[region], 90)
         near = cv2.dilate(region.astype(np.uint8), kernel).astype(bool)
-        refined = near & (diff >= fraction * contrast)
+        refined = near & (diff >= edge_level(region, diff, fraction, grow))
+        # Only the outer edge may move. Inside, the difference can dip below the
+        # edge level, e.g. where a mid-tone particle covers a blurred square
+        # edge in the template, and that must not cut the particle.
+        refined |= cv2.erode(region.astype(np.uint8), kernel).astype(bool)
         # Keep only the part that overlaps the detection, so a neighbour is not pulled in.
         k, parts = cv2.connectedComponents(refined.astype(np.uint8), connectivity=8)
         if k <= 1:

@@ -6,6 +6,7 @@ Manual classification of microplastics larger than 500 µm (color, morphology, s
 
 ## Plan
 
+- [Classification spec](docs/CLASSIFICATION_SPEC.md): size rule, classes, review flags and output columns (issue 1)
 - [Project context and decisions](docs/PROJECT_CONTEXT.md): goal, scope, free browser-based stack, release plan, open questions (current source of truth)
 - [Pipeline plan and checklist](docs/PIPELINE.md): every stage, task, input, output and risk
 - [Interactive tracker](docs/pipeline-tracker.html): the same plan as a checkbox page (download and open in a browser)

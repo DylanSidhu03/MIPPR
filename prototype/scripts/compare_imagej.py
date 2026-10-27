@@ -60,11 +60,13 @@ def main():
     for k, j, dist in pairs:
         r, m = ij.iloc[k], mp.iloc[j]
         rows.append({
-            "imagej": int(r.iloc[0]), "mippr": int(m.particle), "well": m.well, "dist_px": round(dist, 1),
+            "imagej": int(r.iloc[0]), "mippr": int(m.particle_number), "well": m.well, "dist_px": round(dist, 1),
             "ij_area_mm2": r.Area / 1e6, "mp_area_mm2": m.area_um2 / 1e6,
             "ij_feret_mm": r.Feret / 1e3, "mp_feret_mm": m.feret_max_um / 1e3,
             "ij_minferet_mm": r.MinFeret / 1e3, "mp_minferet_mm": m.feret_min_um / 1e3,
-            "ij_circ": r["Circ."], "mp_circ": m.circularity,
+            "ij_perim_mm": r["Perim."] / 1e3, "mp_perim_mm": m.perimeter_um / 1e3,
+            "mp_perim_ij_mm": m.perimeter_imagej_um / 1e3,
+            "ij_circ": r["Circ."], "mp_circ": m.circularity, "mp_circ_ij": m.circularity_imagej,
             "ij_solidity": r.Solidity, "mp_solidity": m.solidity,
         })
     t = pd.DataFrame(rows)
@@ -76,11 +78,13 @@ def main():
         print("\nImageJ objects sharing one MIPPR particle (ImageJ split it):", dup.imagej.tolist())
     good = good.drop_duplicates("mippr", keep=False)
     unmatched_ij = t[(t.dist_px >= 15) | (t.ij_area_mm2 <= 0.1)].imagej.tolist()
-    unmatched_mp = sorted(set(mp.particle) - set(t[t.dist_px < 15].mippr))
+    unmatched_mp = sorted(set(mp.particle_number) - set(t[t.dist_px < 15].mippr))
     print(f"\nmatched one-to-one: {len(good)}   ImageJ-only (specks or misses): {unmatched_ij}"
           f"   MIPPR-only: {unmatched_mp}")
-    for name in ("area_mm2", "feret_mm", "minferet_mm", "circ", "solidity"):
-        rel = good[f"mp_{name}"] / good[f"ij_{name}"] - 1
+    for name, ij_name in (("area_mm2", "area_mm2"), ("feret_mm", "feret_mm"), ("minferet_mm", "minferet_mm"),
+                          ("perim_mm", "perim_mm"), ("perim_ij_mm", "perim_mm"),
+                          ("circ", "circ"), ("circ_ij", "circ"), ("solidity", "solidity")):
+        rel = good[f"mp_{name}"] / good[f"ij_{ij_name}"] - 1
         print(f"{name:12s} MIPPR vs ImageJ: median {rel.median():+.1%}, "
               f"middle 80% {rel.quantile(.1):+.1%} to {rel.quantile(.9):+.1%}")
 

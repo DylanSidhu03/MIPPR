@@ -1,0 +1,1 @@
+Visual classification only. Whether a particle is plastic, and its polymer type, were not tested.

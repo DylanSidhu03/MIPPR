@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 
 from mippr.board import SQUARES_X, SQUARES_Y, find_board
-from mippr.measure import feret, measure, well_id
+from mippr.measure import feret, measure, perimeter_imagej, well_id
 from mippr.segment import segment
 
 SQ = 60  # px per square in the synthetic "photo" before tilting
@@ -64,8 +64,8 @@ def scene():
     particle = tilt(add_particles(board_image()), seed=2)
     rect_p = find_board(particle, P).rectify(particle)
     rect_t = find_board(template, P).rectify(template)
-    labels, _ = segment(rect_p, rect_t, P)
-    rows = measure(labels, rect_p, UM_PER_PX, P)
+    labels, diff = segment(rect_p, rect_t, P)
+    rows = measure(labels, rect_p, UM_PER_PX, P, diff)
     return rect_p, labels, rows
 
 
@@ -98,7 +98,8 @@ def test_disc_size(scene, idx):
     true_d_um = (2 * r + 1) * SQUARE_MM * 1000 / SQ  # an antialiased cv2.circle spans 2r + 1 px
     assert row["ced_um"] == pytest.approx(true_d_um, rel=0.05)
     assert row["feret_max_um"] == pytest.approx(true_d_um, rel=0.08)
-    assert row["circularity"] > 0.8
+    assert row["circularity"] > 0.93
+    assert row["perimeter_um"] == pytest.approx(math.pi * true_d_um, rel=0.06)
 
 
 def test_rectangle_length_and_width(scene):
@@ -129,3 +130,40 @@ def test_well_labels():
     assert well_id(0.5 * P, 0.5 * P, P) == "L1"  # top-left square
     assert well_id(11.5 * P, 0.5 * P, P) == "A1"  # top-right square
     assert well_id(11.5 * P, 23.5 * P, P) == "A12"
+
+
+def test_imagej_perimeter_matches_imagej():
+    one = np.zeros((5, 5), bool)
+    one[2, 2] = True
+    assert perimeter_imagej(one) * 74.904 == pytest.approx(211.861, abs=0.001)  # value from the lab's ImageJ CSV
+    rect = np.zeros((9, 9), bool)
+    rect[2:6, 3:5] = True
+    assert perimeter_imagej(rect) == pytest.approx(12 - 4 * (2 - math.sqrt(2)))  # every corner is cut when sides > 1 px
+
+
+def _m(**kw):
+    base = dict(particle=1, well="A1", x_um=0.0, y_um=0.0, feret_max_um=2000.0, feret_min_um=1500.0,
+                solidity=0.95, _contrast=200.0, _touches_gridline=False)
+    base.update(kw)
+    return base
+
+
+def test_review_reasons():
+    from mippr.export import review_reasons
+    assert review_reasons(_m()) == []
+    assert review_reasons(_m(feret_max_um=520, feret_min_um=400)) == ["near_size_cutoff", "min_width_below_sieve"]
+    assert review_reasons(_m(_contrast=90)) == ["low_contrast_outline"]
+    assert review_reasons(_m(_touches_gridline=True, solidity=0.6)) == ["touches_gridline", "possibly_merged"]
+
+
+def test_export_rows_follow_spec():
+    from mippr.export import COLUMNS, build_rows
+    rows = build_rows([_m(particle=1, well="A3", y_um=10), _m(particle=2, well="A3", y_um=5),
+                       _m(particle=3, well="B1", feret_min_um=300)],
+                      "S042", "photo.jpg", {"operator": "DS"}, "0.1.0", 10.0, 71.4)
+    assert all(list(r) == COLUMNS for r in rows)
+    ids = {r["particle_number"]: r["particle_id"] for r in rows}
+    assert ids == {2: "S042-A3-1", 1: "S042-A3-2", 3: "S042-B1-1"}  # numbered top to bottom within a well
+    flagged = {r["particle_id"]: (r["review"], r["review_reason"]) for r in rows}
+    assert flagged["S042-B1-1"] == ("yes", "min_width_below_sieve")
+    assert rows[0]["operator"] == "DS" and rows[0]["polymer_confirmed"] == "" and rows[0]["color_class"] == ""

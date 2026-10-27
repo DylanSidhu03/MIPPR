@@ -2,6 +2,12 @@
   "mippr_version": "0.1.0",
   "particle": "fragment_area/particle.jpg",
   "template": "fragment_area/template.jpg",
+  "sample_id": "FA01",
+  "date": "",
+  "operator": "",
+  "lab": "Moore Institute",
+  "setup": "fragment_area sample photos",
+  "site": "",
   "square_mm": 10.0,
   "px_per_square": 140,
   "um_per_px": 71.42857142857143,
@@ -14,5 +20,6 @@
     "edge_margin_px": 3,
     "edge_fraction": 0.5
   },
-  "particles": 24
+  "particles": 24,
+  "note": "Visual classification only. Whether a particle is plastic, and its polymer type, were not tested."
 }
