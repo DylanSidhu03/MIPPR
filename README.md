@@ -6,6 +6,7 @@ Manual classification of microplastics larger than 500 µm (color, morphology, s
 
 ## Plan
 
+- [Project context and decisions](docs/PROJECT_CONTEXT.md): goal, scope, free browser-based stack, release plan, open questions (current source of truth)
 - [Pipeline plan and checklist](docs/PIPELINE.md): every stage, task, input, output and risk
 - [Interactive tracker](docs/pipeline-tracker.html): the same plan as a checkbox page (download and open in a browser)
 
@@ -25,4 +26,4 @@ Manual classification of microplastics larger than 500 µm (color, morphology, s
 
 ## Status
 
-Planning. No code yet.
+Python prototype of segmentation and measurement in [prototype/](prototype/README.md). It finds all 24 particles in the lab's sample photo and matches the lab's ImageJ measurements to within 2% (median). Next: validate against hand measurements, then port to OpenCV.js for the v1 browser app.
