@@ -1,0 +1,236 @@
+<title>MIPPR Pipeline Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+/* Layout: a vertical pipeline spine; each stage is a node on the spine with its tasks, I/O and risks beside it. */
+:root{
+  --bg:#F2F6F7; --surface:#FFFFFF; --ink:#0E2830; --muted:#5A7078; --line:#CFDBDF;
+  --accent:#D9480F; --accent-soft:#FBE6DB; --ok:#1F7A55; --ok-soft:#DDF1E8; --warn:#9A6700;
+  --font-display:"Bricolage Grotesque","Helvetica Neue",Arial,sans-serif;
+  --font-body:"Source Sans 3","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0A1A20; --surface:#112830; --ink:#E4EEF0; --muted:#8CA5AD; --line:#244049;
+  --accent:#FF8A4C; --accent-soft:#3A2418; --ok:#5FD1A0; --ok-soft:#12392B; --warn:#E3B341;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0A1A20; --surface:#112830; --ink:#E4EEF0; --muted:#8CA5AD; --line:#244049;
+  --accent:#FF8A4C; --accent-soft:#3A2418; --ok:#5FD1A0; --ok-soft:#12392B; --warn:#E3B341;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--font-body);margin:0;
+  padding-block:32px 72px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:980px;margin:0 auto}
+h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;line-height:1.15}
+.eyebrow{font:500 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+header{display:grid;gap:14px;margin-bottom:28px}
+h1{font-size:clamp(30px,5vw,46px);font-weight:700;letter-spacing:-.01em}
+.lede{max-width:65ch;color:var(--muted);margin:0}
+.scale{display:flex;align-items:center;gap:10px;font:400 12px var(--font-mono);color:var(--muted)}
+.scale i{display:block;width:96px;height:8px;border:2px solid var(--ink);border-top:0;}
+.overall{display:grid;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px 18px;margin-bottom:28px}
+.overall-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.pct{font:700 30px var(--font-display);font-variant-numeric:tabular-nums}
+.bar{height:8px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar b{display:block;height:100%;background:var(--accent);transition:width .25s}
+.segs{display:flex;gap:3px}
+.segs span{flex:1;height:6px;background:var(--line);border-radius:1px}
+.segs span.done{background:var(--ok)} .segs span.wip{background:var(--accent)}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button{font:500 13px var(--font-mono);color:var(--ink);background:transparent;border:1px solid var(--line);border-radius:4px;padding:6px 10px;cursor:pointer}
+button:hover{border-color:var(--ink)}
+button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.spine{position:relative;display:grid;gap:0}
+.stage{display:grid;grid-template-columns:56px 1fr;column-gap:14px}
+.rail{position:relative;display:flex;flex-direction:column;align-items:center}
+.rail::after{content:"";flex:1;width:2px;background:var(--line);margin-top:4px}
+.stage:last-child .rail::after{display:none}
+.node{width:44px;height:44px;border-radius:50%;border:2px solid var(--line);background:var(--bg);display:grid;place-items:center;font:500 13px var(--font-mono);color:var(--muted);flex:none}
+.stage[data-status="wip"] .node{border-color:var(--accent);color:var(--accent)}
+.stage[data-status="done"] .node{background:var(--ok);border-color:var(--ok);color:var(--bg)}
+.flow{font:400 12px var(--font-mono);color:var(--muted);padding:2px 0 14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.flow em{font-style:normal;color:var(--accent)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;margin-bottom:6px}
+.card>summary{list-style:none;cursor:pointer;padding:14px 16px;display:grid;gap:6px}
+.card>summary::-webkit-details-marker{display:none}
+.sum-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+h2{font-size:21px;font-weight:700}
+.tag{font:500 11px var(--font-mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:3px;background:var(--line);color:var(--muted);white-space:nowrap}
+.stage[data-status="wip"] .tag{background:var(--accent-soft);color:var(--accent)}
+.stage[data-status="done"] .tag{background:var(--ok-soft);color:var(--ok)}
+.goal{margin:0;color:var(--muted);max-width:65ch}
+.count{font:400 12px var(--font-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.body{padding:0 16px 16px;display:grid;gap:16px;border-top:1px solid var(--line);padding-top:14px}
+.tasks{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.tasks label{display:grid;grid-template-columns:20px 1fr;gap:10px;cursor:pointer;align-items:start}
+.tasks input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent)}
+.tasks input:checked+span{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.meta h3{font:500 12px var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.meta p{margin:0;font-size:15px}
+.risk h3{color:var(--warn)}
+.gate{margin:6px 0 24px;display:grid;grid-template-columns:56px 1fr;column-gap:14px}
+.gate-box{border:2px dashed var(--accent);border-radius:6px;padding:14px 16px;background:var(--accent-soft)}
+.gate-box h2{font-size:18px;margin-bottom:4px}
+.gate-box p{margin:0 0 10px;max-width:65ch}
+.diamond{width:30px;height:30px;background:var(--accent);transform:rotate(45deg);margin:7px;flex:none}
+.rail.g::after{display:none}
+.optional .node{border-style:dashed}
+footer{margin-top:28px;color:var(--muted);font-size:14px;max-width:65ch}
+@media (max-width:520px){.stage,.gate{grid-template-columns:40px 1fr;column-gap:10px}.node{width:36px;height:36px;font-size:12px}}
+@media (prefers-reduced-motion:reduce){.bar b{transition:none}}
+</style>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Project MIPPR &middot; Microplastic image processing</div>
+  <h1>From photographed particle to standardized measurement</h1>
+  <p class="lede">Everything that has to happen for the pipeline to work, in order. Each stage lists its tasks, what goes in, what comes out, and what is most likely to go wrong. Check tasks off as you finish them; progress saves in this browser.</p>
+  <div class="scale" aria-label="Scale bar"><i></i><span>500 &micro;m, the lower size limit for hand-sorted particles</span></div>
+</header>
+
+<section class="overall" aria-label="Overall progress">
+  <div class="overall-top">
+    <div><div class="eyebrow">Overall</div><div class="pct" id="pct">0%</div></div>
+    <div class="count" id="overallCount"></div>
+  </div>
+  <div class="bar"><b id="barFill" style="width:0"></b></div>
+  <div class="segs" id="segs"></div>
+  <div class="controls">
+    <button id="expand" type="button">Expand all</button>
+    <button id="collapse" type="button">Collapse all</button>
+    <button id="hideDone" type="button" aria-pressed="false">Hide finished stages</button>
+    <button id="reset" type="button">Reset progress</button>
+  </div>
+</section>
+
+<div class="spine" id="spine"></div>
+
+<footer>Plan derived from the MIPPR project guidelines: replace subjective, hand-picked classification of particles larger than 500 &micro;m with a batch image-processing workflow that reports color, morphology and size the same way every time, then release it as an open-source web app if feasible.</footer>
+</div>
+
+<script>
+const STAGES=[
+{id:"scope",name:"Define scope and classes",goal:"Write down exactly what the pipeline decides, so every later step has a target.",
+ io:["Project guidelines","Class definitions + size rule"],
+ tasks:["Fix the size cutoff (particles larger than 500 µm) and which dimension it applies to: longest axis or equivalent diameter","List morphology classes (fragment, fiber, film, foam, pellet or bead) with a written visual rule and example photo for each","List color classes (for example black, white/clear, blue, red, green, yellow, other) with reference swatches","Decide how 'not plastic' particles are handled and what the output says when the model is unsure","Choose the output table columns and units (µm, µm²) before any code exists"],
+ inputs:"Lab sorting protocol, current hand-picking notes.",outputs:"A one-page classification spec every annotator and script follows.",
+ risk:"Hand-picking depends on who is looking. If the class rules stay vague, the labels and the model inherit that disagreement."},
+{id:"capture",name:"Standardize image capture",goal:"Make photos comparable across days, people and labs.",
+ io:["Physical samples","Calibrated image set"],
+ tasks:["Pick the imaging setup (stereo microscope or fixed camera) and lock height, zoom and lighting","Choose one background that separates every color class, including white and clear particles","Place a scale reference and a color reference card in every frame","Record pixels per µm for each setup and check it against a ruler image","Set file naming and metadata (sample ID, date, operator, setup) and a folder layout","Shoot a pilot batch of 50 to 100 particles covering every class"],
+ inputs:"Filtered, dried samples; microscope or camera.",outputs:"Images with a known scale and color reference, plus a metadata sheet.",
+ risk:"Glare, shadows and clear particles on a bright background hide edges. Fixing this at capture is cheaper than fixing it in code."},
+{id:"truth",name:"Build the labeled dataset",goal:"Create the ground truth that both trains and judges the pipeline.",
+ io:["Pilot images","Labeled masks + class tags"],
+ tasks:["Choose an annotation tool (CVAT, Label Studio or similar) and set it up with the class list","Outline particles and tag color and morphology on at least 300 particles","Have a second person label a 20% subset independently","Measure agreement between labelers (Cohen's kappa for classes, overlap for outlines)","Resolve disagreements and update the class spec from what you learn","Split into train, validation and test sets by sample, not by image"],
+ inputs:"Pilot images, class spec.",outputs:"Versioned dataset with a held-out test set and a measured human agreement ceiling.",
+ risk:"The model cannot beat the agreement between humans. Measure that number early so the accuracy target is realistic."},
+{id:"prep",name:"Preprocess images",goal:"Turn raw photos into consistent, calibrated images.",
+ io:["Raw images","Normalized images"],
+ tasks:["Correct uneven illumination with a flat-field or background image","Normalize white balance and color using the reference card","Convert to a standard color space (LAB) for color work","Read scale from metadata or detect the scale reference to get µm per pixel","Write unit tests on a few known images"],
+ inputs:"Raw images and metadata.",outputs:"Normalized images and a µm-per-pixel value for each.",
+ risk:"Color class accuracy depends on this step. A wrong white balance moves particles across color classes."},
+{id:"seg",name:"Segment particles",goal:"Find every particle and separate touching ones.",
+ io:["Normalized images","Particle masks"],
+ tasks:["Build a classical baseline (threshold, morphology, watershed) and score it on the validation set","Try a learned segmenter (Cellpose, SAM or a small U-Net) and compare against the baseline","Handle touching and overlapping particles, and thin fibers that break into pieces","Remove debris, dust and edge artifacts with area and shape rules","Write out an overlay image of outlines on the photo for every input"],
+ inputs:"Normalized images, labeled masks.",outputs:"One mask per particle and a QC overlay image.",
+ risk:"Fibers and clear particles are the usual failures. Look at failures by class, not only the average score."},
+{id:"measure",name:"Measure size and shape",goal:"Produce standardized numbers in µm.",
+ io:["Particle masks + scale","Measurement table"],
+ tasks:["Compute area, equivalent diameter, longest and shortest axis (Feret), and aspect ratio","Measure fiber length along the skeleton instead of the bounding box","Convert pixels to µm and µm² with the stored scale","Apply the 500 µm cutoff and flag particles within 10% of it for review","Compare automated sizes with manual caliper or image-tool measurements on 50 particles"],
+ inputs:"Masks, µm-per-pixel value.",outputs:"One row per particle with size and shape columns.",
+ risk:"A scale error shifts every particle across the 500 µm line, so check calibration before trusting counts."},
+{id:"classify",name:"Classify color and morphology",goal:"Replace the visual judgment call with a repeatable rule or model.",
+ io:["Masks + normalized image","Color and morphology labels"],
+ tasks:["Extract mean and dominant color per particle in LAB, ignoring edge pixels","Map color to classes with clustering or a small classifier trained on the labeled set","Classify morphology from shape features (aspect ratio, solidity, skeleton length) with a baseline model","Try a CNN on particle crops if the feature model falls short","Output a confidence score and send low-confidence particles to a review list","Decide how plastic versus non-plastic is flagged, and state plainly what the images cannot tell you (polymer type)"],
+ inputs:"Masks, images, labeled dataset.",outputs:"Color, morphology and confidence columns added to the table.",
+ risk:"Images alone cannot confirm a particle is plastic. Keep a human review path and say so in the output."},
+{id:"validate",name:"Validate against people",goal:"Show the pipeline is good enough to trust, with numbers.",
+ io:["Test set + pipeline output","Accuracy report"],
+ tasks:["Run the pipeline once on the held-out test set and do not tune on it","Report detection recall and precision, class confusion matrices, and size error in µm","Compare model-versus-human agreement with human-versus-human agreement","Count how many particles land in the review list","Time the manual workflow against the pipeline on the same batch","Run a small test on images from a second setup or lab"],
+ inputs:"Held-out test set, human agreement numbers from the dataset stage.",outputs:"A short report with a pass or fail against targets set at the start.",
+ risk:"A model that works only on the pilot setup is not a standardized method. The second-setup test shows whether it generalizes."},
+{id:"batch",name:"Batch run and outputs",goal:"Process a whole folder with one command and get tidy results.",
+ io:["Folder of images","CSV + QC overlays + summary"],
+ tasks:["Wrap the stages into one command that takes a folder and a settings file","Write per-particle CSV, per-sample summary counts, and QC overlays","Log versions, settings and scale used for every run so results can be reproduced","Handle bad inputs (missing scale, blurry image) with a clear message instead of a crash","Time it on 500 images and fix the slowest step","Write a README with install steps and a worked example"],
+ inputs:"Image folder, settings file.",outputs:"A command-line tool that others in the lab can run.",
+ risk:"If it is hard to install, nobody outside the project will use it."},
+{id:"gate",gate:true,name:"Decision point: build the web app?",
+ body:"Go only if validation met its targets, the batch tool runs for someone other than you, and there is a hosting and maintenance plan. Otherwise release the command-line tool and documentation as the finished project.",
+ tasks:["Validation targets met","A second person ran the batch tool without help","Hosting and upkeep plan agreed"]},
+{id:"web",optional:true,name:"Open-source web app",goal:"Let researchers and community scientists use the pipeline in a browser.",
+ io:["Uploaded images","Downloadable results"],
+ tasks:["Sketch the screens: upload, set scale, run, review, export","Wrap the pipeline in a service with a job queue for batches","Build the upload and progress screens, and a results table with overlays","Add a review screen where a person can correct a class or outline and the correction is saved","Support scale entry for users without a reference card, with clear guidance on how to take the photo","Export CSV and a PDF or HTML summary","Choose a license, add contribution notes and tests, and set up automated builds","Pick hosting, set upload size limits and a data retention policy","Pilot with two or three outside users and collect what confused them"],
+ inputs:"Batch tool, accuracy report.",outputs:"A hosted app and a public repository.",
+ risk:"Community photos will vary far more than lab photos. Plan for quality checks on upload and for retraining with corrected labels."},
+{id:"release",optional:true,name:"Document and release",goal:"Make the method citable and reusable.",
+ io:["Everything above","Public release"],
+ tasks:["Publish the labeled dataset or a sample, with a data card","Write the methods page: class definitions, calibration, accuracy and known limits","Tag version 1.0 with a changelog","Draft a short paper or report and share the repository with the lab group","Set a plan for who answers issues and retrains the model"],
+ inputs:"Validated pipeline, documentation.",outputs:"Tagged release and methods write-up.",
+ risk:"Without stated limits, users will over-trust the output."}
+];
+
+const KEY="mippr-pipeline-v1";
+let state={};try{state=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+let open={};let hideDone=false;
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
+const isOn=(s,i)=>!!state[s.id+":"+i];
+const counts=s=>{const n=s.tasks.length;let d=0;s.tasks.forEach((_,i)=>{if(isOn(s,i))d++});return{n,d}};
+const status=s=>{const{n,d}=counts(s);return d===0?"todo":d===n?"done":"wip"};
+const label={todo:"Not started",wip:"In progress",done:"Done"};
+const esc=t=>t.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const work=STAGES.filter(s=>!s.gate);
+
+function render(){
+  const spine=document.getElementById("spine");
+  let step=0,html="";
+  STAGES.forEach(s=>{
+    const st=status(s),{n,d}=counts(s);
+    if(hideDone&&st==="done")return;
+    const tasks=s.tasks.map((t,i)=>`<li><label><input type="checkbox" data-k="${s.id}:${i}" ${isOn(s,i)?"checked":""}><span>${esc(t)}</span></label></li>`).join("");
+    if(s.gate){
+      html+=`<div class="gate"><div class="rail g"><div class="diamond" aria-hidden="true"></div></div><div class="gate-box"><h2>${s.name}</h2><p>${esc(s.body)}</p><ul class="tasks">${tasks}</ul></div></div>`;
+      return;
+    }
+    step=work.indexOf(s)+1;
+    const flow=`<div class="flow"><span>${esc(s.io[0])}</span><em>&rarr;</em><span>${esc(s.io[1])}</span></div>`;
+    const isOpen=open[s.id]===undefined?(st==="wip"||s.id==="scope"):open[s.id];
+    html+=`<div class="stage ${s.optional?"optional":""}" data-status="${st}"><div class="rail"><div class="node">${st==="done"?"&#10003;":String(step).padStart(2,"0")}</div></div>
+    <div><details class="card" data-id="${s.id}" ${isOpen?"open":""}><summary><div class="sum-top"><h2>${s.name}</h2><span class="tag">${s.optional?"If feasible &middot; ":""}${label[st]}</span></div><p class="goal">${esc(s.goal)}</p><span class="count">${d} of ${n} tasks</span></summary>
+    <div class="body"><ul class="tasks">${tasks}</ul><div class="meta"><div><h3>In</h3><p>${esc(s.inputs)}</p></div><div><h3>Out</h3><p>${esc(s.outputs)}</p></div><div class="risk"><h3>Watch for</h3><p>${esc(s.risk)}</p></div></div></div></details>${flow}</div></div>`;
+  });
+  spine.innerHTML=html||'<p class="goal">All stages are finished. Use Reset progress to start over.</p>';
+  let tot=0,done=0;
+  STAGES.forEach(s=>{const c=counts(s);tot+=c.n;done+=c.d});
+  const p=tot?Math.round(done/tot*100):0;
+  document.getElementById("pct").textContent=p+"%";
+  document.getElementById("barFill").style.width=p+"%";
+  document.getElementById("overallCount").textContent=`${done} of ${tot} tasks, ${work.filter(s=>status(s)==="done").length} of ${work.length} stages`;
+  document.getElementById("segs").innerHTML=work.map(s=>`<span class="${status(s)==="todo"?"":status(s)}" title="${s.name}"></span>`).join("");
+}
+document.addEventListener("change",e=>{
+  const k=e.target.dataset&&e.target.dataset.k;if(!k)return;
+  if(e.target.checked)state[k]=1;else delete state[k];
+  save();
+  document.querySelectorAll("details.card").forEach(d=>{open[d.dataset.id]=d.open});
+  render();
+});
+document.addEventListener("toggle",e=>{if(e.target.dataset&&e.target.dataset.id)open[e.target.dataset.id]=e.target.open},true);
+const setAll=v=>{work.forEach(s=>open[s.id]=v);render()};
+document.getElementById("expand").onclick=()=>setAll(true);
+document.getElementById("collapse").onclick=()=>setAll(false);
+document.getElementById("hideDone").onclick=e=>{hideDone=!hideDone;e.currentTarget.setAttribute("aria-pressed",hideDone);render()};
+let armed=false;
+document.getElementById("reset").onclick=e=>{
+  if(!armed){armed=true;e.currentTarget.textContent="Click again to clear all";setTimeout(()=>{armed=false;e.currentTarget.textContent="Reset progress"},3000);return}
+  state={};save();armed=false;e.currentTarget.textContent="Reset progress";render();
+};
+render();
+</script>
