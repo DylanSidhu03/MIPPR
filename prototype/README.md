@@ -1,7 +1,7 @@
 # Segmentation and measurement prototype (Python)
 
 Prototype of pipeline stages 3 (segmentation) and 4 (measurement) from
-[docs/PROJECT_CONTEXT.md](../docs/PROJECT_CONTEXT.md), built on the lab's
+[CLAUDE.md](../CLAUDE.md), built on the lab's
 template-difference idea from
 [fragment_area](https://github.com/Moore-Institute-4-Plastic-Pollution-Res/fragment_area).
 It is here to settle the method before porting it to OpenCV.js for the v1

@@ -2,7 +2,7 @@
 
 What the pipeline measures and decides for every particle, and what the output looks like. Annotators, the prototype and the web app all follow this. Decisions were made on October 27, 2026 (issue #1). Items marked **provisional** may change once validation data exists.
 
-**Scope.** Particles that were hand-picked from the >500 µm fraction and photographed on the lab's 12 × 24 checkerboard. The app measures and visually classifies them. It does **not** test whether a particle is plastic or which polymer it is; that would need FTIR/Raman.
+**Scope.** Particles that were hand-picked from the >500 µm fraction and photographed on a standard background. Today that is the lab's 12 × 24 checkerboard; the v0.4 imaging plan adds printable white, black and checkerboard backgrounds with corner markers (see CLAUDE.md, stage 2). The app measures and visually classifies them. It does **not** test whether a particle is plastic or which polymer it is; that would need FTIR/Raman.
 
 ---
 
@@ -43,10 +43,10 @@ There are 13 classes: **clear, white, black, grey, blue, green, red, yellow, ora
 |---|---|
 | Clear vs white | Kept separate. **Clear:** the background shows through, so it looks different on black and white squares; on a black square it looks dark or grey. **White:** opaque, and looks white on either square. |
 | Multicolor | A second color covers **≥ 20%** of the particle's area |
-| Consistency between photos | A **color reference card in every frame**. The app corrects white balance from it before measuring color (the card itself is chosen in issue #2). |
-| How the app assigns color (v2) | Rule-based ranges in HSV/Lab, fitted to labelled particles photographed with the card. The prototype already outputs mean and SD of RGB, HSV and Lab for this. |
+| Consistency between photos | A **color reference in every frame**. The app corrects white balance from it before measuring color. The v0.4 printable backgrounds carry white and grey patches. Whether hue classes also need colored patches or a commercial card is decided in issue #2. |
+| How the app assigns color (v2) | Rule-based ranges in HSV/Lab, fitted to labelled particles photographed with the reference. The prototype already outputs mean and SD of RGB, HSV and Lab for this. |
 
-- **Swatches:** each class needs a reference swatch and its HSV/Lab range added here once the card is chosen.
+- **Swatches:** each class needs a reference swatch and its HSV/Lab range added here once the color reference is settled.
 
 ## 4. Review and "unsure"
 
@@ -57,7 +57,7 @@ Each particle gets `review` (yes/no) and `review_reason`, a semicolon-separated 
 | `near_size_cutoff` | `feret_max_um` is 450–550 µm | now |
 | `min_width_below_sieve` | `feret_min_um` < 500 µm | now |
 | `low_contrast_outline` | The particle barely differs from the background, as with pale or clear particles, so the outline may be incomplete. The rule is particle contrast < 100 on a 0–255 scale (provisional): on the sample, the pale A4 fragment scored 92 and every other particle 141 or more. | now |
-| `touches_gridline` | The outline crosses a printed square edge, where edges are least reliable | now |
+| `touches_gridline` | The outline crosses a printed square edge, where edges are least reliable (checkerboard background only) | now |
 | `touches_edge` | The particle touches the edge of the board or photo | now (these are currently left out as tape or frame) |
 | `possibly_merged` | Two or more touching particles may be detected as one. Solidity < 0.75 is a provisional rule. | now |
 | `low_class_confidence` | Color or morphology confidence is below a threshold | v2 / v3 |
@@ -90,7 +90,7 @@ An export contains:
 
 The statement goes in a separate file, not in the CSV, so the CSV opens cleanly in Excel, R and ImageJ.
 
-**Particle ID:** `{sample_id}-{well}-{n}`, for example `S042-A3-1`. `n` counts particles in the same well, in reading order.
+**Particle ID:** `{sample_id}-{well}-{n}`, for example `S042-A3-1`. `n` counts particles in the same well, in reading order. Wells exist only on the labelled checkerboard. On plain backgrounds, the well is left blank and the ID becomes `{sample_id}-{n}`.
 
 **CSV columns, in order:**
 
@@ -116,7 +116,7 @@ The statement goes in a separate file, not in the CSV, so the CSV opens cleanly 
 ## Still open
 
 - Example photos per morphology class (from the stage 2 pilot)
-- Color swatches and HSV/Lab ranges (once the color card is chosen in issue #2)
+- Color swatches and HSV/Lab ranges (once the color reference is settled in issue #2)
 - Measured size of a printed square, checked with a ruler
 - Headline perimeter method (section 5)
 - Validation tolerance against hand measurements (project open question 6)
