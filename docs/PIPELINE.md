@@ -4,7 +4,7 @@ Every action needed for the pipeline to work, in order. Check items off as they 
 
 Decisions and project context live in [CLAUDE.md](../CLAUDE.md) (spec v0.4); what the pipeline measures and outputs is in [CLASSIFICATION_SPEC.md](CLASSIFICATION_SPEC.md). Code so far is the Python prototype in [prototype/](../prototype/README.md), which works on the lab's checkerboard photos with an empty-board photo.
 
-*Last updated October 28, 2026.*
+*Last updated October 28, 2026.* After editing this file, run `python scripts/sync_plan.py` to refresh [pipeline-tracker.html](pipeline-tracker.html); `--issues DIR` also writes matching text for the GitHub issues.
 
 ## 1. Define scope and classes
 
