@@ -2,22 +2,24 @@
 
     python -m mippr.cli particle.jpg template.jpg --square-mm 10 --sample-id S042 --out results/
 
-Writes particles.csv (one row per particle, columns as in
-docs/CLASSIFICATION_SPEC.md), overlay.png (outlines and numbers on the
-rectified photo), run.json (settings and versions) and NOTE.txt to the output
-folder.
+Writes particles.csv (one row per particle) and summary.csv (one row per
+sample), both as defined in docs/OUTPUT_CSV.md, plus overlay.png (outlines and
+numbers on the rectified photo), run.json (settings and versions) and NOTE.txt
+to the output folder.
 """
 import argparse
 import csv
+import hashlib
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import cv2
 
 from . import __version__
 from .board import find_board
-from .export import COLUMNS, METADATA, NOTE, build_rows
+from .export import COLUMNS, METADATA, NOTE, SUMMARY_COLUMNS, build_rows, build_summary
 from .measure import measure
 from .segment import SegmentParams, segment
 
@@ -36,6 +38,12 @@ def draw_overlay(img, labels, rows):
     return out
 
 
+def image_id(path):
+    """File name plus a short hash of the file, so two photos with the same name stay distinct."""
+    digest = hashlib.sha1(Path(path).read_bytes()).hexdigest()[:8]
+    return f"{Path(path).stem}-{digest}"
+
+
 def run(particle_path, template_path, square_mm, out_dir, sample_id="sample", metadata=None,
         px_per_square=140, params=SegmentParams()):
     particle = cv2.imread(str(particle_path))
@@ -46,22 +54,24 @@ def run(particle_path, template_path, square_mm, out_dir, sample_id="sample", me
     rect_t = find_board(template, px_per_square).rectify(template)
     labels, diff = segment(rect_p, rect_t, px_per_square, params)
     um_per_px = square_mm * 1000 / px_per_square
-    measured = measure(labels, rect_p, um_per_px, px_per_square, diff, params.edge_fraction)
-    rows = build_rows(measured, sample_id, Path(particle_path).name, metadata or {}, __version__,
-                      square_mm, um_per_px)
+    measured = measure(labels, rect_p, um_per_px, px_per_square, diff, params.edge_fraction,
+                       params.edge_margin_px)
+    rows = build_rows(measured, sample_id, image_id(particle_path), metadata or {}, __version__,
+                      um_per_px / 1000, datetime.now(timezone.utc).isoformat(timespec="seconds"))
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
-    with open(out_dir / "particles.csv", "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=COLUMNS)
-        w.writeheader()
-        w.writerows(rows)
+    for name, cols, data in (("particles.csv", COLUMNS, rows), ("summary.csv", SUMMARY_COLUMNS, build_summary(rows))):
+        with open(out_dir / name, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=cols)
+            w.writeheader()
+            w.writerows(data)
     cv2.imwrite(str(out_dir / "overlay.png"), draw_overlay(rect_p, labels, measured))
     (out_dir / "NOTE.txt").write_text(NOTE + "\n")
     (out_dir / "run.json").write_text(json.dumps({
         "mippr_version": __version__, "particle": str(particle_path), "template": str(template_path),
         "sample_id": sample_id, **(metadata or {}),
-        "square_mm": square_mm, "px_per_square": px_per_square, "um_per_px": um_per_px,
+        "square_mm": square_mm, "px_per_square": px_per_square, "mm_per_px": um_per_px / 1000,
         "params": vars(params), "particles": len(rows), "note": NOTE}, indent=2))
     return rows
 
@@ -84,7 +94,7 @@ def main(argv=None):
                    {k: getattr(a, k) for k in METADATA}, a.px_per_square)
     except ValueError as e:
         sys.exit(f"error: {e}")
-    flagged = sum(r["review"] == "yes" for r in rows)
+    flagged = sum(bool(r["review_reason"]) for r in rows)
     print(f"{len(rows)} particles ({flagged} flagged for review) -> {a.out}/particles.csv, {a.out}/overlay.png")
 
 

@@ -10,7 +10,7 @@
   "site": "",
   "square_mm": 10.0,
   "px_per_square": 140,
-  "um_per_px": 71.42857142857143,
+  "mm_per_px": 0.07142857142857142,
   "params": {
     "blur_sigma": 1.0,
     "high": 60.0,
@@ -18,6 +18,7 @@
     "min_area_px": 9,
     "grid_band_px": 2,
     "edge_margin_px": 3,
+    "drop_edge": false,
     "edge_fraction": 0.5
   },
   "particles": 24,

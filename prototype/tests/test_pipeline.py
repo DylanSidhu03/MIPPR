@@ -34,6 +34,7 @@ PARTICLES = [
     ("circle", (7.5, 10.5), 9, (230, 230, 230)),  # white disc
     ("rect", (5.5, 18.5), (30, 8), (60, 160, 60)),  # green elongated rectangle
     ("circle", (9.5, 6.0), 10, (200, 120, 40)),  # blue disc straddling a gridline
+    ("circle", (0.05, 15.5), 11, (60, 200, 230)),  # yellow disc cut off by the board's left edge
 ]
 
 
@@ -141,29 +142,57 @@ def test_imagej_perimeter_matches_imagej():
     assert perimeter_imagej(rect) == pytest.approx(12 - 4 * (2 - math.sqrt(2)))  # every corner is cut when sides > 1 px
 
 
+def test_edge_particle_is_kept_and_flagged(scene):
+    _, _, rows = scene
+    from mippr.export import flags
+    row = nearest(rows, *PARTICLES[4][1])
+    assert row["_touches_edge"]
+    assert flags(row)["flag_edge"] is True
+    assert sum(r["_touches_edge"] for r in rows) == 1
+
+
 def _m(**kw):
     base = dict(particle=1, well="A1", x_um=0.0, y_um=0.0, feret_max_um=2000.0, feret_min_um=1500.0,
-                solidity=0.95, _contrast=200.0, _touches_gridline=False)
+                area_um2=3e6, perimeter_um=7000.0, ced_um=1950.0, convex_area_um2=3.1e6,
+                convex_perimeter_um=6900.0, aspect_ratio=1.33, circularity=0.8, solidity=0.95,
+                perimeter_imagej_um=7100.0, circularity_imagej=0.78,
+                R_mean=200.0, G_mean=40.0, B_mean=40.0, L_mean=45.0, a_mean=60.0, b_mean=40.0,
+                L_sd=3.0, a_sd=2.0, b_sd=2.0,
+                _contrast=200.0, _touches_edge=False, _px={"cx": 10.0, "cy": 20.0, "x": 5, "y": 15, "w": 10, "h": 10})
     base.update(kw)
     return base
 
 
-def test_review_reasons():
-    from mippr.export import review_reasons
-    assert review_reasons(_m()) == []
-    assert review_reasons(_m(feret_max_um=520, feret_min_um=400)) == ["near_size_cutoff", "min_width_below_sieve"]
-    assert review_reasons(_m(_contrast=90)) == ["low_contrast_outline"]
-    assert review_reasons(_m(_touches_gridline=True, solidity=0.6)) == ["touches_gridline", "possibly_merged"]
+def test_flags():
+    from mippr.export import flags
+    on = lambda m, med=None: sorted(k for k, v in flags(m, med).items() if v is True)  # noqa: E731
+    assert on(_m()) == []
+    assert on(_m(feret_max_um=520, feret_min_um=400)) == ["flag_min_width", "flag_near_cutoff"]
+    assert on(_m(_contrast=90)) == ["flag_low_contrast"]
+    assert on(_m(solidity=0.6)) == ["flag_merged"]
+    assert on(_m(area_um2=10e6), med=3.0) == ["flag_merged"]  # more than 3x the image's median area
+    assert on(_m(_touches_edge=True)) == ["flag_edge"]
+    assert flags(_m())["flag_low_confidence"] == ""  # not available before colour rules / the model
 
 
-def test_export_rows_follow_spec():
-    from mippr.export import COLUMNS, build_rows
-    rows = build_rows([_m(particle=1, well="A3", y_um=10), _m(particle=2, well="A3", y_um=5),
-                       _m(particle=3, well="B1", feret_min_um=300)],
-                      "S042", "photo.jpg", {"operator": "DS"}, "0.1.0", 10.0, 71.4)
+def test_rows_and_summary_follow_output_csv():
+    from mippr.export import COLUMNS, SUMMARY_COLUMNS, build_rows, build_summary
+    ms = [_m(particle=1), _m(particle=2, feret_max_um=6000.0), _m(particle=3, feret_min_um=300.0)]
+    rows = build_rows(ms, "S042", "photo-1a2b3c4d", {"operator": "DS"}, "0.1.0", 0.0714, "2026-11-02T00:00:00+00:00")
     assert all(list(r) == COLUMNS for r in rows)
-    ids = {r["particle_number"]: r["particle_id"] for r in rows}
-    assert ids == {2: "S042-A3-1", 1: "S042-A3-2", 3: "S042-B1-1"}  # numbered top to bottom within a well
-    flagged = {r["particle_id"]: (r["review"], r["review_reason"]) for r in rows}
-    assert flagged["S042-B1-1"] == ("yes", "min_width_below_sieve")
-    assert rows[0]["operator"] == "DS" and rows[0]["polymer_confirmed"] == "" and rows[0]["color_class"] == ""
+    r = rows[0]
+    assert (r["particle_id"], r["image_id"], r["length_mm"], r["area_mm2"]) == (1, "photo-1a2b3c4d", 2.0, 3.0)
+    assert r["size_class"] == "2-5" and rows[1]["size_class"] == ">5"
+    assert r["color_hex"] == "#c82828"
+    assert r["review_status"] == "auto" and r["outline_edited"] is False and r["operator"] == "DS"
+    assert rows[2]["review_reason"] == "min_width"
+    assert r["polymer_confirmed"] == "" and r["color_label"] == "" and r["morphology_label"] == ""
+
+    rows[1]["review_status"] = "rejected"
+    rows[2]["review_status"] = "corrected"
+    (s,) = build_summary(rows)
+    assert list(s) == SUMMARY_COLUMNS
+    assert s["n_particles"] == 2 and s["count_size_>5"] == 0  # the rejected row is left out
+    assert s["n_reviewed"] == 2 and s["n_corrected"] == 1 and s["pct_human_confirmed"] == 50.0
+    assert s["n_flag_min_width"] == 1
+    assert s["count_fragment"] == "" and s["count_color_red"] == ""  # no labels yet, so no counts

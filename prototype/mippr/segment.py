@@ -20,7 +20,8 @@ class SegmentParams:
     low: float = 25.0  # difference that may extend a particle found with `high`
     min_area_px: int = 9  # drop specks smaller than this (about 3 x 3 px)
     grid_band_px: int = 2  # half-width of the strip along each gridline treated with suspicion
-    edge_margin_px: int = 3  # drop blobs touching the board edge (frame, tape, shadows)
+    edge_margin_px: int = 3  # blobs this close to the board edge get flag_edge (see measure.py)
+    drop_edge: bool = False  # True drops them instead of flagging (the behaviour before Output CSV draft 1)
     edge_fraction: float = 0.5  # edge sits where the difference falls to this share of the particle's contrast
 
 
@@ -163,6 +164,10 @@ def segment(particle, template, px_per_square, params=SegmentParams()):
     """Return (labels, diff): an int32 label image (0 = background) and the difference map."""
     diff = difference(particle, template, px_per_square, params.blur_sigma)
     band = grid_band(diff.shape, px_per_square, params.grid_band_px)
+    # The printed frame around the board leaves the same kind of sliver as the
+    # gridlines, so a strip along the outer edge gets the same treatment.
+    e = params.edge_margin_px + params.grid_band_px
+    band[:e, :] = band[-e:, :] = band[:, :e] = band[:, -e:] = True
     mask = _fill_holes(_hysteresis(diff, params.low, params.high, band))
     if params.edge_fraction:
         mask = _refine_edges(mask, diff, params.edge_fraction)
@@ -175,7 +180,7 @@ def segment(particle, template, px_per_square, params=SegmentParams()):
         x, y, bw, bh, area = stats[lbl]
         if area < params.min_area_px:
             continue
-        if x < e or y < e or x + bw > w - e or y + bh > h - e:
+        if params.drop_edge and (x < e or y < e or x + bw > w - e or y + bh > h - e):
             continue
         k += 1
         out[labels == lbl] = k

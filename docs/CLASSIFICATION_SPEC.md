@@ -1,6 +1,6 @@
-# Classification spec (v0.1)
+# Classification spec (v0.2)
 
-What the pipeline measures and decides for every particle, and what the output looks like. Annotators, the prototype and the web app all follow this. Decisions were made on October 27, 2026 (issue #1). Items marked **provisional** may change once validation data exists.
+What the pipeline measures and decides for every particle, and what the output looks like. Annotators, the prototype and the web app all follow this. Decisions were made on October 27, 2026 (issue #1). Items marked **provisional** may change once validation data exists. v0.2 (November 2, 2026) merges in the team's Output CSV draft. Units are now mm, and the full column list lives in [OUTPUT_CSV.md](OUTPUT_CSV.md).
 
 **Scope.** Particles that were hand-picked from the >500 µm fraction and photographed on a standard background. Today that is the lab's 12 × 24 checkerboard; the v0.4 imaging plan adds printable white, black and checkerboard backgrounds with corner markers (see CLAUDE.md, stage 2). The app measures and visually classifies them. It does **not** test whether a particle is plastic or which polymer it is; that would need FTIR/Raman.
 
@@ -10,12 +10,13 @@ What the pipeline measures and decides for every particle, and what the output l
 
 | Rule | Decision |
 |---|---|
-| Main size | **Longest length (max Feret)**, `feret_max_um`. Used in summaries and size classes. |
-| Also reported | Minimum width (`feret_min_um`) and circular equivalent diameter (`ced_um`) |
+| Main size | **Longest length (max Feret)**, `length_mm`. Used in summaries and size classes. |
+| Also reported | Minimum width (`width_mm`) and circular equivalent diameter (`ced_mm`) |
 | Size cut | Done by the 500 µm sieve. The app does not drop particles by size, it flags them. |
-| Flag: may have passed the sieve | `feret_min_um < 500` → review reason `min_width_below_sieve` |
-| Flag: near the cutoff | `feret_max_um` between 450 and 550 µm (±10%) → review reason `near_size_cutoff` |
-| Units | µm for lengths and µm² for areas, everywhere |
+| Flag: may have passed the sieve | `width_mm < 0.5` → `flag_min_width` |
+| Flag: near the cutoff | `length_mm` between 0.45 and 0.55 (±10%) → `flag_near_cutoff` |
+| Size classes | `length_mm` in bins `<0.5`, `0.5-1`, `1-2`, `2-5`, `>5` (`>5` = above the usual 5 mm microplastic limit) |
+| Units | mm for lengths and mm² for areas, everywhere (changed from µm in v0.2) |
 
 At the current photo resolution (about 75 µm per pixel), ±10% is about ±1 pixel, which is roughly the measurement uncertainty.
 
@@ -44,23 +45,25 @@ There are 13 classes: **clear, white, black, grey, blue, green, red, yellow, ora
 | Clear vs white | Kept separate. **Clear:** the background shows through, so it looks different on black and white squares; on a black square it looks dark or grey. **White:** opaque, and looks white on either square. |
 | Multicolor | A second color covers **≥ 20%** of the particle's area |
 | Consistency between photos | A **color reference in every frame**. The app corrects white balance from it before measuring color. The v0.4 printable backgrounds carry white and grey patches. Whether hue classes also need colored patches or a commercial card is decided in issue #2. |
-| How the app assigns color (v2) | Rule-based ranges in HSV/Lab, fitted to labelled particles photographed with the reference. The prototype already outputs mean and SD of RGB, HSV and Lab for this. |
+| How the app assigns color (v2) | Rule-based ranges in Lab (HSV can be derived from it), fitted to labelled particles photographed with the reference. The output has mean and SD of Lab and a hex code for this. |
 
 - **Swatches:** each class needs a reference swatch and its HSV/Lab range added here once the color reference is settled.
 
 ## 4. Review and "unsure"
 
-Each particle gets `review` (yes/no) and `review_reason`, a semicolon-separated list:
+Each flag is its own True/False column. `review_reason` lists the ones that are True, e.g. `edge;min_width`.
 
-| Reason | When | Available |
+| Flag | When | Available |
 |---|---|---|
-| `near_size_cutoff` | `feret_max_um` is 450–550 µm | now |
-| `min_width_below_sieve` | `feret_min_um` < 500 µm | now |
-| `low_contrast_outline` | The particle barely differs from the background, as with pale or clear particles, so the outline may be incomplete. The rule is particle contrast < 100 on a 0–255 scale (provisional): on the sample, the pale A4 fragment scored 92 and every other particle 141 or more. | now |
-| `touches_gridline` | The outline crosses a printed square edge, where edges are least reliable (checkerboard background only) | now |
-| `touches_edge` | The particle touches the edge of the board or photo | now (these are currently left out as tape or frame) |
-| `possibly_merged` | Two or more touching particles may be detected as one. Solidity < 0.75 is a provisional rule. | now |
-| `low_class_confidence` | Color or morphology confidence is below a threshold | v2 / v3 |
+| `flag_near_cutoff` | `length_mm` is 0.45–0.55 | now |
+| `flag_min_width` | `width_mm` < 0.5 | now |
+| `flag_low_contrast` | The particle barely differs from the background, as with pale or clear particles, so the outline may be incomplete. The rule is particle contrast < 100 on a 0–255 scale (provisional): on the sample, the pale A4 fragment scored 92 and every other particle 141 or more. | now |
+| `flag_edge` | The particle touches the edge of the particle zone or photo. It is kept and flagged, not dropped (changed in v0.2). | now |
+| `flag_merged` | Two or more touching particles may be detected as one: solidity < 0.75, or area > 3 × the image's median (both provisional) | now |
+| `flag_scale` | Markers missing, or the user corrected the scale | now |
+| `flag_low_confidence` | Color or morphology confidence is below a threshold, still to be decided | v2 / v3 |
+
+A reviewer sets `review_status` (`auto`, `confirmed`, `corrected`, `rejected`). Corrections keep the original prediction, and rejected rows are left out of the summary but kept for training (see OUTPUT_CSV.md section 4.9).
 
 - Users reject false detections (dust, hair, paper) on the review screen.
 - **Every export** includes this statement: *"Visual classification only. Whether a particle is plastic, and its polymer type, were not tested."*
@@ -72,8 +75,8 @@ Circularity = 4π × area / perimeter². Perimeter can be measured several ways,
 
 | Method | Perimeter error, worst case | Change with rotation | vs the lab's old ImageJ numbers |
 |---|---|---|---|
-| **Sub-pixel outline** (`perimeter_um`, `circularity`) | −9% | under 1.2% | circularity ~0.08–0.10 higher |
-| **ImageJ method** (`perimeter_imagej_um`, `circularity_imagej`) | −13% | 7–9% | matches (same calculation) |
+| **Sub-pixel outline** (`perimeter_mm`, `circularity`) | −9% | under 1.2% | circularity ~0.08–0.10 higher |
+| **ImageJ method** (`perimeter_imagej_mm`, `circularity_imagej`) | −13% | 7–9% | matches (same calculation) |
 | Pixel-centre contour (old prototype) | −20% | 7–9% | — |
 | Pixel-edge length, scikit-image weighted | +33 to +38% | 20–37% | — |
 
@@ -82,36 +85,14 @@ Circularity = 4π × area / perimeter². Perimeter can be measured several ways,
 
 ## 6. Output
 
-An export contains:
-- `particles.csv`: one row per particle
-- `overlay.png`: the photo with each particle outlined and numbered
-- `run.json`: settings, scale and versions
-- `NOTE.txt`: the statement in section 4
+The export files and every column are defined in **[OUTPUT_CSV.md](OUTPUT_CSV.md)**:
+- `particles.csv`, one row per particle
+- `summary.csv`, one row per sample
+- `overlay.png`, `run.json` and `NOTE.txt`
 
-The statement goes in a separate file, not in the CSV, so the CSV opens cleanly in Excel, R and ImageJ.
+The no-plastic statement goes in `NOTE.txt`, not in the CSV, so the CSV opens cleanly in Excel, R and ImageJ.
 
-**Particle ID:** `{sample_id}-{well}-{n}`, for example `S042-A3-1`. `n` counts particles in the same well, in reading order. Wells exist only on the labelled checkerboard. On plain backgrounds, the well is left blank and the ID becomes `{sample_id}-{n}`.
-
-**CSV columns, in order:**
-
-| Group | Columns |
-|---|---|
-| Identity | `particle_id`, `sample_id`, `image_file`, `well`, `particle_number` (number shown on the overlay), `x_um`, `y_um` |
-| Sample details | `date`, `operator`, `lab`, `setup`, `site` |
-| Size (µm, µm²) | `feret_max_um`, `feret_min_um`, `feret_angle_deg`, `ced_um`, `area_um2`, `perimeter_um`, `convex_area_um2`, `convex_perimeter_um` |
-| Bounding boxes (µm) | `bbox_width_um`, `bbox_height_um`, `min_rect_length_um`, `min_rect_width_um` |
-| Shape (unitless) | `aspect_ratio` (Feret max / min), `circularity`, `solidity` |
-| ImageJ-compatible | `perimeter_imagej_um`, `circularity_imagej` |
-| Color | `R_mean`, `R_sd`, `G_mean`, `G_sd`, `B_mean`, `B_sd`, `H_mean`, `H_sd`, `S_mean`, `S_sd`, `V_mean`, `V_sd`, `L_mean`, `L_sd`, `a_mean`, `a_sd`, `b_mean`, `b_sd`, `color_px` |
-| Classes (blank until v2/v3) | `color_class`, `color_confidence`, `morphology_class`, `morphology_confidence` |
-| Review | `review`, `review_reason`, `corrected_by` |
-| Lab results (blank) | `polymer_confirmed`, `polymer_method` |
-| Reproducibility | `app_version`, `model_version`, `square_mm`, `um_per_px`, `area_px` |
-
-**Notes on the color columns:**
-- Hue is 0–360°, averaged as an angle. Saturation and value are 0–255.
-- L\* is 0–100, and a\* and b\* are in CIE units.
-- Color is taken from the particle's interior, with one edge pixel removed, so the background doesn't mix in.
+**Particle identity** (changed in v0.2): `sample_id` + `image_id` + `particle_id`, where `particle_id` is the number drawn on the overlay. `well` (A1–L12) is filled on the labelled checkerboard only.
 
 ## Still open
 
@@ -120,3 +101,4 @@ The statement goes in a separate file, not in the CSV, so the CSV opens cleanly 
 - Measured size of a printed square, checked with a ruler
 - Headline perimeter method (section 5)
 - Validation tolerance against hand measurements (project open question 6)
+- Confidence threshold for `flag_low_confidence` (from v2/v3 data)

@@ -44,6 +44,10 @@ def main():
     root = Path(a.fragment_area)
     ij = pd.read_csv(root / "results" / "area_results.csv")
     mp = pd.read_csv(a.mippr_csv)
+    # particles.csv (docs/OUTPUT_CSV.md) is in mm; the comparison below works in um.
+    mp = mp.assign(particle_number=mp.particle_id, x_um=mp.centroid_x_mm * 1e3, y_um=mp.centroid_y_mm * 1e3,
+                   area_um2=mp.area_mm2 * 1e6, feret_max_um=mp.length_mm * 1e3, feret_min_um=mp.width_mm * 1e3,
+                   perimeter_um=mp.perimeter_mm * 1e3, perimeter_imagej_um=mp.perimeter_imagej_mm * 1e3)
     ox, oy = crop_offset(cv2.imread(str(root / "template.jpg")))
     board = find_board(cv2.imread(str(root / "particle.jpg")), a.px_per_square)
     pts = np.stack([ij.X / IMAGEJ_UM_PER_PX + ox, ij.Y / IMAGEJ_UM_PER_PX + oy], axis=1)

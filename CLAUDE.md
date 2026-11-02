@@ -4,7 +4,7 @@ Moore Institute for Plastic Pollution Research (MIPPR) and USF practicum project
 Living spec (planning page, kept up to date in chat): https://claude.ai/artifact/21V9QiiwUaRm454CdPMypP
 Spec version at time of writing: 0.4 (October 28, 2026)
 
-In this repository: the classification spec is [docs/CLASSIFICATION_SPEC.md](docs/CLASSIFICATION_SPEC.md) (issue #1), and the Python prototype of segmentation and measurement is in [prototype/](prototype/README.md). This file supersedes the stage list in [docs/PIPELINE.md](docs/PIPELINE.md) where they differ.
+In this repository: the classification spec is [docs/CLASSIFICATION_SPEC.md](docs/CLASSIFICATION_SPEC.md) (issue #1), the export columns are defined in [docs/OUTPUT_CSV.md](docs/OUTPUT_CSV.md), and the Python prototype of segmentation and measurement is in [prototype/](prototype/README.md). This file supersedes the stage list in [docs/PIPELINE.md](docs/PIPELINE.md) where they differ.
 
 ## The problem
 
@@ -74,7 +74,7 @@ roiManager("Show All without labels");
      - hysteresis thresholding
      - half-maximum edge placement
    - Not yet handled: touching particles, clear films, blur/darkness checks, and plain backgrounds with markers.
-4. **Measurement**: DECIDED (prototyped). Deterministic geometry from masks, not a learned model, for exact reproducibility. Size/shape: area, perimeter, max length (Feret), min width, circular equivalent diameter, bounding box, aspect ratio, circularity, solidity, convex area/perimeter. Color values: mean and spread of RGB, HSV, Lab within the mask. Convert pixels to real units using the scale reference. Output: one row per particle, with columns as in [docs/CLASSIFICATION_SPEC.md](docs/CLASSIFICATION_SPEC.md).
+4. **Measurement**: DECIDED (prototyped). Deterministic geometry from masks, not a learned model, for exact reproducibility. Size/shape: area, perimeter, max length (Feret), min width, circular equivalent diameter, bounding box, aspect ratio, circularity, solidity, convex area/perimeter. Color values: mean and spread of Lab within the mask, plus a hex code. Convert pixels to real units (mm) using the scale reference. Output: `particles.csv` with one row per particle, and `summary.csv` with one row per sample, as defined in [docs/OUTPUT_CSV.md](docs/OUTPUT_CSV.md).
    - Perimeter and circularity use a sub-pixel outline, which was the most accurate method on known shapes. ImageJ-compatible columns are kept alongside. The choice of headline number is provisional.
 5. **Classification**: PROPOSED.
    - Color: likely rule-based binning of HSV/Lab into defined categories (deterministic, explainable).
@@ -98,11 +98,21 @@ roiManager("Show All without labels");
 - The deliverable is a usable web app, released in stages: measurement first, ML later.
 - The website generates printable white, black and checkerboard backgrounds with corner markers and a 100 mm scale check.
 - Classification spec v0.1 (issue #1, October 27, 2026; details in [docs/CLASSIFICATION_SPEC.md](docs/CLASSIFICATION_SPEC.md)):
-  - **Size:** the main size is longest length (max Feret), in µm and µm². Particles are flagged for review if their min width is under 500 µm or their longest length is 450–550 µm.
+  - **Size:** the main size is longest length (max Feret). Particles are flagged for review if their min width is under 0.5 mm or their longest length is 0.45–0.55 mm.
   - **Morphology:** fragment, fiber (length:width ≥ 3:1), film, foam, pellet/bead, plus other/unsure. Texture is not recorded for now.
   - **Color:** 13 classes (clear, white, black, grey, blue, green, red, yellow, orange, brown, pink, purple, multicolor). Clear and white are kept separate by a rule; multicolor means a second color covers ≥ 20%. A color reference goes in every frame.
-  - **Review:** `review` and `review_reason` flags. Every export says that whether a particle is plastic, and its polymer type, were not tested. `polymer_confirmed` columns are left for the lab to fill in.
-  - **Output:** particle ID `{sample}-{well}-{n}`, plus sample ID, image file, date, operator, lab, setup and site on every row. Each export is a CSV and an overlay image.
+  - **Review:** flags for review (see the Output CSV entry below). Every export says that whether a particle is plastic, and its polymer type, were not tested. `polymer_confirmed` columns are left for the lab to fill in.
+  - **Output:** sample details (date, operator, lab, setup, site) on every row.
+- Output CSV merged with the team's data dictionary draft (November 2, 2026; [docs/OUTPUT_CSV.md](docs/OUTPUT_CSV.md)):
+  - **Units and names:** mm and mm², with plain names (`length_mm`, `width_mm`, `area_mm2`, ...).
+  - **Files:** two CSVs, per particle and per sample.
+  - **Identity:** `image_id` + per-image `particle_id`, with `well` on the checkerboard only.
+  - **Flags:** True/False columns (edge, merged, low confidence, scale, near cutoff, min width, low contrast) plus a `review_reason` list.
+  - **Edge particles** are kept and flagged, not dropped.
+  - **Review columns:** `review_status` (auto/confirmed/corrected/rejected), original labels, outline edits, reviewer and role. Rejected rows stay in the particle file for training and are left out of the summary.
+  - **Size classes:** `<0.5`, `0.5-1`, `1-2`, `2-5`, `>5` mm.
+  - **No "likely plastic" column.**
+  - **Still to decide:** the confidence threshold for `flag_low_confidence`.
 - Everything is free to use and free to run (no paid servers or services). Ease of building/maintaining is secondary to zero cost.
 
 ## Free technical stack (decided)

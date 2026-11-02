@@ -208,7 +208,7 @@ def _color_stats(img_bgr, mask):
     return out
 
 
-def measure(labels, img_bgr, um_per_px, px_per_square, diff=None, edge_fraction=0.5):
+def measure(labels, img_bgr, um_per_px, px_per_square, diff=None, edge_fraction=0.5, edge_margin_px=3):
     """One dict per particle with geometry in um / um^2 and colour statistics.
 
     Pass the difference map from segment() so perimeters follow the sub-pixel edge.
@@ -263,5 +263,9 @@ def measure(labels, img_bgr, um_per_px, px_per_square, diff=None, edge_fraction=
         # Used for review flags (export.py), not written to the CSV.
         row["_contrast"] = level / edge_fraction if level is not None else float("nan")
         row["_touches_gridline"] = bool((mask & on_line).any())
+        h, w = labels.shape
+        e = edge_margin_px
+        row["_touches_edge"] = bool(x0 < e or y0 < e or x1 >= w - e or y1 >= h - e)
+        row["_px"] = {"cx": cx, "cy": cy, "x": int(x0), "y": int(y0), "w": int(x1 - x0 + 1), "h": int(y1 - y0 + 1)}
         rows.append(row)
     return rows

@@ -20,8 +20,11 @@ cd prototype
 You need two photos of the 12 × 24 checkerboard: one with particles, one
 empty. The output folder gets:
 
-- `particles.csv`: one row per particle, with the columns and review flags
-  defined in [docs/CLASSIFICATION_SPEC.md](../docs/CLASSIFICATION_SPEC.md)
+- `particles.csv`: one row per particle, in mm, with the columns and flags
+  defined in [docs/OUTPUT_CSV.md](../docs/OUTPUT_CSV.md)
+- `summary.csv`: one row per sample (counts by size class, length
+  distribution, review and flag counts; the morphology and color counts fill
+  in once labels exist)
 - `overlay.png`: numbered outlines on the photo
 - `run.json`: settings, scale and version, so a run can be reproduced
 - `NOTE.txt`: the statement that classification is visual only
@@ -59,13 +62,16 @@ every length scales with this number, and areas scale with its square.
    - perimeter, from a sub-pixel outline (the most accurate method in
      `scripts/perimeter_study.py`), plus an ImageJ-compatible perimeter and
      circularity
-   - max and min Feret, and the Feret angle
-   - circular equivalent diameter
-   - bounding box and minimum-area rectangle
+   - length and width (max and min Feret)
+   - circular equivalent diameter and size class
+   - centroid and bounding box (pixels), centroid in mm
    - aspect ratio, circularity and solidity
-   - mean and SD of RGB, HSV (hue averaged as an angle) and CIE Lab, from the
-     mask's interior
+   - mean and SD of CIE Lab from the mask's interior, plus a hex code
    - the well label (A–L, 1–12) as printed on the board
+6. **Export** (`export.py`). Converts to mm and sets the flags (edge,
+   merged, near cutoff, min width, low contrast, scale). Writes `particles.csv`
+   and `summary.csv` as defined in `docs/OUTPUT_CSV.md`, with review and
+   provenance columns ready for the review screen.
 
 ## Results on the lab's sample photo
 
@@ -88,7 +94,7 @@ Files are in `results/fragment_area_sample/`. The comparison uses
   The large area differences are particles where ImageJ's threshold missed part
   of the particle. The clearest case is the pale lavender fragment in A4,
   where ImageJ found 0.34 mm². MIPPR now covers almost all of it, and flags it
-  `low_contrast_outline`.
+  `flag_low_contrast`.
 - **Sub-pixel circularity** reads about 0.08–0.10 higher than ImageJ, because
   ImageJ's pixel-staircase outline makes particles look less round. On shapes
   with a known answer the sub-pixel method is the most accurate

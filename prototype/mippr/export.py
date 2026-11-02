@@ -1,69 +1,164 @@
-"""Turn measurements into the output rows defined in docs/CLASSIFICATION_SPEC.md."""
-from collections import defaultdict
+"""Turn measurements into the output files defined in docs/OUTPUT_CSV.md.
+
+Two files: particles.csv (one row per particle) and summary.csv (one row
+per sample, calculated only from particles.csv). Columns that a release
+doesn't fill yet are left empty, so files from different versions combine.
+"""
+import statistics
+from collections import Counter
 
 NOTE = "Visual classification only. Whether a particle is plastic, and its polymer type, were not tested."
 
-# Review thresholds (spec section 1 and 4).
-SIEVE_UM = 500.0
+# Flag thresholds (docs/OUTPUT_CSV.md section 7).
+SIEVE_MM = 0.5
 NEAR_CUTOFF = 0.10  # +-10% around the sieve size
 LOW_CONTRAST = 100.0  # provisional; on the sample the pale A4 fragment is 92, all others >= 141
 MERGED_SOLIDITY = 0.75  # provisional
+MERGED_AREA_X_MEDIAN = 3.0  # provisional; area this many times the image's median area
+MERGED_MIN_PARTICLES = 3  # the area rule needs a median to compare against
 
+SIZE_BINS = [(0.0, 0.5, "<0.5"), (0.5, 1.0, "0.5-1"), (1.0, 2.0, "1-2"), (2.0, 5.0, "2-5"), (5.0, float("inf"), ">5")]
+MORPHOLOGY = ["fragment", "fiber", "film", "foam", "pellet", "other"]
+COLORS = ["clear", "white", "black", "grey", "blue", "green", "red", "yellow", "orange", "brown", "pink",
+          "purple", "multicolor"]
+FLAGS = ["flag_edge", "flag_merged", "flag_low_confidence", "flag_scale",
+         "flag_near_cutoff", "flag_min_width", "flag_low_contrast"]
 METADATA = ("date", "operator", "lab", "setup", "site")
 
 COLUMNS = [
-    "particle_id", "sample_id", "image_file", "well", "particle_number", "x_um", "y_um",
-    *METADATA,
-    "feret_max_um", "feret_min_um", "feret_angle_deg", "ced_um", "area_um2", "perimeter_um",
-    "convex_area_um2", "convex_perimeter_um",
-    "bbox_width_um", "bbox_height_um", "min_rect_length_um", "min_rect_width_um",
+    # Identifiers and sample details
+    "sample_id", "image_id", "particle_id", "well", *METADATA,
+    # Location
+    "centroid_x_px", "centroid_y_px", "bbox_x_px", "bbox_y_px", "bbox_w_px", "bbox_h_px",
+    "centroid_x_mm", "centroid_y_mm",
+    # Size (mm)
+    "length_mm", "width_mm", "area_mm2", "perimeter_mm", "ced_mm", "size_class",
+    "convex_area_mm2", "convex_perimeter_mm",
+    # Shape
     "aspect_ratio", "circularity", "solidity",
-    "perimeter_imagej_um", "circularity_imagej",
-    *[f"{c}_{s}" for c in "RGBHSVLab" for s in ("mean", "sd")], "color_px",
-    "color_class", "color_confidence", "morphology_class", "morphology_confidence",
-    "review", "review_reason", "corrected_by",
+    # ImageJ-compatible
+    "perimeter_imagej_mm", "circularity_imagej",
+    # Color
+    "color_L", "color_a", "color_b", "color_L_sd", "color_a_sd", "color_b_sd", "color_hex",
+    "color_label", "color_confidence",
+    # Morphology
+    "morphology_label", "morphology_confidence", "morphology_runner_up", "morphology_runner_up_confidence",
+    # Quality flags
+    *FLAGS, "review_reason",
+    # Review
+    "review_status", "color_label_original", "morphology_label_original", "outline_edited",
+    "reviewed_by", "reviewer_role", "reviewed_at",
+    # Lab results
     "polymer_confirmed", "polymer_method",
-    "app_version", "model_version", "square_mm", "um_per_px", "area_px",
+    # Provenance
+    "background_type", "mm_per_px", "scale_source",
+    "app_version", "color_rules_version", "model_version", "processed_at",
+]
+
+SUMMARY_COLUMNS = [
+    "sample_id", "n_images", "n_particles",
+    *[f"count_{m}" for m in MORPHOLOGY],
+    *[f"count_color_{c}" for c in COLORS],
+    *[f"count_size_{b[2]}" for b in SIZE_BINS],
+    "length_mm_median", "length_mm_min", "length_mm_max",
+    "n_reviewed", "n_corrected", "pct_human_confirmed",
+    *[f"n_{f}" for f in FLAGS],
+    "app_version", "color_rules_version", "model_version",
 ]
 
 
-def review_reasons(m):
-    reasons = []
-    lo, hi = SIEVE_UM * (1 - NEAR_CUTOFF), SIEVE_UM * (1 + NEAR_CUTOFF)
-    if lo <= m["feret_max_um"] <= hi:
-        reasons.append("near_size_cutoff")
-    if m["feret_min_um"] < SIEVE_UM:
-        reasons.append("min_width_below_sieve")
-    if m.get("_contrast", float("inf")) < LOW_CONTRAST:
-        reasons.append("low_contrast_outline")
-    if m.get("_touches_gridline"):
-        reasons.append("touches_gridline")
-    if m["solidity"] < MERGED_SOLIDITY:
-        reasons.append("possibly_merged")
-    return reasons
+def size_class(length_mm):
+    for lo, hi, name in SIZE_BINS:
+        if lo <= length_mm < hi:
+            return name
+    return ""
 
 
-def build_rows(measurements, sample_id, image_file, metadata, app_version, square_mm, um_per_px):
-    """Order, name and fill columns as in the spec. Unknown values are left blank."""
-    per_well = defaultdict(int)
-    out = []
-    # Reading order (top to bottom, then right to left as the wells are lettered) for the -n suffix.
-    for m in sorted(measurements, key=lambda m: (m["well"][1:].zfill(2), m["well"][0], m["y_um"], -m["x_um"])):
-        per_well[m["well"]] += 1
-        reasons = review_reasons(m)
+def flags(m, median_area_mm2=None):
+    """True/false quality flags for one measured particle. Empty where not available yet."""
+    length, width = m["feret_max_um"] / 1000, m["feret_min_um"] / 1000
+    big = (median_area_mm2 is not None
+           and m["area_um2"] / 1e6 > MERGED_AREA_X_MEDIAN * median_area_mm2)
+    return {
+        "flag_edge": bool(m.get("_touches_edge")),
+        "flag_merged": bool(m["solidity"] < MERGED_SOLIDITY or big),
+        "flag_low_confidence": "",  # needs colour rules (v2) or the morphology model (v3)
+        "flag_scale": False,  # checkerboard scale; becomes true when markers are missing or the user corrects it
+        "flag_near_cutoff": bool(SIEVE_MM * (1 - NEAR_CUTOFF) <= length <= SIEVE_MM * (1 + NEAR_CUTOFF)),
+        "flag_min_width": bool(width < SIEVE_MM),
+        "flag_low_contrast": bool(m.get("_contrast", float("inf")) < LOW_CONTRAST),
+    }
+
+
+def _hex(m):
+    return "#{:02x}{:02x}{:02x}".format(*(max(0, min(255, round(m[f"{c}_mean"]))) for c in "RGB"))
+
+
+def build_rows(measurements, sample_id, image_id, metadata, app_version, mm_per_px, processed_at,
+               background_type="checkerboard", scale_source="checkerboard"):
+    """Per-particle rows, named, ordered and filled as in docs/OUTPUT_CSV.md."""
+    areas = [m["area_um2"] / 1e6 for m in measurements]
+    median_area = statistics.median(areas) if len(areas) >= MERGED_MIN_PARTICLES else None
+    rows = []
+    for m in sorted(measurements, key=lambda m: m["particle"]):
+        f = flags(m, median_area)
+        px = m["_px"]
+        length = m["feret_max_um"] / 1000
         row = {c: "" for c in COLUMNS}
-        row.update({k: v for k, v in m.items() if k in row})
         row.update({
-            "particle_id": f"{sample_id}-{m['well']}-{per_well[m['well']]}",
-            "sample_id": sample_id,
-            "image_file": image_file,
-            "particle_number": m["particle"],
-            "review": "yes" if reasons else "no",
-            "review_reason": ";".join(reasons),
-            "app_version": app_version,
-            "square_mm": square_mm,
-            "um_per_px": um_per_px,
+            "sample_id": sample_id, "image_id": image_id, "particle_id": m["particle"], "well": m.get("well", ""),
+            **{k: metadata.get(k, "") or "" for k in METADATA},
+            "centroid_x_px": round(px["cx"], 1), "centroid_y_px": round(px["cy"], 1),
+            "bbox_x_px": px["x"], "bbox_y_px": px["y"], "bbox_w_px": px["w"], "bbox_h_px": px["h"],
+            "centroid_x_mm": m["x_um"] / 1000, "centroid_y_mm": m["y_um"] / 1000,
+            "length_mm": length, "width_mm": m["feret_min_um"] / 1000,
+            "area_mm2": m["area_um2"] / 1e6, "perimeter_mm": m["perimeter_um"] / 1000,
+            "ced_mm": m["ced_um"] / 1000, "size_class": size_class(length),
+            "convex_area_mm2": m["convex_area_um2"] / 1e6, "convex_perimeter_mm": m["convex_perimeter_um"] / 1000,
+            "aspect_ratio": m["aspect_ratio"], "circularity": m["circularity"], "solidity": m["solidity"],
+            "perimeter_imagej_mm": m["perimeter_imagej_um"] / 1000, "circularity_imagej": m["circularity_imagej"],
+            "color_L": m["L_mean"], "color_a": m["a_mean"], "color_b": m["b_mean"],
+            "color_L_sd": m["L_sd"], "color_a_sd": m["a_sd"], "color_b_sd": m["b_sd"], "color_hex": _hex(m),
+            **f,
+            "review_reason": ";".join(k[len("flag_"):] for k, v in f.items() if v is True),
+            "review_status": "auto", "outline_edited": False,
+            "background_type": background_type, "mm_per_px": mm_per_px, "scale_source": scale_source,
+            "app_version": app_version, "processed_at": processed_at,
         })
-        row.update({k: metadata.get(k, "") or "" for k in METADATA})
-        out.append(row)
-    return sorted(out, key=lambda r: r["particle_number"])
+        rows.append(row)
+    return rows
+
+
+def build_summary(rows):
+    """One row per sample, from particle rows only. Rejected particles are left out."""
+    out = []
+    for sid in dict.fromkeys(r["sample_id"] for r in rows):
+        mine = [r for r in rows if r["sample_id"] == sid]
+        kept = [r for r in mine if r["review_status"] != "rejected"]
+        s = {c: "" for c in SUMMARY_COLUMNS}
+        s.update({"sample_id": sid, "n_images": len({r["image_id"] for r in mine}), "n_particles": len(kept)})
+        # The label columns already hold the reviewer's correction (the prediction moves to *_original).
+        for col, names, prefix in (("morphology_label", MORPHOLOGY, "count_"),
+                                   ("color_label", COLORS, "count_color_")):
+            labels = [r[col] for r in kept if r[col] != ""]
+            if labels:  # leave counts empty until the labels exist (v2 colour, v3 morphology)
+                c = Counter(labels)
+                s.update({f"{prefix}{n}": c.get(n, 0) for n in names})
+        sizes = Counter(r["size_class"] for r in kept)
+        s.update({f"count_size_{b[2]}": sizes.get(b[2], 0) for b in SIZE_BINS})
+        lengths = [r["length_mm"] for r in kept]
+        if lengths:
+            s.update({"length_mm_median": statistics.median(lengths),
+                      "length_mm_min": min(lengths), "length_mm_max": max(lengths)})
+        reviewed = [r for r in mine if r["review_status"] != "auto"]
+        s.update({
+            "n_reviewed": len(reviewed),
+            "n_corrected": sum(r["review_status"] == "corrected" for r in mine),
+            "pct_human_confirmed": round(100 * sum(r["review_status"] in ("confirmed", "corrected") for r in kept)
+                                         / len(kept), 1) if kept else "",
+        })
+        s.update({f"n_{f}": sum(r[f] is True for r in kept) for f in FLAGS if f != "flag_low_confidence"})
+        for v in ("app_version", "color_rules_version", "model_version"):
+            s[v] = ";".join(sorted({str(r[v]) for r in mine if r[v] != ""}))
+        out.append(s)
+    return out
