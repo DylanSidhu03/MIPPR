@@ -2,7 +2,7 @@
 
 This document defines what the app exports. For each column it gives what the column holds, how it is produced, who creates or changes it, and which release first fills it. Code builds toward this file, and readers of exported files can use it as a reference.
 
-It merges the team's *Output CSV: data dictionary and rationale* (Draft 1, October 28, 2026) with the classification spec decisions ([CLASSIFICATION_SPEC.md](CLASSIFICATION_SPEC.md)). The two were reconciled on November 2, 2026. The prototype in [prototype/](../prototype/README.md) writes exactly these columns.
+It merges the team's *Output CSV: data dictionary and rationale* (Draft 1, October 28, 2026) with the classification spec decisions ([CLASSIFICATION_SPEC.md](CLASSIFICATION_SPEC.md)). The two were reconciled on November 2, 2026, and updated for the Drive spec v0.6 grid backgrounds on November 4, 2026. The Drive doc holds the conceptual definitions; this file holds the technical details. The prototype in [prototype/](../prototype/README.md) writes exactly these columns.
 
 The app describes particles that have already been hand-picked. It does not decide whether a particle is plastic or identify its polymer, which would need FTIR or Raman. Every export includes `NOTE.txt` saying so.
 
@@ -22,7 +22,7 @@ The app describes particles that have already been hand-picked. It does not deci
 |---|---|
 | `particles.csv` | One row per detected particle. This is the main output and the source of everything else. |
 | `summary.csv` | One row per sample, calculated only from `particles.csv`. This is what researchers usually report. |
-| `overlay.png` | The corrected photo with each particle outlined and numbered with its `particle_id` |
+| `overlay.png` | The corrected photo with each particle outlined and labelled with its `particle_id` |
 | `run.json` | Settings, scale and versions for the run |
 | `NOTE.txt` | "Visual classification only. Whether a particle is plastic, and its polymer type, were not tested." |
 
@@ -47,9 +47,10 @@ Columns appear in this order. Empty means "not available in this release" or "no
 | Column | Type | How it is produced | From |
 |---|---|---|---|
 | `sample_id` | Recorded | Typed at upload | v1 |
-| `image_id` | Recorded | File name plus a short hash of the file, e.g. `particle-3f9c21ab`. Image-level settings (scale, background) apply to all its particles. | v1 |
-| `particle_id` | Recorded | Number within the image, matching the number drawn on `overlay.png` | v1 |
-| `well` | Recorded | Well label (A1–L12) on the labelled checkerboard; empty on plain backgrounds | v1 |
+| `picture_label` | Recorded | Readable label for the photo: sample ID plus photo number, e.g. `S042-P01`, `S042-P02`. Shown on the overlay. | v1 |
+| `image_id` | Recorded | File name plus a short hash of the file, e.g. `particle-3f9c21ab`. This is the unique technical key; image-level settings (scale, background) apply to all its particles. | v1 |
+| `particle_id` | Recorded | The printed box label, e.g. `B4` (row letter + column number), unique within the photo. If a box holds more than one blob, they become `B4-1`, `B4-2`, ... (top to bottom, then left to right), and each gets `flag_multi_blob`. On the lab's legacy 12 × 24 checkerboard the well label is used the same way. | v1 |
+| `particle_ref` | Recorded | `picture_label` + `particle_id`, e.g. `S042-P01-B4`: unique across the whole sample | v1 |
 | `date`, `operator`, `lab`, `setup`, `site` | Recorded | Entered by the user once per upload and repeated on every row, so files from different labs and setups can be combined | v1 |
 
 ### 4.2 Location
@@ -115,12 +116,14 @@ These keep old ImageJ results comparable. On real particles the sub-pixel `circu
 | Column | Rule | From |
 |---|---|---|
 | `flag_edge` | The outline is within 3 px of the edge of the particle zone (the board) or photo. The particle may be cut off. It is kept, not dropped, so the reviewer decides. | v1 |
-| `flag_merged` | Solidity < 0.75, **or** area > 3 × the image's median particle area (only with 3 or more particles). Both thresholds are provisional. | v1 |
+| `flag_merged` | Solidity < 0.75, **or** (legacy board only) area > 3 × the image's median particle area, with 3 or more particles. Both thresholds are provisional. On the printed grids only the solidity rule is used: particles sit one per box, sizes on one sheet vary too much for the area rule, and `flag_multi_blob` covers two blobs in a box. | v1 |
 | `flag_low_confidence` | Color or morphology confidence below the threshold. The **threshold is still to be decided** from v2/v3 data; empty until then. | v2 / v3 |
 | `flag_scale` | Markers not all found, or the user corrected the scale | v1 |
 | `flag_near_cutoff` | `length_mm` between 0.45 and 0.55 (±10% of the sieve size) | v1 |
 | `flag_min_width` | `width_mm` < 0.5, so the particle may have passed the 500 µm sieve | v1 |
 | `flag_low_contrast` | The particle barely differs from the background (contrast < 100 on a 0–255 scale, provisional), so the outline may be incomplete | v1 |
+| `flag_line` | The outline reaches a printed line (the line plus a 0.25 mm margin), or a box edge on the checkerboard. Common for long fibers that cross into a neighbouring box; they are kept in one piece. | v1 |
+| `flag_multi_blob` | More than one blob in the same box (Drive v0.6: one particle per box). Each blob gets its own row. | v1 |
 | `review_reason` | Every flag that is True, without the `flag_` prefix, separated by semicolons, e.g. `edge;min_width` | v1 |
 
 ### 4.9 Review
@@ -142,9 +145,9 @@ These keep old ImageJ results comparable. On real particles the sub-pixel `circu
 
 | Column | Type | How it is produced | From |
 |---|---|---|---|
-| `background_type` | Recorded | `white`, `black` or `checkerboard`, read from the corner markers. The prototype always writes `checkerboard`. | v1 |
+| `background_type` | Recorded | `white_grid`, `black_grid` or `checkerboard`, read from the corner marker IDs. The lab's legacy board (no markers) is also `checkerboard`, with `scale_source = checkerboard`. | v1 |
 | `mm_per_px` | Recorded | Scale of the corrected image | v1 |
-| `scale_source` | Recorded | `markers`, `checkerboard` (the prototype: from the square corners) or `user_corrected` | v1 |
+| `scale_source` | Recorded | `markers` (printed sheets), `checkerboard` (legacy board: from the square corners and the entered square size) or `user_corrected` (the printed 100 mm line measured differently and its length was entered) | v1 |
 | `app_version`, `color_rules_version`, `model_version` | Recorded | Versions of the code, color rules and model used. The last two are empty until v2/v3. | v1 |
 | `processed_at` | Recorded | Date and time of processing (UTC, ISO 8601) | v1 |
 
@@ -212,6 +215,13 @@ Column names stay the same across releases. Columns not yet available are left e
   - the per-sample summary
   - keeping edge particles (flagged instead of dropped)
 - **Rejected particles** stay in `particles.csv` with status `rejected`.
+- **November 4, 2026 (Drive v0.6 grids):**
+  - `particle_id` is the box label
+  - `picture_label` and `particle_ref` added
+  - `well` removed, since the box label replaces it
+  - `flag_line` and `flag_multi_blob` added, with one row per blob
+  - `background_type` values are `white_grid`, `black_grid` and `checkerboard`
+  - on grids, the merged flag uses solidity only
 - **No "likely plastic" column:** it stays out of scope, unless the lab asks for it.
 
 ## 9. Still to be decided

@@ -208,13 +208,21 @@ def _color_stats(img_bgr, mask):
     return out
 
 
-def measure(labels, img_bgr, um_per_px, px_per_square, diff=None, edge_fraction=0.5, edge_margin_px=3):
+def measure(labels, img_bgr, um_per_px, px_per_square=None, diff=None, edge_fraction=0.5, edge_margin_px=3,
+            box_fn=None, line_mask=None, color_img=None):
     """One dict per particle with geometry in um / um^2 and colour statistics.
 
-    Pass the difference map from segment() so perimeters follow the sub-pixel edge.
+    Pass the difference map from segmentation so perimeters follow the sub-pixel edge.
+    Each particle gets a `box` label: from `box_fn(cx, cy)` on the printed grids, or
+    the well on the lab's legacy checkerboard (`px_per_square`). `line_mask` marks
+    printed lines for the line flag; `color_img` (e.g. white-balanced) is used for
+    color statistics instead of `img_bgr`.
     """
     rows = []
-    on_line = grid_band(labels.shape, px_per_square, 0)  # pixels on a printed square edge
+    if line_mask is None and px_per_square:
+        line_mask = grid_band(labels.shape, px_per_square, 0)  # pixels on a printed square edge
+    if box_fn is None and px_per_square:
+        box_fn = lambda x, y: well_id(x, y, px_per_square)  # noqa: E731
     for lbl in range(1, int(labels.max()) + 1):
         mask = labels == lbl
         area_px = int(mask.sum())
@@ -237,7 +245,7 @@ def measure(labels, img_bgr, um_per_px, px_per_square, diff=None, edge_fraction=
         u, u2 = um_per_px, um_per_px ** 2
         row = {
             "particle": lbl,
-            "well": well_id(cx, cy, px_per_square),
+            "box": box_fn(cx, cy) if box_fn else "",
             "x_um": cx * u,
             "y_um": cy * u,
             "area_um2": area_px * u2,
@@ -259,10 +267,10 @@ def measure(labels, img_bgr, um_per_px, px_per_square, diff=None, edge_fraction=
             "circularity_imagej": min(1.0, 4 * math.pi * area_px / perim_ij ** 2) if perim_ij > 0 else float("nan"),
             "solidity": min(1.0, area_px / convex_area) if convex_area > 0 else float("nan"),
         }
-        row.update(_color_stats(img_bgr, mask))
+        row.update(_color_stats(img_bgr if color_img is None else color_img, mask))
         # Used for review flags (export.py), not written to the CSV.
         row["_contrast"] = level / edge_fraction if level is not None else float("nan")
-        row["_touches_gridline"] = bool((mask & on_line).any())
+        row["_touches_line"] = bool(line_mask is not None and (mask & line_mask).any())
         h, w = labels.shape
         e = edge_margin_px
         row["_touches_edge"] = bool(x0 < e or y0 < e or x1 >= w - e or y1 >= h - e)

@@ -1,39 +1,104 @@
 # Segmentation and measurement prototype (Python)
 
-Prototype of pipeline stages 3 (segmentation) and 4 (measurement) from
-[CLAUDE.md](../CLAUDE.md), built on the lab's
-template-difference idea from
-[fragment_area](https://github.com/Moore-Institute-4-Plastic-Pollution-Res/fragment_area).
-It is here to settle the method before porting it to OpenCV.js for the v1
-browser app, so it uses only operations OpenCV.js has.
+Prototype of pipeline stages 2–4 (printable backgrounds, segmentation and
+measurement) from [CLAUDE.md](../CLAUDE.md).
+
+There are two methods:
+- **grid** (primary): the Drive spec v0.6 printed grid sheets, with one
+  particle per box and corner markers
+- **legacy**: the lab's existing checkerboard photos, using the
+  template-difference idea from
+  [fragment_area](https://github.com/Moore-Institute-4-Plastic-Pollution-Res/fragment_area)
+
+The prototype is here to settle the method before porting it to OpenCV.js
+for the v1 browser app, so it uses only operations OpenCV.js has (ArUco
+detection included).
 
 ## Run it
 
 ```bash
 python -m venv .venv && .venv/bin/pip install -r prototype/requirements.txt
 cd prototype
-../.venv/bin/python -m mippr.cli PARTICLE.jpg TEMPLATE.jpg --square-mm 10 --sample-id S042 \
-    --date 2026-10-27 --operator DS --lab "Moore Institute" --setup "phone, overhead" --site "Site 3" --out out/
+
+# 1. Print a background (Drive spec v0.6). Ready-made PDFs are in sheets/.
+../.venv/bin/python -m mippr.cli sheet --background white_grid --paper letter --out sheets/
+
+# 2. Measure a photo of particles on it, one particle per box
+../.venv/bin/python -m mippr.cli grid PHOTO.jpg --sample-id S042 --photo 1 \
+    --date 2026-11-04 --operator DS --lab "Moore Institute" --setup "phone, overhead" --site "Site 3" --out out/
+
+# The lab's existing photos: particle photo + empty-board photo of the 12 x 24 checkerboard
+../.venv/bin/python -m mippr.cli legacy PARTICLE.jpg TEMPLATE.jpg --square-mm 10 --sample-id S042 --out out/
+
 ../.venv/bin/python -m pytest tests
 ```
 
-You need two photos of the 12 × 24 checkerboard: one with particles, one
-empty. The output folder gets:
+### Printable backgrounds (`sheets/`)
+
+There are three backgrounds:
+- **white grid** (white boxes, black lines), for dark particles
+- **black grid** (black boxes, white lines), for light and clear particles
+- **checkerboard**, for mixed samples
+
+Each comes in Letter and A4. **Print at actual size (100%).**
+
+Each sheet has:
+- 12 mm boxes labelled by row letter and column number in the margin (box B4 = row B, column 4)
+- four corner markers whose IDs tell the app the background and paper
+- white and grey patches for white balance
+- a 100 mm line: if it doesn't measure 100 mm, pass `--line-mm` with its true length
+
+Place one particle per box, not touching a line.
+
+### Outputs
+
+The output folder gets:
 
 - `particles.csv`: one row per particle, in mm, with the columns and flags
-  defined in [docs/OUTPUT_CSV.md](../docs/OUTPUT_CSV.md)
+  defined in [docs/OUTPUT_CSV.md](../docs/OUTPUT_CSV.md). Particles are
+  identified by box label (`B4`) and `particle_ref` (`S042-P01-B4`).
 - `summary.csv`: one row per sample (counts by size class, length
   distribution, review and flag counts; the morphology and color counts fill
   in once labels exist)
-- `overlay.png`: numbered outlines on the photo
-- `run.json`: settings, scale and version, so a run can be reproduced
+- `overlay.png`: the flattened grid with outlines and box labels
+- `run.json`: settings, scale, markers found and white balance, so a run can be reproduced
 - `NOTE.txt`: the statement that classification is visual only
 
-`--square-mm` is the side of one printed square. The lab's notes say 1 cm, and
-the ImageJ results imply 10.07 mm. **Measure the printed board with a ruler**:
-every length scales with this number, and areas scale with its square.
+`--square-mm` (legacy mode only) is the side of one printed square of the lab's
+board. The lab's notes say 1 cm, and the ImageJ results imply 10.07 mm.
+**Measure the printed board with a ruler**: every length scales with this
+number, and areas with its square.
 
-## How it works
+## How the grid pipeline works (`grid.py`, `gridseg.py`)
+
+1. **Find the sheet.** Detect the ArUco corner markers, which give the
+   background type, paper size, scale and perspective.
+2. **Flatten it.** The markers are far from the grid, so under lens
+   distortion they can miss the grid lines by up to about 0.4 of a box.
+   The grid's own line crossings (checkerboard corners on the checkerboard)
+   are found in three passes: a wide search, a smooth fit, then a narrow
+   search. Each box is then warped onto a flat grid. In synthetic tests this
+   puts the printed lines within about 0.1 px.
+3. **White balance** from the printed white patch. The grey patch is checked,
+   and the result is recorded in `run.json`.
+4. **Segment box by box.** Each box's background color is its median. A pixel
+   is compared with its own box's color, so on the checkerboard each half of a
+   particle across a black/white edge is judged against its own box. Along the
+   lines the difference is bridged from both sides, so a line never becomes a
+   particle but a fiber crossing it stays whole. Hysteresis threshold and
+   half-maximum edges are as in the legacy method.
+5. **Assign and flag.** Each blob goes to the box containing its center.
+   Flags: `flag_line` (reaches a line), `flag_multi_blob` (more than one blob
+   in a box), `flag_edge` (at the grid's outer edge), plus the size and
+   contrast flags.
+
+There are synthetic results in `results/synthetic_grid_sample/`:
+- the photo
+- its overlay
+- the CSVs: 8 particles, including a fiber crossing a line, two blobs in H4
+  and a particle cut by the edge
+
+## How the legacy method works (checkerboard + empty-board photo)
 
 1. **Find the board** (`board.py`). OpenCV's chessboard detector finds the
    11 × 23 inner corners, which are then refined to sub-pixel accuracy.
@@ -122,13 +187,17 @@ measurements of real particles (stage 8 / open question 6).
 
 ## Known gaps
 
-- Touching particles are not split yet, though there are none in the sample.
-- There is no blur, darkness or missing-board check on input beyond a clear
-  error when the board isn't found.
+- **The grid pipeline is tested only on synthetic photos.** It needs real
+  printed sheets photographed with a phone, including the box-size and
+  line-thickness test (Drive open question 1a).
+- Touching particles are not split. The grid design avoids them (one
+  particle per box); two blobs in a box get `flag_multi_blob`.
+- There is no blur or darkness check on input beyond a clear error when the
+  markers or board aren't found.
 - Clear films are the expected worst case and need test photos. The pale A4
   fragment is now outlined but flagged for review.
 - The marching-squares step behind the sub-pixel perimeter uses scikit-image.
   The browser port will need its own version, about 60 lines, because
   OpenCV.js doesn't include it.
-- There is no template-free mode yet. A synthetic background could be built
-  from the known grid if the lab can't always shoot an empty board.
+- Particle crops (needed for the v3 model and possibly for Supabase, Drive
+  9b) are not written yet.

@@ -45,7 +45,7 @@ def main():
     ij = pd.read_csv(root / "results" / "area_results.csv")
     mp = pd.read_csv(a.mippr_csv)
     # particles.csv (docs/OUTPUT_CSV.md) is in mm; the comparison below works in um.
-    mp = mp.assign(particle_number=mp.particle_id, x_um=mp.centroid_x_mm * 1e3, y_um=mp.centroid_y_mm * 1e3,
+    mp = mp.assign(x_um=mp.centroid_x_mm * 1e3, y_um=mp.centroid_y_mm * 1e3,
                    area_um2=mp.area_mm2 * 1e6, feret_max_um=mp.length_mm * 1e3, feret_min_um=mp.width_mm * 1e3,
                    perimeter_um=mp.perimeter_mm * 1e3, perimeter_imagej_um=mp.perimeter_imagej_mm * 1e3)
     ox, oy = crop_offset(cv2.imread(str(root / "template.jpg")))
@@ -64,7 +64,7 @@ def main():
     for k, j, dist in pairs:
         r, m = ij.iloc[k], mp.iloc[j]
         rows.append({
-            "imagej": int(r.iloc[0]), "mippr": int(m.particle_number), "well": m.well, "dist_px": round(dist, 1),
+            "imagej": int(r.iloc[0]), "mippr": m.particle_id, "dist_px": round(dist, 1),
             "ij_area_mm2": r.Area / 1e6, "mp_area_mm2": m.area_um2 / 1e6,
             "ij_feret_mm": r.Feret / 1e3, "mp_feret_mm": m.feret_max_um / 1e3,
             "ij_minferet_mm": r.MinFeret / 1e3, "mp_minferet_mm": m.feret_min_um / 1e3,
@@ -82,7 +82,7 @@ def main():
         print("\nImageJ objects sharing one MIPPR particle (ImageJ split it):", dup.imagej.tolist())
     good = good.drop_duplicates("mippr", keep=False)
     unmatched_ij = t[(t.dist_px >= 15) | (t.ij_area_mm2 <= 0.1)].imagej.tolist()
-    unmatched_mp = sorted(set(mp.particle_number) - set(t[t.dist_px < 15].mippr))
+    unmatched_mp = sorted(set(mp.particle_id) - set(t[t.dist_px < 15].mippr))
     print(f"\nmatched one-to-one: {len(good)}   ImageJ-only (specks or misses): {unmatched_ij}"
           f"   MIPPR-only: {unmatched_mp}")
     for name, ij_name in (("area_mm2", "area_mm2"), ("feret_mm", "feret_mm"), ("minferet_mm", "minferet_mm"),

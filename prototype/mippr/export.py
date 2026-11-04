@@ -22,12 +22,12 @@ MORPHOLOGY = ["fragment", "fiber", "film", "foam", "pellet", "other"]
 COLORS = ["clear", "white", "black", "grey", "blue", "green", "red", "yellow", "orange", "brown", "pink",
           "purple", "multicolor"]
 FLAGS = ["flag_edge", "flag_merged", "flag_low_confidence", "flag_scale",
-         "flag_near_cutoff", "flag_min_width", "flag_low_contrast"]
+         "flag_near_cutoff", "flag_min_width", "flag_low_contrast", "flag_line", "flag_multi_blob"]
 METADATA = ("date", "operator", "lab", "setup", "site")
 
 COLUMNS = [
     # Identifiers and sample details
-    "sample_id", "image_id", "particle_id", "well", *METADATA,
+    "sample_id", "picture_label", "image_id", "particle_id", "particle_ref", *METADATA,
     # Location
     "centroid_x_px", "centroid_y_px", "bbox_x_px", "bbox_y_px", "bbox_w_px", "bbox_h_px",
     "centroid_x_mm", "centroid_y_mm",
@@ -74,7 +74,7 @@ def size_class(length_mm):
     return ""
 
 
-def flags(m, median_area_mm2=None):
+def flags(m, median_area_mm2=None, scale_flag=False, multi_blob=False):
     """True/false quality flags for one measured particle. Empty where not available yet."""
     length, width = m["feret_max_um"] / 1000, m["feret_min_um"] / 1000
     big = (median_area_mm2 is not None
@@ -83,10 +83,12 @@ def flags(m, median_area_mm2=None):
         "flag_edge": bool(m.get("_touches_edge")),
         "flag_merged": bool(m["solidity"] < MERGED_SOLIDITY or big),
         "flag_low_confidence": "",  # needs colour rules (v2) or the morphology model (v3)
-        "flag_scale": False,  # checkerboard scale; becomes true when markers are missing or the user corrects it
+        "flag_scale": bool(scale_flag),  # markers missing, or the user corrected the scale
         "flag_near_cutoff": bool(SIEVE_MM * (1 - NEAR_CUTOFF) <= length <= SIEVE_MM * (1 + NEAR_CUTOFF)),
         "flag_min_width": bool(width < SIEVE_MM),
         "flag_low_contrast": bool(m.get("_contrast", float("inf")) < LOW_CONTRAST),
+        "flag_line": bool(m.get("_touches_line")),
+        "flag_multi_blob": bool(multi_blob),
     }
 
 
@@ -94,19 +96,45 @@ def _hex(m):
     return "#{:02x}{:02x}{:02x}".format(*(max(0, min(255, round(m[f"{c}_mean"]))) for c in "RGB"))
 
 
-def build_rows(measurements, sample_id, image_id, metadata, app_version, mm_per_px, processed_at,
-               background_type="checkerboard", scale_source="checkerboard"):
-    """Per-particle rows, named, ordered and filled as in docs/OUTPUT_CSV.md."""
+def particle_ids(measurements):
+    """{measurement index: particle_id}. The box label (B4); B4-1, B4-2 ... when a box holds several blobs,
+    numbered top to bottom, then left to right."""
+    by_box = {}
+    for i, m in enumerate(measurements):
+        by_box.setdefault(m.get("box") or "", []).append(i)
+    ids = {}
+    for box, idx in by_box.items():
+        idx.sort(key=lambda i: (round(measurements[i]["y_um"]), measurements[i]["x_um"]))
+        for n, i in enumerate(idx, 1):
+            if not box:
+                ids[i] = str(n)
+            else:
+                ids[i] = box if len(idx) == 1 else f"{box}-{n}"
+    return ids, {b for b, idx in by_box.items() if b and len(idx) > 1}
+
+
+def build_rows(measurements, sample_id, picture_label, image_id, metadata, app_version, mm_per_px, processed_at,
+               background_type="checkerboard", scale_source="checkerboard", scale_flag=False, merged_area_rule=True):
+    """Per-particle rows, named, ordered and filled as in docs/OUTPUT_CSV.md.
+
+    `merged_area_rule=False` uses solidity alone for flag_merged. On the printed grids
+    particles sit one per box, so touching particles are rare and sizes on one sheet
+    vary too much for the area rule; flag_multi_blob covers two blobs in a box.
+    """
     areas = [m["area_um2"] / 1e6 for m in measurements]
-    median_area = statistics.median(areas) if len(areas) >= MERGED_MIN_PARTICLES else None
+    use_area = merged_area_rule and len(areas) >= MERGED_MIN_PARTICLES
+    median_area = statistics.median(areas) if use_area else None
+    ids, multi = particle_ids(measurements)
     rows = []
-    for m in sorted(measurements, key=lambda m: m["particle"]):
-        f = flags(m, median_area)
+    for i in sorted(range(len(measurements)), key=lambda i: measurements[i]["particle"]):
+        m = measurements[i]
+        f = flags(m, median_area, scale_flag, m.get("box") in multi)
         px = m["_px"]
         length = m["feret_max_um"] / 1000
         row = {c: "" for c in COLUMNS}
         row.update({
-            "sample_id": sample_id, "image_id": image_id, "particle_id": m["particle"], "well": m.get("well", ""),
+            "sample_id": sample_id, "picture_label": picture_label, "image_id": image_id,
+            "particle_id": ids[i], "particle_ref": f"{picture_label}-{ids[i]}",
             **{k: metadata.get(k, "") or "" for k in METADATA},
             "centroid_x_px": round(px["cx"], 1), "centroid_y_px": round(px["cy"], 1),
             "bbox_x_px": px["x"], "bbox_y_px": px["y"], "bbox_w_px": px["w"], "bbox_h_px": px["h"],

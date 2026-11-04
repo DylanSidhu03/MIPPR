@@ -59,8 +59,10 @@ Each flag is its own True/False column. `review_reason` lists the ones that are 
 | `flag_min_width` | `width_mm` < 0.5 | now |
 | `flag_low_contrast` | The particle barely differs from the background, as with pale or clear particles, so the outline may be incomplete. The rule is particle contrast < 100 on a 0–255 scale (provisional): on the sample, the pale A4 fragment scored 92 and every other particle 141 or more. | now |
 | `flag_edge` | The particle touches the edge of the particle zone or photo. It is kept and flagged, not dropped (changed in v0.2). | now |
-| `flag_merged` | Two or more touching particles may be detected as one: solidity < 0.75, or area > 3 × the image's median (both provisional) | now |
+| `flag_merged` | Two or more touching particles may be detected as one: solidity < 0.75, or on the legacy board area > 3 × the image's median (both provisional) | now |
 | `flag_scale` | Markers missing, or the user corrected the scale | now |
+| `flag_line` | The outline reaches a printed line or box edge (long fibers crossing into the next box) | now |
+| `flag_multi_blob` | More than one blob in one box; each gets its own row (`B4-1`, `B4-2`) | now |
 | `flag_low_confidence` | Color or morphology confidence is below a threshold, still to be decided | v2 / v3 |
 
 A reviewer sets `review_status` (`auto`, `confirmed`, `corrected`, `rejected`). Corrections keep the original prediction, and rejected rows are left out of the summary but kept for training (see OUTPUT_CSV.md section 4.9).
@@ -92,7 +94,11 @@ The export files and every column are defined in **[OUTPUT_CSV.md](OUTPUT_CSV.md
 
 The no-plastic statement goes in `NOTE.txt`, not in the CSV, so the CSV opens cleanly in Excel, R and ImageJ.
 
-**Particle identity** (changed in v0.2): `sample_id` + `image_id` + `particle_id`, where `particle_id` is the number drawn on the overlay. `well` (A1–L12) is filled on the labelled checkerboard only.
+**Particle identity** (updated November 4, 2026, for the Drive v0.6 grids):
+- `particle_id` is the printed box label, e.g. `B4` (`B4-1`, `B4-2` if a box holds several blobs).
+- `picture_label` names the photo, e.g. `S042-P01`.
+- `particle_ref` combines the two, e.g. `S042-P01-B4`, and is unique across the sample.
+- `image_id` is the technical key for the file.
 
 ## Still open
 
