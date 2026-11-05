@@ -36,6 +36,7 @@ class Layout:
     margin_mm: float = 8.0  # unprinted edge most printers need
     marker_mm: float = 18.0
     gap_mm: float = 8.0  # between the markers' inner edge and the grid, room for labels
+    box_labels: bool = False  # also print each box's label (e.g. B4) small in its top-left corner
 
     def __post_init__(self):
         if self.background not in BACKGROUNDS:
@@ -148,6 +149,16 @@ def render(layout, dpi=600):
         text(str(c + 1), gx + (c + 0.5) * b, gy - 3.5)
     for r in range(layout.rows):
         text(string.ascii_uppercase[r], gx - 3.5, gy + (r + 0.5) * b)
+    if layout.box_labels:
+        # Small grey label in each box's top-left corner; segmentation masks this known area like the lines.
+        small = scale * 0.5
+        sthick = max(1, p(0.18))
+        for r in range(layout.rows):
+            for c in range(layout.cols):
+                dark_box = layout.background == "black_grid" or (layout.background == "checkerboard" and (r + c) % 2)
+                ink = 150 if dark_box else 110
+                cv2.putText(img, layout.box_label(r, c), (p(gx + c * b + lw + 0.6), p(gy + r * b + lw + 2.1)),
+                            font, small, ink, sthick, cv2.LINE_AA)
 
     d = cv2.aruco.getPredefinedDictionary(ARUCO_DICT)
     for mid, pts in layout.marker_corners_mm().items():
