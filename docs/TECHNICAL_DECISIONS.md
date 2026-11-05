@@ -67,6 +67,7 @@ Merged with the Drive doc "Output CSV: data dictionary and rationale" (Draft 1).
   - 17 × 12 = 204 boxes on Letter, 19 × 11 = 209 on A4
   - the white and grey patches in the top margin, and the 100 mm line in the bottom margin
   - `scripts/preview_backgrounds.py` renders the three design options for comparison
+  - the sheets are vector PDFs (about 3 KB each) in [backgrounds/](../backgrounds/README.md), with copies in the Drive folder "Backgrounds"
 - **Prototype direction:**
   - The grid pipeline is primary: printable sheet generator, marker detection, refinement from the grid's crossings, and per-box segmentation against each box's own background color (no empty-board photo).
   - The checkerboard + empty-board method stays as `legacy`, for the lab's existing photos.

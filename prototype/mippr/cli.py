@@ -1,7 +1,7 @@
 """Command line for the MIPPR prototype.
 
     # Printable backgrounds (Drive spec v0.6): PNG + PDF, print at actual size
-    python -m mippr.cli sheet --background white_grid --paper letter --out sheets/
+    python -m mippr.cli sheet --background white_grid --paper letter --out ../backgrounds/
 
     # A photo of particles on a printed sheet, one particle per box
     python -m mippr.cli grid photo.jpg --sample-id S042 --photo 1 --out results/
@@ -153,9 +153,10 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
 
-    s = sub.add_parser("sheet", help="make a printable background (PNG and PDF)")
+    s = sub.add_parser("sheet", help="make a printable background (vector PDF; --png also writes an image)")
     s.add_argument("--background", choices=BACKGROUNDS, default="white_grid")
     s.add_argument("--paper", choices=tuple(PAPERS), default="letter")
+    s.add_argument("--png", action="store_true", help="also write a PNG at --dpi")
     s.add_argument("--dpi", type=int, default=600)
     s.add_argument("--out", default="sheets")
 
@@ -186,7 +187,7 @@ def main(argv=None):
             out.mkdir(parents=True, exist_ok=True)
             lay = Layout(a.background, a.paper)
             stem = out / f"mippr_{a.background}_{a.paper}"
-            save_sheet(lay, f"{stem}.png", f"{stem}.pdf", a.dpi)
+            save_sheet(lay, f"{stem}.png" if a.png else None, f"{stem}.pdf", a.dpi)
             print(f"{lay.rows} x {lay.cols} boxes of {lay.box_mm:g} mm -> {stem}.pdf (print at actual size)")
             return
         meta = {k: getattr(a, k) for k in METADATA}

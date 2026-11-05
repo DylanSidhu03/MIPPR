@@ -20,8 +20,8 @@ detection included).
 python -m venv .venv && .venv/bin/pip install -r prototype/requirements.txt
 cd prototype
 
-# 1. Print a background (Drive spec v0.6). Ready-made PDFs are in sheets/.
-../.venv/bin/python -m mippr.cli sheet --background white_grid --paper letter --out sheets/
+# 1. Print a background (Drive spec v0.6). Ready-made PDFs are in ../backgrounds/.
+../.venv/bin/python -m mippr.cli sheet --background white_grid --paper letter --out ../backgrounds/
 
 # 2. Measure a photo of particles on it, one particle per box
 ../.venv/bin/python -m mippr.cli grid PHOTO.jpg --sample-id S042 --photo 1 \
@@ -33,7 +33,7 @@ cd prototype
 ../.venv/bin/python -m pytest tests
 ```
 
-### Printable backgrounds (`sheets/`)
+### Printable backgrounds ([`backgrounds/`](../backgrounds/README.md))
 
 There are three backgrounds:
 - **white grid** (white boxes, black lines), for dark particles

@@ -182,12 +182,123 @@ def render(layout, dpi=600):
     return img
 
 
-def save_sheet(layout, path_png, path_pdf=None, dpi=600):
-    from PIL import Image
-    img = Image.fromarray(render(layout, dpi))
-    img.save(path_png, dpi=(dpi, dpi))
+# Helvetica advance widths (1/1000 em) for the characters the sheet prints; others use 556.
+_HELV = dict(zip("ABCDEFGHIJKLMNOPQRSTUVWXYZ", [667, 667, 722, 722, 667, 611, 778, 722, 278, 500, 667, 556, 833,
+                                                722, 778, 667, 778, 722, 667, 611, 722, 667, 944, 667, 667, 611]))
+_HELV.update({" ": 278, ":": 278, "|": 260, "(": 333, ")": 333, "%": 889, ",": 278, ".": 278, "-": 333,
+              "f": 278, "i": 222, "j": 222, "l": 222, "t": 278, "r": 333, "m": 833, "w": 722, "k": 500,
+              "s": 500, "c": 500, "v": 500, "x": 500, "y": 500, "z": 500})
+
+
+def render_pdf(layout):
+    """The sheet as a vector PDF (bytes): exact geometry at any printer resolution, and a small file.
+
+    Same drawing as `render`, with Helvetica text (a standard PDF font, not embedded).
+    """
+    W, H = layout.size_mm
+    k = 72 / 25.4  # PDF points per mm
+    ops = []
+
+    def rect(x, y, w, h, grey):  # sheet mm, y down
+        ops.append(f"{grey:.3f} g {x * k:.3f} {(H - y - h) * k:.3f} {w * k:.3f} {h * k:.3f} re f")
+
+    def line(x0, y0, x1, y1, width, grey=0.0):
+        ops.append(f"{grey:.3f} G {width * k:.3f} w {x0 * k:.3f} {(H - y0) * k:.3f} m "
+                   f"{x1 * k:.3f} {(H - y1) * k:.3f} l S")
+
+    def frame(x, y, w, h, width):
+        ops.append(f"0 G {width * k:.3f} w {x * k:.3f} {(H - y - h) * k:.3f} {w * k:.3f} {h * k:.3f} re S")
+
+    def text(s, x, y, size_mm, grey=0.0, center=True):
+        """`x, y` is the centre of the capitals (center=True) or the left end of the baseline."""
+        size = size_mm * k
+        if center:
+            x -= sum(_HELV.get(ch, 556) for ch in s) / 1000 * size_mm / 2
+            y += 0.718 * size_mm / 2  # Helvetica cap height
+        s = s.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+        ops.append(f"BT {grey:.3f} g /F1 {size:.3f} Tf {x * k:.3f} {(H - y) * k:.3f} Td ({s}) Tj ET")
+
+    gx, gy = layout.grid_origin_mm
+    b, lw = layout.box_mm, layout.line_mm
+    gw, gh = layout.grid_size_mm
+    if layout.background == "black_grid":
+        rect(gx, gy, gw, gh, 0)
+    if layout.background == "checkerboard":
+        for r in range(layout.rows):
+            for c in range(layout.cols):
+                if (r + c) % 2:
+                    rect(gx + c * b, gy + r * b, b, b, 0)
+    if layout.background in ("white_grid", "black_grid"):
+        ink = 0 if layout.background == "white_grid" else 1
+        for c in range(layout.cols + 1):
+            rect(gx + c * b - lw / 2, gy - lw / 2, lw, gh + lw, ink)
+        for r in range(layout.rows + 1):
+            rect(gx - lw / 2, gy + r * b - lw / 2, gw + lw, lw, ink)
+    else:
+        frame(gx, gy, gw, gh, lw)
+
+    big = 4.4  # mm font size: capitals about 3.2 mm high
+    for c in range(layout.cols):
+        text(str(c + 1), gx + (c + 0.5) * b, gy - 3.5, big)
+    for r in range(layout.rows):
+        text(string.ascii_uppercase[r], gx - 3.5, gy + (r + 0.5) * b, big)
+    if layout.box_labels:
+        for r in range(layout.rows):
+            for c in range(layout.cols):
+                dark_box = layout.background == "black_grid" or (layout.background == "checkerboard" and (r + c) % 2)
+                text(layout.box_label(r, c), gx + c * b + lw + 0.6, gy + r * b + lw + 2.1, 2.5,
+                     grey=(150 if dark_box else 110) / 255, center=False)
+
+    d = cv2.aruco.getPredefinedDictionary(ARUCO_DICT)
+    for mid, pts in layout.marker_corners_mm().items():
+        x0, y0 = pts[0]
+        bits = cv2.aruco.generateImageMarker(d, mid, 6)  # 4x4 cells plus a 1-cell black border
+        cell = layout.marker_mm / 6
+        for i in range(6):
+            for j in range(6):
+                if bits[i, j] < 128:
+                    rect(x0 + j * cell, y0 + i * cell, cell, cell, 0)
+
+    (x0, y), (x1, _) = layout.scale_line_mm()
+    line(x0, y, x1, y, 0.3)
+    for x in (x0, x1):
+        line(x, y - 2, x, y + 2, 0.3)
+    text("100 mm: if this line is not 100 mm, enter its length in the app", (x0 + x1) / 2, y + 4.5, big * 0.6)
+    for name, (x, y, pw, ph, level) in layout.patches_mm().items():
+        rect(x, y, pw, ph, level / 255)
+        frame(x, y, pw, ph, 0.2)
+    text(f"MIPPR {layout.background.replace('_', ' ')} | {layout.paper} | {layout.box_mm:g} mm boxes | "
+         f"print at actual size (100%)", W / 2, layout.margin_mm + 17, big * 0.55)
+
+    import zlib
+    stream = zlib.compress("\n".join(ops).encode("latin-1"), 9)
+    objs = [b"<< /Type /Catalog /Pages 2 0 R >>",
+            b"<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+            (f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {W * k:.3f} {H * k:.3f}] "
+             f"/Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>").encode(),
+            b"<< /Length %d /Filter /FlateDecode >>\nstream\n" % len(stream) + stream + b"\nendstream",
+            b"<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>",
+            (f"<< /Title (MIPPR {layout.background} {layout.paper}) /Creator (MIPPR prototype) >>").encode()]
+    out = bytearray(b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
+    offsets = []
+    for i, o in enumerate(objs, 1):
+        offsets.append(len(out))
+        out += b"%d 0 obj\n" % i + o + b"\nendobj\n"
+    xref = len(out)
+    out += b"xref\n0 %d\n0000000000 65535 f \n" % (len(objs) + 1)
+    out += b"".join(b"%010d 00000 n \n" % off for off in offsets)
+    out += b"trailer\n<< /Size %d /Root 1 0 R /Info 6 0 R >>\nstartxref\n%d\n%%%%EOF\n" % (len(objs) + 1, xref)
+    return bytes(out)
+
+
+def save_sheet(layout, path_png=None, path_pdf=None, dpi=600):
+    """Write the sheet as a vector PDF and/or a PNG at `dpi`."""
+    if path_png:
+        from PIL import Image
+        Image.fromarray(render(layout, dpi)).save(path_png, dpi=(dpi, dpi))
     if path_pdf:
-        img.convert("L").save(path_pdf, "PDF", resolution=dpi)
+        with open(path_pdf, "wb") as f:
+            f.write(render_pdf(layout))
 
 
 # ── Finding the sheet in a photo ───────────────────────────────────────────

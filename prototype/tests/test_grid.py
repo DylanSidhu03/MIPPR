@@ -118,3 +118,15 @@ def test_printed_line_correction_scales_sizes(tmp_path):
     b = {r["particle_id"]: r for r in run_grid(path, tmp_path / "b", "S", 1, line_mm=98.0)}
     assert b["D3"]["length_mm"] == pytest.approx(a["D3"]["length_mm"] * 0.98)
     assert b["D3"]["flag_scale"] is True and b["D3"]["scale_source"] == "user_corrected"
+
+
+def test_vector_pdf_is_well_formed():
+    import re
+    from mippr.grid import render_pdf
+    for bg in ("white_grid", "black_grid", "checkerboard"):
+        pdf = render_pdf(Layout(bg, "a4"))
+        assert pdf.startswith(b"%PDF-1.4") and len(pdf) < 20000
+        start = int(re.search(rb"startxref\n(\d+)", pdf).group(1))
+        assert pdf[start:start + 4] == b"xref"
+        for i, off in enumerate(re.findall(rb"(\d{10}) 00000 n", pdf), 1):
+            assert pdf[int(off):].startswith(b"%d 0 obj" % i)

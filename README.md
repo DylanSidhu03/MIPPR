@@ -12,6 +12,10 @@ Manual classification of microplastics larger than 500 µm (color, morphology, s
 - [Pipeline plan and checklist](docs/PIPELINE.md): every stage, task, input, output and risk
 - [Interactive tracker](docs/pipeline-tracker.html): the same plan as a checkbox page (download and open in a browser)
 
+## Printable backgrounds
+
+[backgrounds/](backgrounds/README.md): white grid, black grid and checkerboard sheets as PDFs (Letter and A4). Print at actual size.
+
 ## Stages
 
 1. Define scope and classes
