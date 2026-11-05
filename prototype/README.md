@@ -43,7 +43,8 @@ There are three backgrounds:
 Each comes in Letter and A4. **Print at actual size (100%).**
 
 Each sheet has:
-- 12 mm boxes labelled by row letter and column number in the margin (box B4 = row B, column 4)
+- the "Standard" design: 12 mm boxes with 0.5 mm lines (204 boxes on Letter, 209 on A4)
+- box labels by row letter and column number in the margin, and each box's label (e.g. B4) printed small in its top-left corner; keep particles out of that corner
 - four corner markers whose IDs tell the app the background and paper
 - white and grey patches for white balance
 - a 100 mm line: if it doesn't measure 100 mm, pass `--line-mm` with its true length

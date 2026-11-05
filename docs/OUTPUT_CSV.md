@@ -122,7 +122,7 @@ These keep old ImageJ results comparable. On real particles the sub-pixel `circu
 | `flag_near_cutoff` | `length_mm` between 0.45 and 0.55 (±10% of the sieve size) | v1 |
 | `flag_min_width` | `width_mm` < 0.5, so the particle may have passed the 500 µm sieve | v1 |
 | `flag_low_contrast` | The particle barely differs from the background (contrast < 100 on a 0–255 scale, provisional), so the outline may be incomplete | v1 |
-| `flag_line` | The outline reaches a printed line (the line plus a 0.25 mm margin), or a box edge on the checkerboard. Common for long fibers that cross into a neighbouring box; they are kept in one piece. | v1 |
+| `flag_line` | The outline reaches a printed line (the line plus a 0.25 mm margin), a box edge on the checkerboard, or the printed label in a box's corner. Common for long fibers that cross into a neighbouring box; they are kept in one piece. | v1 |
 | `flag_multi_blob` | More than one blob in the same box (Drive v0.6: one particle per box). Each blob gets its own row. | v1 |
 | `review_reason` | Every flag that is True, without the `flag_` prefix, separated by semicolons, e.g. `edge;min_width` | v1 |
 

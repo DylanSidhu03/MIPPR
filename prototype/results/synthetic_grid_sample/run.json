@@ -13,7 +13,7 @@
   "paper": "letter",
   "layout": {
     "box_mm": 12.0,
-    "line_mm": 0.4,
+    "line_mm": 0.5,
     "rows": 17,
     "cols": 12
   },

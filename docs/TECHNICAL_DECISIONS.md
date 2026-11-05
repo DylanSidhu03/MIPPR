@@ -59,11 +59,14 @@ Merged with the Drive doc "Output CSV: data dictionary and rationale" (Draft 1).
 - **Lines:** one `flag_line`, set when the outline reaches a printed line plus a 0.25 mm margin. Fibers crossing into the next box are kept in one piece.
 - **`background_type`:** `white_grid`, `black_grid`, `checkerboard`.
 - **Merged flag on grids:** solidity only. The area rule is kept for the legacy board.
-- **Sheet layout (layout version 1, provisional until open question 1a is tested):**
-  - 12 mm boxes and 0.4 mm lines
+- **Sheet design (November 5, 2026):** the "Standard" design for all three backgrounds, chosen from three options (Compact 10 mm / Standard 12 mm / Large 15 mm boxes). It still needs testing on real photos (Drive open question 1a).
+  - 12 mm boxes and 0.5 mm lines
+  - each box's label (e.g. `B4`) printed small and mid-grey in its top-left corner, as well as row and column labels in the margin
+  - segmentation masks a 6.5 × 3.2 mm label corner in each box, like the lines: the longest label (`M12`) prints 4.5 × 2 mm
   - 18 mm ArUco markers (4x4_50 dictionary); their IDs encode the background and paper
-  - 17 × 12 boxes on Letter, 19 × 12 on A4
+  - 17 × 12 = 204 boxes on Letter, 19 × 11 = 209 on A4
   - the white and grey patches in the top margin, and the 100 mm line in the bottom margin
+  - `scripts/preview_backgrounds.py` renders the three design options for comparison
 - **Prototype direction:**
   - The grid pipeline is primary: printable sheet generator, marker detection, refinement from the grid's crossings, and per-box segmentation against each box's own background color (no empty-board photo).
   - The checkerboard + empty-board method stays as `legacy`, for the lab's existing photos.

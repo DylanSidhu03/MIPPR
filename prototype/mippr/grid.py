@@ -32,11 +32,12 @@ class Layout:
     background: str = "white_grid"
     paper: str = "letter"
     box_mm: float = 12.0  # "around 10 mm or more"; particles in scope are 0.5-5 mm
-    line_mm: float = 0.4  # thin lines
+    line_mm: float = 0.5  # "Standard" design, chosen November 5, 2026
     margin_mm: float = 8.0  # unprinted edge most printers need
     marker_mm: float = 18.0
     gap_mm: float = 8.0  # between the markers' inner edge and the grid, room for labels
-    box_labels: bool = False  # also print each box's label (e.g. B4) small in its top-left corner
+    box_labels: bool = True  # also print each box's label (e.g. B4) small in its top-left corner
+    label_zone_mm: tuple = (6.5, 3.2)  # top-left corner kept for the label: longest label (M12) prints 4.5 x 2 mm from 0.85 mm in
 
     def __post_init__(self):
         if self.background not in BACKGROUNDS:

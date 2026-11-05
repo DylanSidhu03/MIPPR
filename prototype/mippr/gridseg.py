@@ -58,6 +58,20 @@ def line_band(layout, px_per_mm, shape, margin_mm):
     return band, half, outer
 
 
+def label_zones(layout, px_per_mm, shape):
+    """True in each box's top-left label corner (empty mask when the sheet has no box labels)."""
+    zones = np.zeros(shape, bool)
+    if not layout.box_labels:
+        return zones
+    b = layout.box_mm * px_per_mm
+    zw, zh = (v * px_per_mm for v in layout.label_zone_mm)
+    for r in range(layout.rows):
+        for c in range(layout.cols):
+            x0, y0 = int(c * b), int(r * b)
+            zones[y0:int(y0 + zh), x0:int(x0 + zw)] = True
+    return zones
+
+
 def box_of(layout, px_per_mm, x, y):
     """(row, col) of the box containing point (x, y) of the rectified grid, clipped to the grid."""
     b = layout.box_mm * px_per_mm
@@ -88,7 +102,28 @@ def difference(img, layout, px_per_mm, params=GridSegmentParams()):
     p = cv2.GaussianBlur(img.astype(np.float32), (0, 0), params.blur_sigma)
     d = np.abs(p - bg_img).max(axis=2)
     band, half, outer = line_band(layout, px_per_mm, (h, w), params.line_margin_mm)
-    return _bridge(d, layout, b, half, outer), band
+    d = _bridge(d, layout, b, half, outer)
+    # The printed box label in each corner is masked like the lines: no detection
+    # starts there, and a particle reaching into it is bridged from below and the right.
+    zones = label_zones(layout, px_per_mm, (h, w))
+    if zones.any():
+        d = _bridge_labels(d, layout, b, px_per_mm)
+        band = band | zones
+    return d, band
+
+
+def _bridge_labels(d, layout, b, px_per_mm):
+    d = d.copy()
+    h, w = d.shape
+    zw, zh = (int(np.ceil(v * px_per_mm)) for v in layout.label_zone_mm)
+    for r in range(layout.rows):
+        for c in range(layout.cols):
+            x0, y0 = int(c * b), int(r * b)
+            x1, y1 = min(w - 1, x0 + zw), min(h - 1, y0 + zh)
+            below = d[y1, x0:x1][None, :]
+            right = d[y0:y1, x1][:, None]
+            d[y0:y1, x0:x1] = np.minimum(below, right)
+    return d
 
 
 def _bridge(d, layout, b, half, outer):
