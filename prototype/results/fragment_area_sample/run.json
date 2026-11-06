@@ -1,0 +1,28 @@
+{
+  "mippr_version": "0.1.0",
+  "mode": "legacy",
+  "particle": "fragment_area/particle.jpg",
+  "template": "fragment_area/template.jpg",
+  "sample_id": "FA01",
+  "picture_label": "FA01-P01",
+  "date": "",
+  "operator": "",
+  "lab": "Moore Institute",
+  "setup": "fragment_area sample photos",
+  "site": "",
+  "square_mm": 10.0,
+  "px_per_square": 140,
+  "mm_per_px": 0.07142857142857142,
+  "params": {
+    "blur_sigma": 1.0,
+    "high": 60.0,
+    "low": 25.0,
+    "min_area_px": 9,
+    "grid_band_px": 2,
+    "edge_margin_px": 3,
+    "drop_edge": false,
+    "edge_fraction": 0.5
+  },
+  "particles": 24,
+  "note": "Visual classification only. Whether a particle is plastic, and its polymer type, were not tested."
+}

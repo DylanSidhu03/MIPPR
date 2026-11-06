@@ -10,7 +10,7 @@ MIPPR automates classification and measurement of microplastics larger than 500 
 - docs/PIPELINE.md: full 11-stage plan with task checklists (source of truth)
 - docs/pipeline-tracker.html: interactive checkbox version of the same plan
 - .github/ISSUE_TEMPLATE/task.md: issue template
-- scripts-create-issues.sh: creates one GitHub issue per stage (needs gh auth)
+- scripts/sync_plan.py: refreshes docs/pipeline-tracker.html (and issue text) from docs/PIPELINE.md
 - .gitignore
 
 ## Do now (in order)
@@ -18,7 +18,7 @@ MIPPR automates classification and measurement of microplastics larger than 500 
 2. git init if needed. Remote origin = https://github.com/DylanSidhu03/MIPPR.git (show any existing origin before changing it).
 3. Commit everything as "Initial commit", rename branch to main, git push -u origin main. If rejected, explain why; never force-push.
 4. Confirm the push and list top-level files uploaded.
-5. Optional: run ./scripts-create-issues.sh to open the stage issues. Optionally publish docs/pipeline-tracker.html with GitHub Pages.
+5. Done: the stage issues exist (#1–#11). Optionally publish docs/pipeline-tracker.html with GitHub Pages.
 
 ## Next project steps (from docs/PIPELINE.md)
 1. Define scope and classes: size rule, morphology and color class lists, "not plastic" handling, output columns.

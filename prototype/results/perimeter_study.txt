@@ -1,0 +1,39 @@
+
+ALL SHAPES  (n=86)
+method                        perimeter error            circularity error
+pixel_centre       median  -0.8%  worst -19.7%   median +0.000  worst +0.215
+imagej             median  +1.1%  worst -12.8%   median -0.014  worst +0.199
+crack_edge         median +27.3%  worst +37.5%   median -0.332  worst -0.411
+skimage_weighted   median +19.4%  worst +33.1%   median -0.223  worst -0.364
+subpixel_iso       median  -2.2%  worst  -9.4%   median +0.018  worst +0.147
+
+SMALL (<= 10 px across, i.e. under ~0.7 mm at current resolution)  (n=24)
+method                        perimeter error            circularity error
+pixel_centre       median  -9.3%  worst -19.7%   median +0.037  worst +0.215
+imagej             median  -3.7%  worst -12.8%   median +0.012  worst +0.199
+crack_edge         median +24.1%  worst +29.6%   median -0.332  worst -0.411
+skimage_weighted   median  +7.9%  worst +14.6%   median -0.157  worst -0.273
+subpixel_iso       median  -4.2%  worst  -9.4%   median +0.026  worst +0.147
+
+LARGE (>= 20 px across)  (n=56)
+method                        perimeter error            circularity error
+pixel_centre       median  +0.9%  worst  -9.6%   median -0.009  worst +0.120
+imagej             median  +2.2%  worst  -6.8%   median -0.021  worst -0.088
+crack_edge         median +27.3%  worst +37.5%   median -0.317  worst -0.390
+skimage_weighted   median +22.0%  worst +33.1%   median -0.277  worst -0.364
+subpixel_iso       median  -2.2%  worst  -5.0%   median +0.020  worst +0.068
+
+DISCS (true circularity 1.0)  (n=36)
+method                        perimeter error            circularity error
+pixel_centre       median  +0.7%  worst -19.7%   median -0.026  worst -0.078
+imagej             median  +2.7%  worst -12.2%   median -0.059  worst -0.088
+crack_edge         median +27.3%  worst +27.3%   median -0.384  worst -0.411
+skimage_weighted   median +19.4%  worst +25.2%   median -0.305  worst -0.364
+subpixel_iso       median  -0.4%  worst  -4.1%   median +0.000  worst -0.096
+
+ROTATION: spread (max - min) of perimeter across 7 angles, as % of true
+  rect 20x20 pixel_centre  6.7%  imagej  6.7%  crack_edge 35.0%  skimage_weighted 35.0%  subpixel_iso  0.5%
+  rect 24x6  pixel_centre  7.5%  imagej  7.5%  crack_edge 33.3%  skimage_weighted 30.7%  subpixel_iso  0.4%
+  rect 40x10 pixel_centre  7.3%  imagej  7.3%  crack_edge 36.0%  skimage_weighted 36.0%  subpixel_iso  0.3%
+  rect 60x4  pixel_centre  7.8%  imagej  7.8%  crack_edge 37.5%  skimage_weighted 36.3%  subpixel_iso  0.2%
+  rect 8x8   pixel_centre  8.8%  imagej  8.8%  crack_edge 25.0%  skimage_weighted 20.0%  subpixel_iso  1.2%
