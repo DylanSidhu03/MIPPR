@@ -189,7 +189,9 @@ def test_rows_and_summary_follow_output_csv():
     assert r["color_hex"] == "#c82828"
     assert r["review_status"] == "auto" and r["outline_edited"] is False and r["operator"] == "DS"
     assert rows[2]["review_reason"] == "min_width"
-    assert r["polymer_confirmed"] == "" and r["color_label"] == "" and r["morphology_label"] == ""
+    assert r["polymer_confirmed"] == "" and r["color_label"] == ""  # no colour classes in this fake measurement
+    # Morphology comes from the v2 rules: an ordinary piece is a fragment the rules can't refine (0.5)
+    assert (r["morphology_label"], r["morphology_source"], r["morphology_confidence"]) == ("fragment", "rule", 0.5)
 
     rows[1]["review_status"] = "rejected"
     rows[2]["review_status"] = "corrected"
@@ -198,7 +200,8 @@ def test_rows_and_summary_follow_output_csv():
     assert s["n_particles"] == 2 and s["count_size_>5"] == 0  # the rejected row is left out
     assert s["n_reviewed"] == 2 and s["n_corrected"] == 1 and s["pct_human_confirmed"] == 50.0
     assert s["n_flag_min_width"] == 1
-    assert s["count_fragment"] == "" and s["count_color_red"] == ""  # no labels yet, so no counts
+    assert s["count_fragment"] == 2 and s["count_fiber"] == 0  # rule labels are counted
+    assert s["count_color_red"] == ""  # no colour labels in this fake measurement, so no counts
 
 
 def test_two_blobs_in_a_box_get_numbered_ids_and_a_flag():

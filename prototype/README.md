@@ -88,7 +88,21 @@ number, and areas with its square.
    lines the difference is bridged from both sides, so a line never becomes a
    particle but a fiber crossing it stays whole. Hysteresis threshold and
    half-maximum edges are as in the legacy method.
-5. **Assign and flag.** Each blob goes to the box containing its center.
+5. **Measure and classify** (spec v0.3, `classify.py`). As well as the size and shape
+   columns:
+   - **length along the fiber** (`fiber_length_mm`): the skeleton's longest path,
+     smoothed, with its ends trimmed where it runs into corners and the true end
+     length added back. It is within about 1–3% on curved and straight test shapes.
+   - **opacity**: how much of the known box background the particle blocks. With
+     one background colour this is a lower bound; across a checkerboard edge it is
+     measured directly.
+   - **colour classes**: every pixel is sorted into one of the 13 classes by
+     provisional Lab rules, giving the main colour, the second colour and its share.
+     It is `multicolor` at 20% or more, unless the two are shades of one colour.
+   - **morphology rules (v2)**: fiber (length:width ≥ 3), pellet (round and solid),
+     film (see-through). Everything else is fragment with confidence 0.5 until the
+     v3 model exists.
+6. **Assign and flag.** Each blob goes to the box containing its center.
    Flags: `flag_line` (reaches a line), `flag_multi_blob` (more than one blob
    in a box), `flag_edge` (at the grid's outer edge), plus the size and
    contrast flags.
@@ -202,3 +216,16 @@ measurements of real particles (stage 8 / open question 6).
   OpenCV.js doesn't include it.
 - Particle crops (needed for the v3 model and possibly for Supabase, Drive
   9b) are not written yet.
+- The colour rules and the fiber, pellet and film thresholds are provisional
+  starting values. They still need fitting to the lab's labelled particles.
+- The skeleton step uses scikit-image and SciPy; the browser port needs its own
+  thinning and a shortest-path search over skeleton pixels.
+
+## Checking against the lab's hand measurements
+
+`scripts/lab_photo_check.py` compares the app with the lab's ParticleCount
+spreadsheets on their "Rows A–H" layout photos. Those photos show particles laid out
+in 8 columns on a white background with a steel ruler. The script reads the scale
+from the ruler ticks, finds and measures the particles, matches them to spreadsheet
+wells by column and position, and reports agreement. Results are in
+[docs/LAB_DATA.md](../docs/LAB_DATA.md).

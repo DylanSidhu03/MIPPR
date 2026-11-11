@@ -29,7 +29,7 @@ from . import __version__
 from .board import find_board
 from .export import COLUMNS, METADATA, NOTE, SUMMARY_COLUMNS, build_rows, build_summary
 from .grid import BACKGROUNDS, PAPERS, Layout, find_sheet, save_sheet
-from .gridseg import GridSegmentParams, box_of, line_band, segment_grid
+from .gridseg import GridSegmentParams, background_image, box_of, line_band, segment_grid
 from .measure import measure
 from .segment import SegmentParams, segment
 
@@ -110,7 +110,7 @@ def run_grid(photo_path, out_dir, sample_id="sample", photo=1, metadata=None, li
     measured = measure(labels, rect, mm_per_px * 1000, None, diff, params.edge_fraction,
                        edge_margin_px=int(np.ceil(outer)) + 2,
                        box_fn=lambda x, y: lay.box_label(*box_of(lay, ppm, x, y)), line_mask=near_line,
-                       color_img=balanced)
+                       color_img=balanced, bg_img=background_image(balanced, lay, ppm, params.inset_frac))
     label = picture_label(sample_id, photo)
     rows = build_rows(measured, sample_id, label, image_id(photo_path), metadata or {}, __version__, mm_per_px,
                       datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -136,8 +136,9 @@ def run_legacy(particle_path, template_path, square_mm, out_dir, sample_id="samp
     rect_t = find_board(template, px_per_square).rectify(template)
     labels, diff = segment(rect_p, rect_t, px_per_square, params)
     um_per_px = square_mm * 1000 / px_per_square
+    # The empty-board photo is the background behind every pixel (for opacity).
     measured = measure(labels, rect_p, um_per_px, px_per_square, diff, params.edge_fraction,
-                       params.edge_margin_px)
+                       params.edge_margin_px, bg_img=rect_t)
     label = picture_label(sample_id, photo)
     rows = build_rows(measured, sample_id, label, image_id(particle_path), metadata or {}, __version__,
                       um_per_px / 1000, datetime.now(timezone.utc).isoformat(timespec="seconds"))

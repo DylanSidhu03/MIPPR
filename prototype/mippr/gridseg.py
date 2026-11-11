@@ -90,15 +90,21 @@ def background_colors(img, layout, px_per_mm, inset_frac=0.15):
     return out
 
 
+def background_image(img, layout, px_per_mm, inset_frac=0.15):
+    """The background colour expected behind every pixel: each box's median colour, filled across the box."""
+    b = layout.box_mm * px_per_mm
+    h, w = img.shape[:2]
+    bg = background_colors(img, layout, px_per_mm, inset_frac)
+    rows = np.minimum((np.arange(h) // b).astype(int), layout.rows - 1)
+    cols = np.minimum((np.arange(w) // b).astype(int), layout.cols - 1)
+    return bg[rows[:, None], cols[None, :]]
+
+
 def difference(img, layout, px_per_mm, params=GridSegmentParams()):
     """Largest color-channel difference from the pixel's own box background, bridged across lines."""
     b = layout.box_mm * px_per_mm
     h, w = img.shape[:2]
-    bg = background_colors(img, layout, px_per_mm, params.inset_frac)
-    # Expand box colors to a full image (nearest box), then compare.
-    rows = np.minimum((np.arange(h) // b).astype(int), layout.rows - 1)
-    cols = np.minimum((np.arange(w) // b).astype(int), layout.cols - 1)
-    bg_img = bg[rows[:, None], cols[None, :]]
+    bg_img = background_image(img, layout, px_per_mm, params.inset_frac)
     p = cv2.GaussianBlur(img.astype(np.float32), (0, 0), params.blur_sigma)
     d = np.abs(p - bg_img).max(axis=2)
     band, half, outer = line_band(layout, px_per_mm, (h, w), params.line_margin_mm)

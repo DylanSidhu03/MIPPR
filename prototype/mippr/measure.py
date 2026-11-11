@@ -21,6 +21,7 @@ import numpy as np
 from skimage.measure import find_contours
 
 from .board import SQUARES_X
+from .classify import color_classes, fiber_metrics, opacity
 from .segment import edge_level, grid_band
 
 WELL_COLUMNS = "ABCDEFGHIJKL"  # printed right to left across the top of the lab board
@@ -209,14 +210,20 @@ def _color_stats(img_bgr, mask):
 
 
 def measure(labels, img_bgr, um_per_px, px_per_square=None, diff=None, edge_fraction=0.5, edge_margin_px=3,
-            box_fn=None, line_mask=None, color_img=None):
+            box_fn=None, line_mask=None, color_img=None, bg_img=None, min_width_px=2.0):
     """One dict per particle with geometry in um / um^2 and colour statistics.
 
     Pass the difference map from segmentation so perimeters follow the sub-pixel edge.
     Each particle gets a `box` label: from `box_fn(cx, cy)` on the printed grids, or
     the well on the lab's legacy checkerboard (`px_per_square`). `line_mask` marks
     printed lines for the line flag; `color_img` (e.g. white-balanced) is used for
-    color statistics instead of `img_bgr`.
+    color statistics instead of `img_bgr`. `bg_img` is the background expected behind
+    each pixel (same colour space as `color_img`): the box colours on the printed grids,
+    the empty-board photo on the legacy board. It gives `opacity`.
+
+    Also measured (spec v0.3): the length and mean width along the particle's centre
+    line (`fiber_length_um`, `fiber_width_um`), whether the width is too thin to
+    resolve (under `min_width_px`), and the colour classes (main, second, share).
     """
     rows = []
     if line_mask is None and px_per_square:
@@ -267,7 +274,16 @@ def measure(labels, img_bgr, um_per_px, px_per_square=None, diff=None, edge_frac
             "circularity_imagej": min(1.0, 4 * math.pi * area_px / perim_ij ** 2) if perim_ij > 0 else float("nan"),
             "solidity": min(1.0, area_px / convex_area) if convex_area > 0 else float("nan"),
         }
-        row.update(_color_stats(img_bgr if color_img is None else color_img, mask))
+        cimg = img_bgr if color_img is None else color_img
+        row.update(_color_stats(cimg, mask))
+        fl_px, fw_px, uniform = fiber_metrics(mask)
+        row["fiber_length_um"] = fl_px * u
+        row["fiber_width_um"] = fw_px * u
+        row["fiber_uniform"] = uniform  # evenly thick along its length, so the centre-line numbers apply
+        row["width_unresolved"] = bool(min(fw_px if uniform else f_min, f_min) < min_width_px)
+        row["opacity"] = opacity(cimg, bg_img, mask) if bg_img is not None and not row["width_unresolved"] else None
+        (row["color_label"], row["color_confidence"],
+         row["color_secondary"], row["color_secondary_fraction"]) = color_classes(cimg, mask, row["opacity"])
         # Used for review flags (export.py), not written to the CSV.
         row["_contrast"] = level / edge_fraction if level is not None else float("nan")
         row["_touches_line"] = bool(line_mask is not None and (mask & line_mask).any())
