@@ -78,6 +78,19 @@ Merged with the Drive doc "Output CSV: data dictionary and rationale" (Draft 1).
   - `flag_scale` is also set when fewer than 4 markers are found
 - **Supabase table layout:** waits for Drive open question 9b (what is stored).
 
+### Features and how they are obtained (November 11, 2026)
+
+Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the standard backgrounds make outlines, sizes and the background colour behind each particle reliable. Details in [CLASSIFICATION_SPEC.md](CLASSIFICATION_SPEC.md) section 0 and [OUTPUT_CSV.md](OUTPUT_CSV.md) section 8b.
+
+- **Morphology:** rules from v2 for fiber, pellet and film; the image model (v3) for fragment, rubbery fragment and foam, and it may overrule a rule.
+- **Classes:** fragment, rubbery_fragment, fiber, film, foam, pellet, other. Lab labels: Line → fiber; Line Bundle / fiber bundle → fiber + `flag_bundle`; Sphere → pellet.
+- **Opacity** is measured against the known background, and decides clear vs white and helps find films.
+- **Fiber length** is measured along the fiber (`fiber_length_mm`) and used for fibers' size class and summaries.
+- **Thin fibers:** length is reported; width under about 2 px is left empty with `flag_width_unresolved`.
+- **Colour:** nearest class with a confidence, no automatic "unknown"; the second colour and its share are always recorded.
+- **Tar:** an optional reviewer tag `tar_like`; no automatic detection.
+- **Validation:** match the lab's plate photos to their spreadsheet rows and compare per class; the pass mark is set after.
+
 ### Repository (October 28 – November 4, 2026)
 
 - The plan, issues and tracker are kept in sync from `docs/PIPELINE.md` with `scripts/sync_plan.py`.

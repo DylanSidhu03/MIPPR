@@ -13,8 +13,9 @@ The app describes particles that have already been hand-picked. It does not deci
 | Size | Measured: geometry from the outline, converted to mm with the scale | No. It is exact for a given outline. |
 | Shape | Measured: ratios from the same outline | No |
 | Color values | Measured: average color inside the outline, after white balance | No |
+| Opacity | Measured: how much of the known background shows through the particle | No |
 | Color label | Classified by fixed rules (v2) | Yes |
-| Morphology label | Classified by a model (v3) | Yes |
+| Morphology label | Classified by rules for fiber, pellet and film (v2), and by a model for the rest (v3) | Yes |
 
 ## 2. Files in an export
 
@@ -66,11 +67,13 @@ Columns appear in this order. Empty means "not available in this release" or "no
 | Column | Type | How it is produced | From |
 |---|---|---|---|
 | `length_mm` | Measured | Longest distance across the outline (max Feret) × scale. **The main size.** | v1 |
-| `width_mm` | Measured | Narrowest distance across the outline (min Feret) × scale. Key for fibers and for the sieve check. | v1 |
+| `width_mm` | Measured | Narrowest distance across the outline (min Feret) × scale. Key for fibers and for the sieve check. Empty, with `flag_width_unresolved`, when the width is under about 2 pixels (most fibers are ~24 µm wide). | v1 |
 | `area_mm2` | Measured | Pixels inside the outline × scale² | v1 |
 | `perimeter_mm` | Measured | Length of the sub-pixel outline × scale (see 4.5) | v1 |
 | `ced_mm` | Derived | Diameter of a circle with the same area | v1 |
-| `size_class` | Derived | `length_mm` sorted into bins: `<0.5`, `0.5-1`, `1-2`, `2-5`, `>5`. Each bin includes its lower bound. `>5` marks particles above the usual 5 mm microplastic limit. | v1 |
+| `fiber_length_mm` | Measured | Length along the fiber's centre line (skeleton) × scale, so curved fibers are not under-measured. Filled for particles classed as fiber; empty otherwise. | v2 |
+| `size_length_source` | Derived | Which length `size_class` and summaries use: `fiber_length` for fibers, `max_feret` for everything else | v2 |
+| `size_class` | Derived | `length_mm` (`fiber_length_mm` for fibers) sorted into bins: `<0.5`, `0.5-1`, `1-2`, `2-5`, `>5`. Each bin includes its lower bound. `>5` marks particles above the usual 5 mm microplastic limit. | v1 |
 | `convex_area_mm2`, `convex_perimeter_mm` | Measured | Area and perimeter of the convex outline. Saturna reports both; solidity uses the convex area. | v1 |
 
 Length and width follow ImageJ's convention: they are measured over the outer edges of the boundary pixels. Every size column depends on `mm_per_px`. If the scale is wrong, all of them are wrong by the same factor, which is why the printed 100 mm check line exists.
@@ -99,15 +102,19 @@ These keep old ImageJ results comparable. On real particles the sub-pixel `circu
 | `color_L`, `color_a`, `color_b` | Measured | Mean CIE Lab inside the outline, with one edge pixel removed, after white balance | v1 |
 | `color_L_sd`, `color_a_sd`, `color_b_sd` | Measured | Spread of the same values; high spread suggests a multicolor particle | v1 |
 | `color_hex` | Derived | Mean color as a hex code, for a quick look in a spreadsheet | v1 |
+| `opacity` | Measured | 0 (fully see-through) to 1 (opaque): how much of the box's known background contrast is blocked inside the outline. Separates clear from white and helps find films. | v1 |
+| `color_secondary` | Measured | The second most common colour class inside the outline, if any, so multicolour detail is kept even when the main label is a single colour | v2 |
+| `color_secondary_fraction` | Measured | Share of the particle's area in `color_secondary` (0–1). At 0.20 or more the label is `multicolor`. | v2 |
 | `color_label` | Classified | One of the 13 spec classes (clear, white, black, grey, blue, green, red, yellow, orange, brown, pink, purple, multicolor), assigned by rules; correctable | v2 |
-| `color_confidence` | Classified | How clearly the color falls inside one class rather than near a boundary (0–1) | v2 |
+| `color_confidence` | Classified | How clearly the color falls inside one class rather than near a boundary (0–1). Rules always pick the nearest class; borderline particles get a low value and go to review. A reviewer may set `unknown`. | v2 |
 
 ### 4.7 Morphology
 
 | Column | Type | How it is produced | From |
 |---|---|---|---|
-| `morphology_label` | Classified | fragment, fiber, film, foam, pellet or other, from the particle crop plus shape columns; correctable | v3 |
-| `morphology_confidence` | Classified | Model probability for its top choice (0–1) | v3 |
+| `morphology_label` | Classified | fragment, rubbery_fragment, fiber, film, foam, pellet or other; correctable. Fiber, pellet and film by rules from v2; the rest by the image model from v3 (on the crop plus the shape columns). | v2 / v3 |
+| `morphology_source` | Classified | `rule` or `model`: what produced the label | v2 |
+| `morphology_confidence` | Classified | Model probability for its top choice, or how clearly a rule's thresholds are passed (0–1) | v2 / v3 |
 | `morphology_runner_up` | Classified | Second choice; helps on borderline cases such as film vs. fragment | v3 |
 | `morphology_runner_up_confidence` | Classified | Probability of the second choice. A small gap to the top choice means a genuinely uncertain particle. | v3 |
 
@@ -124,6 +131,8 @@ These keep old ImageJ results comparable. On real particles the sub-pixel `circu
 | `flag_low_contrast` | The particle barely differs from the background (contrast < 100 on a 0–255 scale, provisional), so the outline may be incomplete | v1 |
 | `flag_line` | The outline reaches a printed line (the line plus a 0.25 mm margin), a box edge on the checkerboard, or the printed label in a box's corner. Common for long fibers that cross into a neighbouring box; they are kept in one piece. | v1 |
 | `flag_multi_blob` | More than one blob in the same box (Drive v0.6: one particle per box). Each blob gets its own row. | v1 |
+| `flag_width_unresolved` | Width under about 2 pixels, too thin to measure from the photo; `width_mm` is empty | v1 |
+| `flag_bundle` | A fiber bundle (the lab's "Line Bundle" / "fiber bundle"), labelled fiber; set by a reviewer, later by the model | v2 / v3 |
 | `review_reason` | Every flag that is True, without the `flag_` prefix, separated by semicolons, e.g. `edge;min_width` | v1 |
 
 ### 4.9 Review
@@ -133,6 +142,7 @@ These keep old ImageJ results comparable. On real particles the sub-pixel `circu
 | `review_status` | Review | `auto` (not reviewed), `confirmed`, `corrected` or `rejected`. Rejected rows stay in `particles.csv`, where they serve as negative examples for training, but are left out of `summary.csv`. | v1 |
 | `color_label_original`, `morphology_label_original` | Review | The prediction before a correction; empty if unchanged. The label columns hold the corrected value. | v2 / v3 |
 | `outline_edited` | Review | True if the reviewer redrew, split or merged the outline. Measurements then come from the edited outline. | v1 |
+| `tar_like` | Review | Optional tag a reviewer ticks for tar-like particles (the lab notes ~900). The app does not detect tar. | v1 |
 | `reviewed_by`, `reviewer_role`, `reviewed_at` | Review | Who reviewed, `expert` or `community`, and when. Expert-confirmed rows can be weighted more in training and used for the gold test set. | v1 |
 
 ### 4.10 Lab results
@@ -159,7 +169,7 @@ All counts leave out rejected particles.
 |---|---|
 | `sample_id` | From the particle rows |
 | `n_images`, `n_particles` | Number of photos, and particles not rejected |
-| `count_fragment`, `count_fiber`, `count_film`, `count_foam`, `count_pellet`, `count_other` | Counts by `morphology_label` (corrected labels where they exist); empty until labels exist |
+| `count_fragment`, `count_rubbery_fragment`, `count_fiber`, `count_film`, `count_foam`, `count_pellet`, `count_other` | Counts by `morphology_label` (corrected labels where they exist); empty until labels exist |
 | `count_color_<class>` (13 columns) | Counts by `color_label`; empty until labels exist |
 | `count_size_<bin>` (5 columns) | Counts by `size_class` |
 | `length_mm_median`, `length_mm_min`, `length_mm_max` | Size distribution |
@@ -224,8 +234,22 @@ Column names stay the same across releases. Columns not yet available are left e
   - on grids, the merged flag uses solidity only
 - **No "likely plastic" column:** it stays out of scope, unless the lab asks for it.
 
+## 8b. Decisions on November 11, 2026 (standard backgrounds and the lab's records)
+
+- **Morphology:** rules from v2 for fiber (aspect ratio ≥ 3), pellet (round and solid) and film (low opacity); the v3 model for the rest, allowed to overrule a rule when confident. `morphology_source` records which.
+- **Classes:** fragment, rubbery_fragment, fiber, film, foam, pellet, other. The lab's labels map onto them ([LAB_DATA.md](LAB_DATA.md)).
+- **New columns:**
+  - `opacity`, measured against the known background
+  - `fiber_length_mm` (along the fiber) and `size_length_source`; size classes use the fiber length for fibers
+  - `color_secondary` and `color_secondary_fraction`, so multicolour detail is kept
+  - `flag_width_unresolved` for fibers too thin to measure, and `flag_bundle` for fiber bundles
+  - the reviewer tag `tar_like`
+- **Colour:** always the nearest class with a confidence; no automatic "unknown".
+- **Validation:** compare with the lab's hand measurements by matching their plate photos to spreadsheet rows.
+
 ## 9. Still to be decided
 
 - The confidence threshold for `flag_low_confidence` (from v2/v3 validation data).
 - Which perimeter method is the headline circularity (sub-pixel or ImageJ-compatible).
 - The provisional thresholds: merged solidity 0.75, merged area 3 × median, low contrast 100.
+- The rule thresholds for fiber, pellet and film, and how `opacity` is computed on each background, tuned on labelled particles.
