@@ -100,14 +100,22 @@ def flags(m, median_area_mm2=None, scale_flag=False, multi_blob=False):
     }
 
 
+CURVED_RATIO = 1.1  # centre-line length / straight length above which a particle counts as bent
+
+
 def morphology(m):
     """(label, source, confidence, runner_up, runner_up_confidence) from the v2 rules.
 
-    The fiber rule uses the larger of the straight (Feret) and along-the-fiber
-    length:width, so a curved fiber still counts.
+    The fiber rule uses the straight (Feret) length:width, or the along-the-fiber one
+    for a particle that bends, so a curved fiber still counts.
     """
     ar = m["aspect_ratio"]
-    if m.get("fiber_uniform") and m.get("fiber_width_um"):
+    # The centre-line length:width only takes over for a particle that bends (its length
+    # along the centre line is clearly longer than straight across). For straight
+    # particles Feret is already right, and the centre line over-reads chunky,
+    # elongated fragments (found on the lab's EX_01 photos, November 11, 2026).
+    if (m.get("fiber_uniform") and m.get("fiber_width_um")
+            and m["fiber_length_um"] >= CURVED_RATIO * m["feret_max_um"]):
         ar = max(ar, m["fiber_length_um"] / m["fiber_width_um"])
     label, conf, runner, runner_conf = morphology_rules(ar, m["circularity"], m["solidity"], m.get("opacity"),
                                                         bool(m.get("width_unresolved")))

@@ -18,10 +18,12 @@ It is a validation tool, not part of the app: the photos have no printed markers
 so the ruler position is given by hand.
 
     python scripts/lab_photo_check.py PHOTO.jpg SHEET.xlsx SAMPLE_ID \
-        --ruler X0 X1 Y0 Y1 [--px-per-mm N] [--out DIR]
+        --ruler X0 X1 Y0 Y1 [--roi X0 X1 Y0 Y1] [--px-per-mm N] [--out FILE.json]
 
 `--ruler` is a strip along the ruler's tick edge, in the coordinates of the photo
-scaled to 1200 px wide. Add `--px-per-mm` to skip the ruler.
+scaled to 1200 px wide. Add `--px-per-mm` to skip the ruler. `--roi` (same
+coordinates) limits detection to where the particles are laid out, for photos with
+other marks on the background.
 """
 import argparse
 import json
@@ -67,7 +69,7 @@ def ruler_scale(gray, x0, x1, y0, y1):
     return float(np.median(est)), float(np.std(est))
 
 
-def find_particles(img, px_per_mm, exclude_from_x=None, high=60, low=25, min_size_mm=0.25):
+def find_particles(img, px_per_mm, exclude_from_x=None, high=60, low=25, min_size_mm=0.25, roi=None):
     """Labels of dark particles on a white background, outlines at half the particle's contrast."""
     h, w = img.shape[:2]
     g = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -80,6 +82,11 @@ def find_particles(img, px_per_mm, exclude_from_x=None, high=60, low=25, min_siz
     region = cv2.erode(region, np.ones((41, 41), np.uint8))
     if exclude_from_x is not None:
         region[:, int(exclude_from_x):] = 0
+    if roi is not None:
+        s = w / PREVIEW_W
+        keep = np.zeros_like(region)
+        keep[int(roi[2] * s):int(roi[3] * s), int(roi[0] * s):int(roi[1] * s)] = 1
+        region &= keep
     bg = cv2.resize(cv2.medianBlur(cv2.resize(g, None, fx=0.1, fy=0.1), 15), (w, h)).astype(np.float64)
     diff = np.clip(bg - g, 0, 255) * region
     hi = diff > high
@@ -155,6 +162,7 @@ def main():
     ap.add_argument("sheet")
     ap.add_argument("sample")
     ap.add_argument("--ruler", nargs=4, type=float, metavar=("X0", "X1", "Y0", "Y1"))
+    ap.add_argument("--roi", nargs=4, type=float, metavar=("X0", "X1", "Y0", "Y1"))
     ap.add_argument("--px-per-mm", type=float)
     ap.add_argument("--out")
     a = ap.parse_args()
@@ -165,7 +173,7 @@ def main():
     else:
         ppm, sd = ruler_scale(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY).astype(np.float64), *a.ruler)
     print(f"scale: {ppm:.3f} px/mm (spread {sd:.3f}), {1000 / ppm:.1f} um/px")
-    labels, diff, bg = find_particles(img, ppm, (a.ruler[0] - 15) * s if a.ruler else None)
+    labels, diff, bg = find_particles(img, ppm, (a.ruler[0] - 15) * s if a.ruler else None, roi=a.roi)
     measured = measure(labels, img, 1000 / ppm, None, diff, 0.5, 3, bg_img=bg)
     particles = []
     for m in measured:

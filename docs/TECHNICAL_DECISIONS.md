@@ -126,6 +126,14 @@ Tested on synthetic photos: perspective tilt, barrel lens distortion up to k1 = 
 - **Low contrast:** a white particle on the white grid (or dark on dark) is not detected. This is why the user picks the contrasting background; `flag_low_contrast` only catches particles that are partly visible.
 - **Checkerboard edges:** a particle across a black/white edge is compared with each box's own background, so the ImageJ macro's two-pass threshold is not needed in this test. It still needs checking on real photos.
 
+## Findings from the lab's photos (November 11, 2026)
+
+Two of the lab's "Rows A–H" photos (EX_01_S01, EX_01_S03) were checked against their hand measurements with `prototype/scripts/lab_photo_check.py`. Details in [LAB_DATA.md](LAB_DATA.md).
+
+- **Detection:** every particle found on both photos, matched to its well by column and position (r = 0.98 and 1.00 between the app's and the hand lengths).
+- **Scale gap:** the app's sizes, using the ruler in each photo, are a constant 8% and 10.3% larger than the sheet's. On S03 the ratio is the same for every particle, so the outlines agree and only the scale differs. This needs the lab's answer before the sheets can serve as size ground truth.
+- **Fiber rule:** the centre-line length:width now only counts for particles that bend (centre line ≥ 1.1 × straight length), because it over-read chunky, elongated fragments. The lab also records some ≥ 3:1 particles as fragments, so the 3:1 rule may need a thinness condition.
+
 ## Open technical questions
 
 - The lab's spreadsheets ([LAB_DATA.md](LAB_DATA.md)) raise new ones: classes for rubbery fragment and line/line bundle, how the lab measures length and width, and whether photos match spreadsheet rows by well.

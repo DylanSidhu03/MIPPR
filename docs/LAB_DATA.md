@@ -8,7 +8,7 @@ Summary of the hand-classification spreadsheets in the Drive folder **ParticleCo
 - **SF_03** was read as text, not parsed, so it is not in the counts below. It has the same pattern as SF_02: rubbery fragments, fibers with polymer IDs, and width often larger than length.
 - **Gyre Library plate-reader sheet**: read as text up to plate 5 (the tool cut it off). It has shape and colour but no sizes or polymer types.
 - **Not read yet:** OC_01_03 (its download comes back inline, too large to handle that way).
-- **No photos opened yet.** Drive gives no preview, and each photo is 1–3 MB.
+- **Photos:** two "Rows A–H" photos were checked against their sheet rows on November 11 (see *Checking the app against the hand measurements* below).
 
 ## Spreadsheet layout
 
@@ -81,12 +81,32 @@ Each comes with a `MatchValue` (library match score). Wells sent to the plate re
 - **580 files**, about 1.4 GB, all JPEG except one TIFF.
 - **About 391 are distinct.** Many photos are saved twice: once under the camera timestamp (`IMG_2026_…S.jpg`) and once under a sample name.
 - **Sample names match the spreadsheets**, e.g. `EX_01_S01_Rows_A-H.jpg`, `SF_04_TEN_1of2_Rows_A-H.jpg`, `OC_05_US1_ROWS_A-H.jpg`, `PSF_01_RCM1.jpg`, `PlateReader_Gyre_Plate_03.jpg`, `MIPPR_LFB02_14SEP26.jpg`.
-- **"Rows A–H"** in a name means the photo shows a well plate or its row layout, so each particle in the photo can be matched to a spreadsheet row by well number.
+- **"Rows A–H" photos are not of well plates.** They show the particles laid out by hand in 8 columns on a white background (a white disc or sheet), one column per plate row, with a steel ruler for scale. Reading the columns right to left as rows A–H and each column top to bottom as wells 1–12 matches the sheets.
 - **Other sets:**
   - three `CheckerBoard_Test` photos
   - about 35 `NN_Plastic_NBS(_SB).jpg`
   - flow-rate tests (`12GPM High 1000-4750 EFF/INF`)
   - Seal Beach wrackline, Venice Beach fire, bristle mat
+
+## Checking the app against the hand measurements (November 11, 2026)
+
+`prototype/scripts/lab_photo_check.py` reads the scale from the ruler's 0.5 mm ticks, finds the dark particles, measures them with the pipeline's own code, and matches them to the sheet's wells by column and position.
+
+| Photo | Scale (ruler) | Particles found / in sheet | Matched | Length correlation | App vs hand (length) | App vs hand (width) |
+|---|---|---|---|---|---|---|
+| EX_01_S01 (closer shot) | 30.67 px/mm (32.6 µm/px) | 92 / 92 | 92 | r = 0.980 | median +8.3%; fit app = 1.08 × hand + 0.03 mm | median +18.4% |
+| EX_01_S03 (farther shot) | 15.99 px/mm (62.5 µm/px) | 94 / 92 | 68 | r = 1.000 | +10.3% for every particle; app = 1.103 × hand | +10.3% |
+
+- **Detection works.** Every particle was found on both photos, plus two specks on S03. Two columns there had one extra each, so they couldn't be matched by position.
+- **Colour agrees:** all matched particles are black in both, except one the app called multicolour.
+- **The sizes differ by a fixed percentage.** On S03 every particle's hand length and width is the app's value ÷ 1.103, to within 0.1%. The outlines match exactly and only the scale differs. That strongly suggests the lab measured these photos in ImageJ with a scale setting about 10% (S03) and 8% (S01) different from what the ruler in the photo shows.
+- **The ruler scale was checked three ways:**
+  - tick repeat over 5, 10, 20 and 30 mm, agreeing to 0.1%
+  - the printed numbers 10–150 mm
+  - three different strips of the ruler
+
+  A ruler on the background plane can't be off by 8–10%. Either the lab's scale setting is off, and their recorded sizes are about 8–10% too small, or the hand values come from a different step (another image, a resized copy, or a fixed per-setup scale).
+- **Shape:** the lab calls some particles with length:width ≥ 3 (by its own numbers) fragments, so it doesn't use a strict 3:1 rule for fibers. Its fibers are thin threads (median width 24 µm). The app's first version also over-read chunky, elongated fragments; that is fixed. The centre-line length now only counts for a particle that bends.
 
 ## What this means for MIPPR
 
@@ -102,6 +122,9 @@ Each comes with a `MatchValue` (library match score). Wells sent to the plate re
 6. **Fibers are measured and identified on a separate path** from fragments. Their widths are below what the current photos resolve.
 
 ## Questions for the lab
+
+- **Scale:** how is the ImageJ scale set for the "Rows A–H" photos? On EX_01_S01 and S03 the app's sizes, using the ruler in each photo, are 8% and 10.3% larger than the sheet values, with identical outlines. Measuring one particle with calipers would settle which is right.
+- **Fibers:** is a fiber a thin thread (like the F-numbered fibers), rather than anything with length:width ≥ 3? Some ≥ 3:1 particles are recorded as fragments.
 
 - How are ParticleLength and ParticleWidth measured (tool, and which axes)? Why is width larger than length in SF_02/SF_03?
 - What is "Rubbery Fragment" (tire wear? rubber?), and should it be its own class?
