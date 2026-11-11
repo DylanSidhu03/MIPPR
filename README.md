@@ -9,6 +9,7 @@ Manual classification of microplastics larger than 500 µm (color, morphology, s
 - [Classification spec](docs/CLASSIFICATION_SPEC.md): size rule, classes, review flags and output columns (issue 1)
 - [Project context](CLAUDE.md): copy of the team's Google Drive CLAUDE.md, the source for conceptual decisions (spec v0.6)
 - [Technical decisions](docs/TECHNICAL_DECISIONS.md): technical choices and prototype findings, made after Drive
+- [The lab's existing particle records](docs/LAB_DATA.md): what the hand-classification spreadsheets and photos in Drive contain
 - [Pipeline plan and checklist](docs/PIPELINE.md): every stage, task, input, output and risk
 - [Interactive tracker](docs/pipeline-tracker.html): the same plan as a checkbox page (download and open in a browser)
 

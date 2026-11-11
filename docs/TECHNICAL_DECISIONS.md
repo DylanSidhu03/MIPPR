@@ -115,6 +115,8 @@ Tested on synthetic photos: perspective tilt, barrel lens distortion up to k1 = 
 
 ## Open technical questions
 
+- The lab's spreadsheets ([LAB_DATA.md](LAB_DATA.md)) raise new ones: classes for rubbery fragment and line/line bundle, how the lab measures length and width, and whether photos match spreadsheet rows by well.
+
 - Headline perimeter method (after validation).
 - Confidence threshold for `flag_low_confidence` (from v2/v3 data).
 - Tuning the provisional flag thresholds on more photos.
