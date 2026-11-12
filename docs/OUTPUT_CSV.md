@@ -24,7 +24,7 @@ The app describes particles that have already been hand-picked. It does not deci
 | `particles.csv` | One row per detected particle. This is the main output and the source of everything else. |
 | `summary.csv` | One row per sample, calculated only from `particles.csv`. This is what researchers usually report. |
 | `overlay.png` | The corrected photo with each particle outlined and labelled with its `particle_id` |
-| `run.json` | Settings, scale and versions for the run |
+| `run.json` | Settings, scale and versions for the run, and `quality`: the photo check's problems (code, message, value, limit) and the values it measured (edge width, white level, clipped share, glare, light ratio, grey spread) |
 | `NOTE.txt` | "Visual classification only. Whether a particle is plastic, and its polymer type, were not tested." |
 
 ## 3. Column types and who may change them

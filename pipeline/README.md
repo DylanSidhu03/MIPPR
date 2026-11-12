@@ -75,7 +75,7 @@ The output folder gets:
   distribution, review and flag counts; the morphology and color counts fill
   in once labels exist)
 - `overlay.png`: the flattened grid with outlines and box labels
-- `run.json`: settings, scale, markers found and white balance, so a run can be reproduced
+- `run.json`: settings, scale, markers found, white balance and the photo quality check (`quality`: problems and the numbers behind them), so a run can be reproduced
 - `NOTE.txt`: the statement that classification is visual only
 
 `--square-mm` (legacy mode only) is the side of one printed square of the lab's
@@ -220,8 +220,8 @@ measurements of real particles (stage 8 / open question 6).
   line-thickness test (Drive open question 1a).
 - Touching particles are not split. The grid design avoids them (one
   particle per box); two blobs in a box get `flag_multi_blob`.
-- There is no blur or darkness check on input beyond a clear error when the
-  markers or board aren't found.
+- The photo quality check (`capture/calibration.py`, `check_quality`) is tuned on
+  synthetic photos only, and runs in grid mode only, not legacy.
 - Clear films are the expected worst case and need test photos. The pale A4
   fragment is now outlined but flagged for review.
 - The marching-squares step behind the sub-pixel perimeter uses scikit-image.

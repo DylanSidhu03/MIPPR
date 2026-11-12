@@ -101,6 +101,11 @@ def flags(m, median_area_mm2=None, scale_flag=False, multi_blob=False):
     }
 
 
+def review_reason(f):
+    """Every flag that is True, without the `flag_` prefix, separated by semicolons (e.g. `edge;min_width`)."""
+    return ";".join(k[len("flag_"):] for k, v in f.items() if k.startswith("flag_") and v is True)
+
+
 CURVED_RATIO = 1.1  # centre-line length / straight length above which a particle counts as bent
 
 
@@ -192,7 +197,7 @@ def build_rows(measurements, sample_id, picture_label, image_id, metadata, app_v
             "morphology_label": morph, "morphology_source": source, "morphology_confidence": mconf,
             "morphology_runner_up": runner, "morphology_runner_up_confidence": rconf,
             **f,
-            "review_reason": ";".join(k[len("flag_"):] for k, v in f.items() if v is True),
+            "review_reason": review_reason(f),
             "review_status": "auto", "outline_edited": False, "tar_like": "",
             "background_type": background_type, "mm_per_px": mm_per_px, "scale_source": scale_source,
             "app_version": app_version, "color_rules_version": COLOR_RULES_VERSION if m.get("color_label") else "",

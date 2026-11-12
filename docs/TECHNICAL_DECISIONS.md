@@ -100,6 +100,39 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 - `web/src/` mirrors the Python parts so each piece can be ported and checked against the Python results (parity tests).
 - Proposed, to confirm: plain ES modules with no build step for the web app.
 
+### Browser app foundation (November 12, 2026)
+
+- **Plain ES modules, no build step** (confirmed by going ahead with the build). Cloudflare Pages serves `web/` as it is.
+- **OpenCV.js 4.10.0, the official build, pinned by version and hash.** It includes ArUco: `cv.getPredefinedDictionary`, `cv.aruco_DetectorParameters` and `cv.aruco_ArucoDetector` (note the `aruco_` prefix). On synthetic photos its marker corners match Python's `cv2.aruco` to 0 px, in Node and in Chromium. 4.12.0 gives the same; 5.0.0 works but returns marker IDs in a different shape.
+  - Missing from 4.10.0 and needed later: `cornerSubPix` (checkerboard crossing refinement), `findChessboardCorners` (legacy board), `boxPoints`. These need small JS versions or a custom build.
+  - The page loads the file from jsDelivr with an SRI hash. `web/scripts/fetch_opencv.mjs` downloads the same file for tests (from the npm package `@techstark/opencv-js@4.10.0-release.1`, which is the official file plus a one-line UMD wrapper; sha256 checked). Not committed (10.4 MB).
+  - To decide: serve it from jsDelivr or from Cloudflare Pages itself (files up to 25 MiB are allowed).
+- **Parity tests:** `node --test web/tests/` compares the JS layout with Python's (within 1e-6 mm), the marker corners, the homography (within 0.01 px) and the rectified sheet (within 1 grey level). Fixtures are generated from the Python pipeline by `web/tests/dump_python_*.py`.
+- Functions take `cv` as their first argument, so they have no DOM or global dependency and run in Node for tests.
+
+### Photo quality check (November 12, 2026)
+
+- `check_quality(photo, sheet)` returns problems with a stable code and a plain message; the web app can map the codes to translated text. The run warns and still measures; `run.json` records the problems and the measured values under `quality`.
+- Checks and limits (set on degraded synthetic photos, to confirm on real phone photos): markers (names the missing corner), resolution < 10 px/mm, blur (edge width > 0.30 mm and > 4 px), too dark (white patch < 110), overexposed (> 10% of box interiors clipped), glare (≥ 0.5 mm² of colourless pixels brighter than paper), uneven light (darkest/brightest white box < 0.6), colour cast (grey patch spread > 15 after white balance).
+- On the lab's existing photos it reports missing markers and overexposure (their white backgrounds are clipped at 254), and no blur.
+
+### Review logic (November 12, 2026)
+
+- `review/corrections.py`: `apply`, `apply_all`, `remeasure`, `review_queue`, `kept`. Reviewers change labels and outlines; an edited outline is re-measured through the same `measure()` and `build_rows()` as the pipeline, so its row is identical to what the pipeline would produce for that outline (tested exactly).
+- Status follows from the row: `corrected` if any `*_original` is set or the outline was edited, else `confirmed`. A relabel back to the prediction clears `*_original`. The last decision wins, so a later confirm un-rejects a row.
+- Not built: split and merge (need rules for the new particle IDs).
+- Gaps in OUTPUT_CSV found while building it: no column says a label was set by a person (`morphology_source` is `rule` or `model`), and only the latest reviewer is kept. The Supabase `labels` table (part 9) holds the full history.
+
+### Ruler scale reader (November 12, 2026)
+
+- `validation/ruler.py` reads the scale from a ruler with no help: it finds the tick edge, tells a millimetre edge from an inch edge by the repeats further in (0.5 → 1 → 5 → 10 mm, versus x2 steps), and refines over hundreds of ticks by autocorrelation. It also returns a mask of the ruler so its ticks and numbers aren't detected as particles.
+- On the lab's photos it agrees with the hand-placed reading on EX_01_S01 (30.66 vs 30.67 px/mm) and S03 (15.95 vs 15.99), and was checked by eye on 21 of 22 photos with `--check-image` (one printed number per 10 mm line). It fails on EX_02_S03, whose ruler is inch-only, and finds nothing on OC_07_DS1.
+- It is a validation tool for now. The same approach could be the app's scale fallback for photos without the printed sheet.
+
+### Tests on every push (November 12, 2026)
+
+- `.github/workflows/tests.yml`: pipeline tests, the ruler reader's tests, the browser parity tests (with the pinned OpenCV.js fetched and hash-checked), and `scripts/sync_plan.py --check`, which fails if the tracker is out of step with `docs/PIPELINE.md`.
+
 ### Repository (October 28 – November 4, 2026)
 
 - The plan, issues and tracker are kept in sync from `docs/PIPELINE.md` with `scripts/sync_plan.py`.

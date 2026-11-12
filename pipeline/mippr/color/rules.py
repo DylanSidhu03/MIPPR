@@ -81,7 +81,11 @@ def color_classes(img_bgr, mask, opacity_value=None):
     y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
     crop = cv2.medianBlur(np.ascontiguousarray(img_bgr[y0:y1, x0:x1]), 3)
     px = crop[m[y0:y1, x0:x1]]
-    lab = lab_cie(px)
+    return label_from_lab(lab_cie(px), opacity_value)
+
+
+def label_from_lab(lab, opacity_value=None):
+    """The particle-level decision of color_classes, from its CIE Lab pixels (used for fitting too)."""
     cls = pixel_classes(lab)
     names, counts = np.unique(cls, return_counts=True)
     order = np.argsort(-counts)

@@ -45,8 +45,10 @@ Folder: [pipeline/mippr/capture/](../pipeline/mippr/capture/README.md) and `back
 - [x] Read the scale from the legacy checkerboard: µm/px = square size / px per square
 - [x] Normalize white balance using the printed white patch; the grey patch is checked (`run.json`)
 - [x] Write unit tests on synthetic photos with tilt, lens distortion, uneven light, blur and noise
-- [ ] Check photo quality before processing (blur, too dark, glare, missing markers, too few px per mm) and give a clear message instead of a bad result (`check_quality`, planned)
-- [ ] Scale fallback for photos without the printed sheet: read a ruler's ticks (a working version is in `validation/lab_photo_check.py`)
+- [x] Check photo quality before processing and give a clear message instead of a bad result (`capture/calibration.py` `check_quality`): missing markers, blur, too dark, overexposed, glare, uneven light, colour cast, too few px per mm. Limits set on degraded synthetic photos; `run.json` records them.
+- [ ] Confirm the quality limits on the first real phone photos of the printed sheets (blur 0.30 mm, white patch 110, 10 px/mm)
+- [x] Scale fallback for photos without the printed sheet: read a ruler's ticks with no help (`validation/ruler.py`: finds the millimetre edge, tells it from an inch edge, refines over hundreds of ticks; right on 21 of the lab's 22 ruler photos, checked by eye)
+- [ ] Port the ruler reader to the browser for photos without the sheet; inch-only rulers aren't read
 - [ ] Record pixels per mm for each setup and check it against a ruler image
 - [ ] Measure a printed legacy checkerboard square with a ruler. The notes say 10 mm; the ImageJ results imply 10.07 mm.
 - [ ] Set file naming and folder layout. The metadata fields are already decided in the spec: sample ID, date, operator, lab, setup, site.
@@ -152,8 +154,9 @@ Folder: [pipeline/mippr/review/](../pipeline/mippr/review/README.md) (rules for 
 
 - [x] Decide how 'not plastic' particles are handled and what the output says when the model is unsure. The app doesn't test plastic or polymer, and every export says so. Uncertain particles get `review_reason` flags. `polymer_confirmed` columns are left for the lab.
 - [x] Decide the review columns: `review_status`, `*_original` labels, `outline_edited`, reviewer, role and time; rejected rows stay in particles.csv and leave the summary
-- [ ] Apply reviewer decisions (`review/corrections.py`): status, original labels kept, edited outlines re-measured, split and merge
-- [ ] Output a confidence score and order the review list: flagged and low-confidence particles first
+- [x] Apply reviewer decisions (`review/corrections.py`): confirm, reject, relabel, edit outline (re-measured exactly as the pipeline would), tag; original labels kept
+- [ ] Split and merge: decide the new particle IDs and what happens to the merged-away row
+- [x] Order the review list: flagged and low-confidence particles first, then unflagged, reviewed, rejected (`review_queue`)
 - [ ] Set the `flag_low_confidence` threshold from validation data
 - [ ] Build the review screen: outlines on the photo, accept / reject / relabel / redraw, keyboard shortcuts, tar-like and bundle tags
 - [ ] Count how many particles need review and how long it takes
@@ -221,16 +224,19 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
 - [ ] Process a whole folder with one command and one settings file (`batch.py`, planned); report each failed photo and why
 - [ ] Time it on 500 images and fix the slowest step
 - [ ] Sketch the screens: print background, upload, sample details, run, review, export
-- [ ] Offer the printable backgrounds on the website (the PDFs exist in `backgrounds/`)
+- [x] Offer the printable backgrounds on the website (download table in `web/index.html`)
 - [ ] Port parts 1–5 to the browser module by module (`web/src/`), each passing parity tests against the Python pipeline
-  - Check that the OpenCV.js build includes the ArUco module, or use a custom build or a JS marker library.
+  - Done: the official OpenCV.js 4.10.0 build has ArUco (`cv.aruco_ArucoDetector`); its marker corners match Python's to 0 px.
+  - Done: sheet layout, marker detection and rectification (`web/src/capture/sheet.js`), parity-tested against Python.
+  - Next: grid-crossing refinement (`rectify_grid`); the checkerboard needs a JS `cornerSubPix`, which 4.10.0 lacks.
   - Write a marching-squares step for the sub-pixel perimeter and a skeleton step for fiber length, which OpenCV.js lacks.
 - [ ] Run batches in the browser on the user's machine (no processing server)
 - [ ] Build the upload and progress screens, and a results table with overlays
 - [ ] Support scale entry for photos without the printed sheet, with clear guidance on how to take the photo
 - [ ] Export CSV and the overlay image, plus a PDF or HTML summary
 - [ ] Host on Cloudflare Pages from the GitHub repo, with upload size limits
-- [ ] Choose a license, add contribution notes and tests, and set up automated builds
+- [x] Run the tests on every push (GitHub Actions: pipeline, ruler reader, browser parity tests, plan in sync)
+- [ ] Choose a license and add contribution notes
 - [ ] Write the methods page: class definitions, calibration, accuracy and known limits
 - [ ] Tag version 1.0 with a changelog
 - [ ] Pilot with two or three outside users and collect what confused them

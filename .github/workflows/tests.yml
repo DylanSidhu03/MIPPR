@@ -1,0 +1,37 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pipeline/requirements.txt
+      - run: pip install -r pipeline/requirements.txt openpyxl
+      - name: Pipeline tests
+        working-directory: pipeline
+        run: python -m pytest tests -q
+      - name: Validation tools (ruler reader on drawn rulers)
+        working-directory: validation
+        run: python -m pytest test_ruler.py -q
+      - name: Plan, issues and tracker in sync
+        run: python scripts/sync_plan.py --check
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Fetch the pinned OpenCV.js (sha256 checked)
+        run: node web/scripts/fetch_opencv.mjs
+      - name: Browser code tests (parity with the Python pipeline)
+        run: node --test web/tests/

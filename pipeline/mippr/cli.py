@@ -27,7 +27,7 @@ import numpy as np
 
 from . import __version__
 from .capture.board import find_board
-from .capture.calibration import white_balance
+from .capture.calibration import check_quality, measure_quality, white_balance
 from .capture.sheet import BACKGROUNDS, PAPERS, Layout, find_sheet, save_sheet
 from .export import COLUMNS, METADATA, NOTE, SUMMARY_COLUMNS, build_rows, build_summary
 from .measurement.geometry import measure
@@ -77,7 +77,17 @@ def run_grid(photo_path, out_dir, sample_id="sample", photo=1, metadata=None, li
     img = cv2.imread(str(photo_path))
     if img is None:
         raise ValueError("Could not read the photo.")
-    sheet = find_sheet(img)
+    try:
+        sheet = find_sheet(img)
+    except ValueError as e:  # can't go on without the sheet; say what else is wrong with the photo
+        problems = check_quality(img)
+        raise ValueError("\n".join([str(e)] + [f"photo check: {p.message}" for p in problems
+                                                if p.code not in ("no_markers", "marker_missing")])) from e
+    # Photo quality check: warn, but measure anyway (the problems go into run.json).
+    quality = measure_quality(img, sheet)
+    problems = check_quality(img, sheet, metrics=quality)
+    for p in problems:
+        print(f"warning: {p.message}", file=sys.stderr)
     lay, ppm = sheet.layout, sheet.px_per_mm
     rect = sheet.rectify_grid(img)
     gains, wb = white_balance(sheet, img)
@@ -107,7 +117,8 @@ def run_grid(photo_path, out_dir, sample_id="sample", photo=1, metadata=None, li
         **(metadata or {}), "background_type": lay.background, "paper": lay.paper,
         "layout": {"box_mm": lay.box_mm, "line_mm": lay.line_mm, "rows": lay.rows, "cols": lay.cols},
         "markers_found": sheet.markers_found, "px_per_mm": ppm, "mm_per_px": mm_per_px,
-        "printed_line_mm": line_mm, "white_balance": wb, "params": vars(params)})
+        "printed_line_mm": line_mm, "white_balance": wb,
+        "quality": {"problems": [p.as_dict() for p in problems], "metrics": quality}, "params": vars(params)})
     return rows
 
 

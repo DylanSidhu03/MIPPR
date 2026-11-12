@@ -1,6 +1,7 @@
 """Keep docs/pipeline-tracker.html (and GitHub issue text) in step with docs/PIPELINE.md.
 
     python scripts/sync_plan.py                 # rewrite the tracker's stage data
+    python scripts/sync_plan.py --check         # fail if the tracker is out of date (CI)
     python scripts/sync_plan.py --issues DIR    # also write one issue body per part to DIR
                                                 # (--branch NAME to link to a branch other than main)
 
@@ -18,7 +19,7 @@ TRACKER = ROOT / "docs" / "pipeline-tracker.html"
 REPO_URL = "https://github.com/DylanSidhu03/MIPPR/blob/{branch}"
 APP_PART = 8  # the decision point (build the web app?) is shown at the top of this part's issue
 IDS = ["capture", "segment", "measure", "color", "morphology", "review", "truth", "app", "storage", "retrain"]
-STORAGE_KEY = "mippr-pipeline-v3"  # bump whenever the task list changes, so saved ticks don't shift onto other tasks
+STORAGE_KEY = "mippr-pipeline-v4"  # bump whenever the task list changes, so saved ticks don't shift onto other tasks
 
 
 def parse():
@@ -83,8 +84,8 @@ def tracker_data(stages):
     return out
 
 
-def write_tracker(stages):
-    html = TRACKER.read_text()
+def write_tracker(stages, check=False):
+    before = html = TRACKER.read_text()
     data = tracker_data(stages)
     block = "const STAGES=[\n" + ",\n".join(json.dumps(d, ensure_ascii=False) for d in data) + "\n];\n"
     html, n = re.subn(r"const STAGES=\[.*?\n\];\n", lambda _: block, html, flags=re.S)
@@ -98,7 +99,11 @@ def write_tracker(stages):
            'if(!state){state={};STAGES.forEach(s=>(s.done||[]).forEach((d,i)=>{if(d)state[s.id+":"+i]=1}))}')
     if old in html:
         html = html.replace(old, new)
-    TRACKER.write_text(html)
+    if check:
+        if html != before:
+            raise SystemExit("docs/pipeline-tracker.html is out of date: run python scripts/sync_plan.py")
+    else:
+        TRACKER.write_text(html)
     return data
 
 
@@ -133,9 +138,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--issues", help="folder to write issue_<n>.md bodies into")
     ap.add_argument("--branch", default="main", help="branch that issue links point to")
+    ap.add_argument("--check", action="store_true", help="fail if the tracker is out of date (for CI); writes nothing")
     a = ap.parse_args()
     stages = parse()
-    data = write_tracker(stages)
+    data = write_tracker(stages, check=a.check)
     done = sum(sum(s["done"]) for s in data)
     total = sum(len(s["tasks"]) for s in data)
     print(f"tracker: {len(data)} sections, {done} of {total} tasks ticked")

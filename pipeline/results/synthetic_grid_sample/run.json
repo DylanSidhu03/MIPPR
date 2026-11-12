@@ -39,6 +39,25 @@
     ],
     "grey_spread_after": 0.004194564496287967
   },
+  "quality": {
+    "problems": [],
+    "metrics": {
+      "missing_corners": [],
+      "markers_found": 4,
+      "px_per_mm": 10.7,
+      "edge_width_px": [
+        3.16,
+        3.17
+      ],
+      "edge_width_mm": 0.296,
+      "clipped_share": 0.0,
+      "white_level": 238.0,
+      "white_clipped": 0.0,
+      "glare_mm2": 0.0,
+      "light_ratio": null,
+      "grey_spread": 0.0
+    }
+  },
   "params": {
     "blur_sigma": 1.0,
     "high": 60.0,
