@@ -191,7 +191,7 @@ The app only takes photos on the three printed backgrounds, so the labelled set,
 - [ ] Time the manual workflow against the pipeline on the same batch
 - [ ] Run a small test on images from a second setup or lab
 
-**In:** The lab's spreadsheets and photos, new labels from review, the app's output.  
+**In:** Labelled photos on the printed sheets (the lab's labelled particles re-photographed, and new labels from review), the app's output; the lab's spreadsheets and older photos as a cross-check.  
 **Out:** Tuned thresholds, a split labelled set, a gold test set, and a validation report.  
 **Watch for:** Don't tune on the test set. A method proven only on the pilot setup isn't a standard method.
 
