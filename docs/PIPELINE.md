@@ -174,7 +174,7 @@ Folder: [pipeline/mippr/review/](../pipeline/mippr/review/README.md) (rules for 
 Folder: [validation/](../validation/README.md). The lab's data stays in Drive.
 
 - [x] Find out whether a labeled set already exists from past hand-classification (open question 4). It does: about 4,600 particles with shape and colour, and about 4,000 with hand-measured length and width, in the Drive ParticleCount spreadsheets ([LAB_DATA.md](LAB_DATA.md)).
-- [x] Match the lab's "Rows A–H" photos to their spreadsheet rows by sample and well (`validation/lab_photo_check.py`; done for EX_01_S01 and S03)
+- [x] Match the lab's "Rows A–H" photos to their spreadsheet rows by sample and well (`validation/lab_photo_check.py`; 20 photos so far)
 - [x] Compare automated sizes with the lab's ImageJ results on the fragment_area sample. Median differences across 24 particles: area +0.5%, Feret −0.2%, min Feret +0.1%.
 - [ ] Settle the scale gap with the lab: the app's sizes are 8–12% larger than the sheet on five EX_01 photos but within 2% on three others. Measure one particle from EX_01_S07 with calipers.
 - [ ] Ask the lab how length and width are measured, and why width is larger than length in SF_02/SF_03
