@@ -181,14 +181,13 @@ The app only takes photos on the three printed backgrounds, so the labelled set,
 - [ ] Settle the scale gap with the lab: the app's sizes are 8–12% larger than the sheet on five EX_01 photos but within 2% on three others. Measure one particle from EX_01_S07 with calipers.
 - [ ] Ask the lab how length and width are measured, and why width is larger than length in SF_02/SF_03
 - [x] Run the photo check on more samples and collect the matches into one table: 20 photos, 1,210 particles paired, 8 photos reliable ([report](../validation/reports/lab_photos.md)). The size gap varies by photo (+12% to −2%), so it comes from the lab's scale settings, not the app. SF_04 has no sheet in Drive.
-- [ ] Compare automated sizes with manual caliper or microscope measurements on 50 particles
 - [ ] Re-photograph the lab's labelled particles on the printed sheets (all three backgrounds), with a well-to-box list, so their hand labels and sizes carry over
 - [ ] Compare box by box: length and width against the lab's sizes, colour and morphology against the lab's labels; report agreement per class and the confusion between classes
 - [ ] Count detection from the well-to-box list: boxes with a particle the app missed, and extra detections in boxes listed empty
 - [ ] Measure 30–50 of those particles with calipers, to decide which is right where the app and the lab's sizes disagree (the lab's older sizes vary by session)
 - [ ] Set each flag's threshold from the results: `flag_size_uncertain` (which `size_uncertainty` goes with a wrong size), `flag_low_contrast`, `flag_merged`, and `flag_low_confidence` once confidences exist. Record how many wrong results each flag catches and how many it misses.
 - [ ] Shoot a pilot batch of 50 to 100 particles on the printed sheets, covering every class
-- [ ] Choose an annotation tool (CVAT, Label Studio or similar) and set it up with the class list from the spec
+- [ ] Set up a per-box label sheet (sample, photo, box, colour, morphology, labeller), with the class lists from the spec; no outline annotation tool is needed
 - [ ] Label colour and morphology (one label per box, no outlines) on at least 300 more particles on the sheets, including film, foam and clear particles
 - [ ] Have a second person label a 20% subset independently
 - [ ] Measure agreement between labelers (Cohen's kappa for classes)

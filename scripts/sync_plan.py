@@ -117,7 +117,8 @@ def issue_bodies(stages, branch):
         num = int(s["title"].split(".")[0])
         anchor = re.sub(r"[^a-z0-9 -]", "", s["title"].lower()).replace(" ", "-")
         lines = [f"**Goal:** {s['goal']}", ""]
-        lines += [n for n in s["notes"]] + ([""] if s["notes"] else [])
+        for n in s["notes"]:
+            lines += [n, ""]
         if num == APP_PART:
             lines += ["**Decision point first.** " + " ".join(gate["notes"]), ""]
             lines += [f"- [{'x' if t['done'] else ' '}] {t['text']}" for t in gate["tasks"]] + ["", "**Tasks**", ""]
