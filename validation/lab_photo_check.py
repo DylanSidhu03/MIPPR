@@ -165,6 +165,30 @@ def read_sheet(path, sample):
     return out
 
 
+def main_cluster(particles, k=3.0):
+    """Indices of the particles laid out on the plate grid: the largest group of points linked
+    at under k times the median nearest-neighbour distance. Specks on tape or card edges
+    around the disc are farther away and fall out."""
+    xy = np.array([[p["x"], p["y"]] for p in particles])
+    if len(xy) < 3:
+        return np.arange(len(xy))
+    d = np.hypot(*(xy[:, None, :] - xy[None, :, :]).transpose(2, 0, 1))
+    np.fill_diagonal(d, np.inf)
+    link = d < k * np.median(d.min(axis=1))
+    group = -np.ones(len(xy), int)
+    for i in range(len(xy)):
+        if group[i] >= 0:
+            continue
+        group[i], stack = i, [i]
+        while stack:
+            j = stack.pop()
+            for n in np.nonzero(link[j] & (group < 0))[0]:
+                group[n] = i
+                stack.append(n)
+    biggest = np.bincount(group).argmax()
+    return np.nonzero(group == biggest)[0]
+
+
 def match(particles, sheet):
     """Assign wells by column and position; pick the column order and direction that agree best.
 
@@ -174,13 +198,24 @@ def match(particles, sheet):
     row_of = lambda w: (int(w[1:]) - 1) // 12  # noqa: E731
     letters = sorted({row_of(w) for w in sheet})
     ncol = len(letters)
-    xs = np.array([p["x"] for p in particles])
-    order = np.argsort(xs)
-    col = np.zeros(len(particles), int)
-    if ncol > 1:
-        cut = np.sort(np.argsort(np.diff(xs[order]))[-(ncol - 1):])
-        for c in cut:
-            col[order[c + 1:]] += 1
+    expected = [sum(1 for w in sheet if row_of(w) == L) for L in letters]
+    keep = main_cluster(particles)
+    for _ in range(20):
+        # cut at the ncol - 1 widest gaps; a "column" far smaller than any plate row is
+        # stray specks (or a bit of ruler): drop those points and cut again
+        xs = np.array([particles[i]["x"] for i in keep])
+        order = np.argsort(xs)
+        col_k = np.zeros(len(keep), int)
+        if ncol > 1:
+            for c in np.sort(np.argsort(np.diff(xs[order]))[-(ncol - 1):]):
+                col_k[order[c + 1:]] += 1
+        counts = np.bincount(col_k, minlength=ncol)
+        small = [c for c in range(ncol) if counts[c] < max(2, 0.4 * min(expected))]
+        if not small:
+            break
+        keep = keep[~np.isin(col_k, small)]
+    col = np.full(len(particles), -1)
+    col[keep] = col_k
     present = lambda w: sheet[w].get("L") not in (None, "")  # noqa: E731
     best = None
     for rtl in (True, False):
@@ -200,20 +235,11 @@ def match(particles, sheet):
                 r = float(np.corrcoef(*zip(*pairs))[0, 1])
                 if best is None or r > best[0]:
                     best = (r, m, rtl, top_down)
-    return best, [int((col == c).sum()) for c in range(ncol)]
+    return best, [int((col == c).sum()) for c in range(ncol)] + [int((col < 0).sum())]
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("photo")
-    ap.add_argument("sheet")
-    ap.add_argument("sample")
-    ap.add_argument("--ruler", nargs=4, type=float, metavar=("X0", "X1", "Y0", "Y1"))
-    ap.add_argument("--roi", nargs=4, type=float, metavar=("X0", "X1", "Y0", "Y1"))
-    ap.add_argument("--px-per-mm", type=float)
-    ap.add_argument("--out")
-    a = ap.parse_args()
-    img = cv2.imread(a.photo)
+def detect(img, a):
+    """Scale, background type and every particle found on the photo (with colour pixels)."""
     s = img.shape[1] / PREVIEW_W
     exclude = None
     if a.px_per_mm:
@@ -236,16 +262,41 @@ def main():
     measured = measure(labels, img, 1000 / ppm, None, diff, 0.5, 3, bg_img=bg)
     particles = []
     for m in measured:
-        morph = morphology(m)[0]
         if m["feret_max_um"] > MAX_LENGTH_MM * 1000:
             continue  # the ruler's end, a label or the disc's edge, not a particle
         particles.append({"x": m["x_um"] / 1000, "y": m["y_um"] / 1000, "length_mm": m["feret_max_um"] / 1000,
-                          "width_mm": m["feret_min_um"] / 1000, "color": m["color_label"], "morphology": morph,
-                          "label": m["particle"], "color_stats": {k: m.get(k) for k in COLOR_KEYS}})
+                          "width_mm": m["feret_min_um"] / 1000, "color": m["color_label"],
+                          "morphology": morphology(m)[0], "color_stats": {k: m.get(k) for k in COLOR_KEYS},
+                          "lab_px": lab_sample(img, labels == m["particle"])})
+    return ppm, sd, how, background, particles
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("photo")
+    ap.add_argument("sheet")
+    ap.add_argument("sample")
+    ap.add_argument("--ruler", nargs=4, type=float, metavar=("X0", "X1", "Y0", "Y1"))
+    ap.add_argument("--roi", nargs=4, type=float, metavar=("X0", "X1", "Y0", "Y1"))
+    ap.add_argument("--px-per-mm", type=float)
+    ap.add_argument("--out")
+    ap.add_argument("--cache", help="save the detected particles here, or read them if the file exists")
+    a = ap.parse_args()
+    cache = Path(a.cache) if a.cache else None
+    if cache and cache.exists():
+        c = json.loads(cache.read_text())
+        ppm, sd, how, background, particles = c["px_per_mm"], c["spread"], c["how"], c["background"], c["particles"]
+        print(f"scale: {ppm:.3f} px/mm ({how}; detection read from {cache.name})")
+    else:
+        img = cv2.imread(a.photo)
+        ppm, sd, how, background, particles = detect(img, a)
+        if cache:
+            cache.write_text(json.dumps({"px_per_mm": ppm, "spread": sd, "how": how, "background": background,
+                                         "particles": particles}))
     sheet = read_sheet(a.sheet, a.sample)
     print(f"particles found: {len(particles)}; sheet rows with a W well: {len(sheet)}")
     best, per_col = match(particles, sheet)
-    print("particles per column, left to right:", per_col)
+    print("particles per column, left to right:", per_col[:-1], f"(+{per_col[-1]} strays left out)")
     summary = {"photo": Path(a.photo).name, "sample": a.sample, "px_per_mm": ppm, "scale_spread": sd,
                "scale_source": how, "background": background, "n_found": len(particles), "n_sheet": len(sheet),
                "per_column": per_col}
@@ -266,7 +317,7 @@ def main():
                      "hand_width_mm": float(h["W"]) / 1000, "app_width_mm": p["width_mm"],
                      "hand_shape": str(h.get("shape") or ""), "app_morphology": p["morphology"],
                      "hand_color": str(h.get("color") or ""), "app_color": p["color"],
-                     "color_stats": p["color_stats"], "lab_px": lab_sample(img, labels == p["label"])})
+                     "color_stats": p["color_stats"], "lab_px": p["lab_px"]})
     for what in ("length", "width"):
         hand = np.array([x[f"hand_{what}_mm"] for x in rows])
         app = np.array([x[f"app_{what}_mm"] for x in rows])

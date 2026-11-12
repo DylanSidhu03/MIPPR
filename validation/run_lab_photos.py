@@ -29,7 +29,8 @@ def run(photos_csv, photo_dir, sheet_dir, out_dir):
         stem = Path(row["photo"]).stem
         js = out_dir / f"{stem}.json"
         cmd = [sys.executable, str(HERE / "lab_photo_check.py"), str(Path(photo_dir) / row["photo"]),
-               str(Path(sheet_dir) / row["sheet"]), row["sample"], "--out", str(js)]
+               str(Path(sheet_dir) / row["sheet"]), row["sample"], "--out", str(js),
+               "--cache", str(out_dir / f"{stem}.particles.json")]
         cmd += shlex.split(row.get("extra") or "")
         p = subprocess.run(cmd, capture_output=True, text=True)
         (out_dir / f"{stem}.txt").write_text(p.stdout + p.stderr)

@@ -39,7 +39,7 @@ def lab_label(s):
 
 def load(results_dir):
     rows = []
-    for f in sorted(Path(results_dir).glob("*.json")):
+    for f in sorted(p for p in Path(results_dir).glob("*.json") if not p.name.endswith(".particles.json")):
         d = json.loads(f.read_text())
         for r in d.get("rows", []):
             hand = lab_label(r["hand_color"])
