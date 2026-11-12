@@ -4,7 +4,12 @@ ImageJ measured cropped_particle.jpg, a straight crop of particle.jpg, at
 74.904 um/px. This maps each ImageJ centroid back into the photo, then onto
 the rectified board, and pairs it with the nearest MIPPR particle.
 
-    python validation/compare_imagej.py FRAGMENT_AREA_DIR MIPPR_CSV [--square-mm 10]
+    python validation/legacy/run.py FRAGMENT_AREA_DIR/particle.jpg FRAGMENT_AREA_DIR/template.jpg \
+        --square-mm 10 --sample-id FA01 --out OUT
+    python validation/compare_imagej.py FRAGMENT_AREA_DIR OUT/particles.csv [--square-mm 10]
+
+The lab's old checkerboard is a validation setup only (validation/legacy/); the app
+takes photos on the three printed MIPPR backgrounds.
 """
 import argparse
 import sys
@@ -15,7 +20,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "pipeline"))
-from mippr.capture.board import find_board  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from legacy.board import find_board  # noqa: E402
 
 IMAGEJ_UM_PER_PX = 74.904
 

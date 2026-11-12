@@ -33,7 +33,8 @@ def _m(**kw):
 def _rows():
     ms = [_m(particle=1, box="A1"), _m(particle=2, box="B3", feret_max_um=6000.0),
           _m(particle=3, box="C2", feret_min_um=300.0, color_confidence=0.4)]
-    return build_rows(ms, "S042", "S042-P01", "img", {}, "0.1.0", 0.07, "2026-11-02T00:00:00+00:00")
+    return build_rows(ms, "S042", "S042-P01", "img", {}, "0.1.0", 0.07, "2026-11-02T00:00:00+00:00",
+                      background_type="white_grid")
 
 
 def _d(ref, action, at="2026-11-12T10:00:00Z", **kw):
@@ -167,7 +168,7 @@ def grid_sample(tmp_path_factory):
                          color_img=balanced, line_mask=near_line,
                          box_fn=lambda x, y: lay.box_label(*box_of(lay, ppm, x, y)),
                          edge_fraction=params.edge_fraction, edge_margin_px=int(np.ceil(outer)) + 2)
-    measured = measure(labels, rect, ctx.mm_per_px * 1000, None, diff, ctx.edge_fraction,
+    measured = measure(labels, rect, ctx.mm_per_px * 1000, diff, ctx.edge_fraction,
                        edge_margin_px=ctx.edge_margin_px, box_fn=ctx.box_fn, line_mask=near_line,
                        color_img=balanced, bg_img=ctx.background)
     masks = {}

@@ -1,6 +1,6 @@
 {
   "mippr_version": "0.1.0",
-  "mode": "legacy",
+  "mode": "legacy (validation only)",
   "particle": "/home/user/moore-institute-4-plastic-pollution-res/fragment_area/particle.jpg",
   "template": "/home/user/moore-institute-4-plastic-pollution-res/fragment_area/template.jpg",
   "sample_id": "FA01",

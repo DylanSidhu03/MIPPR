@@ -58,7 +58,7 @@ Merged with the Drive doc "Output CSV: data dictionary and rationale" (Draft 1).
 - **More than one blob in a box:** one row per blob (`B4-1`, `B4-2`, top to bottom then left to right), each with `flag_multi_blob`.
 - **Lines:** one `flag_line`, set when the outline reaches a printed line plus a 0.25 mm margin. Fibers crossing into the next box are kept in one piece.
 - **`background_type`:** `white_grid`, `black_grid`, `checkerboard`.
-- **Merged flag on grids:** solidity only. The area rule is kept for the legacy board.
+- **Merged flag on grids:** solidity only. (The area rule existed only for the lab's old board and went with it on November 12.)
 - **Sheet design (November 5, 2026):** the "Standard" design for all three backgrounds, chosen from three options (Compact 10 mm / Standard 12 mm / Large 15 mm boxes). It still needs testing on real photos (Drive open question 1a).
   - 12 mm boxes and 0.5 mm lines
   - each box's label (e.g. `B4`) printed small and mid-grey in its top-left corner, as well as row and column labels in the margin
@@ -70,7 +70,7 @@ Merged with the Drive doc "Output CSV: data dictionary and rationale" (Draft 1).
   - the sheets are vector PDFs (about 3 KB each) in [backgrounds/](../backgrounds/README.md), with copies in the Drive folder "Backgrounds"
 - **Prototype direction:**
   - The grid pipeline is primary: printable sheet generator, marker detection, refinement from the grid's crossings, and per-box segmentation against each box's own background color (no empty-board photo).
-  - The checkerboard + empty-board method stays as `legacy`, for the lab's existing photos.
+  - The checkerboard + empty-board method stays as `legacy`, for the lab's existing photos. (Superseded November 12: moved to `validation/legacy/`.)
 - **White balance:** per-channel gains that make the printed white patch neutral; the grey patch is checked.
 - **Scale:**
   - from the markers
@@ -91,6 +91,15 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 - **Tar:** an optional reviewer tag `tar_like`; no automatic detection.
 - **Validation:** match the lab's plate photos to their spreadsheet rows and compare per class; the pass mark is set after.
 
+### Photos are always on one of the three printed backgrounds (November 12, 2026)
+
+Decided by the user: the project runs on the assumption that every photo is taken on one of the three printed backgrounds (white grid, black grid, checkerboard). So:
+- **The app has one input.** A photo without the sheet's corner markers is refused, with a message to photograph it on a printed background; the markers give the scale, the flattening and the background type. There is no ruler fallback and no manual scale entry. The only scale correction is the printed 100 mm line (`--line-mm`, `scale_source = user_corrected`).
+- **The lab's old 12 × 24 checkerboard is no longer an app mode.** The `legacy` command, `capture/board.py` and `segmentation/legacy.py` moved to `validation/legacy/`, where they only reproduce the lab's earlier setup to compare with its ImageJ results. The shared edge steps (hysteresis, hole filling, half-maximum edges) moved to `segmentation/edges.py`. `measure()` no longer knows about wells or `px_per_square`. `scale_source = checkerboard` and the area rule for `flag_merged` are gone; the database draft now allows only the three background types and `markers` / `user_corrected`.
+- **The ruler reader is validation only** (`validation/ruler.py`), used to check the measurement code on the lab's older photos.
+- **Labelled data comes from the sheets.** Colour fitting, rule tuning, the v3 training set, the gold set and the pass mark all use photos on the printed sheets. The proposed route: the lab re-photographs its already-labelled particles on the sheets with a well-to-box list, so the hand labels carry over. The lab's older photos stay a cross-check only (their colour cast and per-session scale settings make them unfit as ground truth anyway).
+- **Overexposure warning on the lab's old photos:** no longer a question; those photos aren't app inputs.
+
 ### Repository organized by the 10 parts (November 12, 2026)
 
 - The plan, the issues (#1–#10) and the folders follow the project's 10 parts: capture and calibration, segmentation, measurement, colour, morphology, review, ground truth and validation, app, storage, and retraining. The old 11-stage plan was folded in, and #11 was closed.
@@ -104,7 +113,7 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 
 - **Plain ES modules, no build step** (confirmed by going ahead with the build). Cloudflare Pages serves `web/` as it is.
 - **OpenCV.js 4.10.0, the official build, pinned by version and hash.** It includes ArUco: `cv.getPredefinedDictionary`, `cv.aruco_DetectorParameters` and `cv.aruco_ArucoDetector` (note the `aruco_` prefix). On synthetic photos its marker corners match Python's `cv2.aruco` to 0 px, in Node and in Chromium. 4.12.0 gives the same; 5.0.0 works but returns marker IDs in a different shape.
-  - Missing from 4.10.0 and needed later: `cornerSubPix` (checkerboard crossing refinement), `findChessboardCorners` (legacy board), `boxPoints`. These need small JS versions or a custom build.
+  - Missing from 4.10.0 and needed later: `cornerSubPix` (checkerboard crossing refinement) and `boxPoints`. These need small JS versions or a custom build.
   - The page loads the file from jsDelivr with an SRI hash. `web/scripts/fetch_opencv.mjs` downloads the same file for tests (from the npm package `@techstark/opencv-js@4.10.0-release.1`, which is the official file plus a one-line UMD wrapper; sha256 checked). Not committed (10.4 MB).
   - To decide: serve it from jsDelivr or from Cloudflare Pages itself (files up to 25 MiB are allowed).
 - **Parity tests:** `node --test web/tests/` compares the JS layout with Python's (within 1e-6 mm), the marker corners, the homography (within 0.01 px) and the rectified sheet (within 1 grey level). Fixtures are generated from the Python pipeline by `web/tests/dump_python_*.py`.
@@ -127,7 +136,7 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 
 - `validation/ruler.py` reads the scale from a ruler with no help: it finds the tick edge, tells a millimetre edge from an inch edge by the repeats further in (0.5 → 1 → 5 → 10 mm, versus x2 steps), and refines over hundreds of ticks by autocorrelation. It also returns a mask of the ruler so its ticks and numbers aren't detected as particles.
 - On the lab's photos it agrees with the hand-placed reading on EX_01_S01 (30.66 vs 30.67 px/mm) and S03 (15.95 vs 15.99), and was checked by eye on 21 of 22 photos with `--check-image` (one printed number per 10 mm line). It fails on EX_02_S03, whose ruler is inch-only, and finds nothing on OC_07_DS1.
-- It is a validation tool for now. The same approach could be the app's scale fallback for photos without the printed sheet.
+- It is a validation tool only: the app takes photos on the printed sheets, whose markers give the scale.
 
 ### Tests on every push (November 12, 2026)
 

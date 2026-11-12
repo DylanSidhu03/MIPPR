@@ -21,14 +21,14 @@ Conceptual decisions and project context live in [CLAUDE.md](../CLAUDE.md) (Driv
 
 ## 1. Capture and calibration
 
-**Goal:** Turn a photo into a flat, correctly scaled, colour-corrected image whose grid geometry is known exactly.
+**Goal:** Turn a photo on one of the three printed backgrounds into a flat, correctly scaled, colour-corrected image whose grid geometry is known exactly. Every photo is taken on a printed sheet; there is no other input.
 
 **Flow:** Photo of particles on a printed sheet -> Flattened grid image + scale + white balance
 
 Folder: [pipeline/mippr/capture/](../pipeline/mippr/capture/README.md) and `backgrounds/`. Every number downstream depends on this part.
 
 - [ ] Pick the imaging setup and lock height, zoom and lighting. Proposed: diffuse even light, no flash, roughly overhead, phone-friendly.
-- [ ] Set a minimum photo resolution. The lab's ruler photos are 33–63 µm/px; the old checkerboard photos about 75 µm/px, where a 500 µm particle is only about 7 px across. Fiber widths (about 24 µm) can't be resolved on a whole-sheet photo.
+- [ ] Set a minimum photo resolution for a whole-sheet phone photo (the quality check rejects under 10 px/mm, where a 500 µm particle is 5 px across). Fiber widths (about 24 µm) can't be resolved on a whole-sheet photo.
 - [x] Choose the backgrounds. Decided in Drive v0.6: three grids with identical square boxes (white boxes/black lines, black boxes/white lines, checkerboard), one particle per box; the box label is the particle ID.
 - [x] Make the printable sheets: `backgrounds/` (vector PDF, Letter and A4; corner markers encoding the background, 100 mm line, white/grey patches, row and column labels)
 - [x] Choose the sheet design: "Standard" for all three backgrounds (12 mm boxes, 0.5 mm lines, each box's label printed in its corner), chosen November 5 from three options
@@ -40,20 +40,15 @@ Folder: [pipeline/mippr/capture/](../pipeline/mippr/capture/README.md) and `back
 - [ ] Put a color reference in every frame. The white and grey patches are on the sheets; decide whether hue classes also need colored patches.
 - [x] Keep the grid in the center, clear of the markers, with row/column labels and the patches in the margin
 - [x] Correct perspective and lens distortion on the printed grids: markers first, then the grid's line crossings (or checkerboard corners). About 0.1 px in synthetic tests; not yet tested on real photos.
-- [x] Correct perspective and lens distortion on the lab's legacy checkerboard: each square is warped using its own four corners (about 3 px down to 0.1 px)
 - [x] Read the scale from the corner markers, with the 100 mm check line correction (`--line-mm`, sets `flag_scale`)
-- [x] Read the scale from the legacy checkerboard: µm/px = square size / px per square
 - [x] Normalize white balance using the printed white patch; the grey patch is checked (`run.json`)
 - [x] Write unit tests on synthetic photos with tilt, lens distortion, uneven light, blur and noise
-- [x] Check photo quality before processing and give a clear message instead of a bad result (`capture/calibration.py` `check_quality`): missing markers, blur, too dark, overexposed, glare, uneven light, colour cast, too few px per mm. Limits set on degraded synthetic photos; `run.json` records them.
+- [x] Check photo quality before processing and give a clear message instead of a bad result (`capture/calibration.py` `check_quality`): missing markers, blur, too dark, overexposed, glare, uneven light, colour cast, too few px per mm. Limits set on degraded synthetic photos; `run.json` records them. A photo without the sheet's markers is refused with a message saying to photograph it on a printed background.
 - [ ] Confirm the quality limits on the first real phone photos of the printed sheets (blur 0.30 mm, white patch 110, 10 px/mm)
-- [x] Scale fallback for photos without the printed sheet: read a ruler's ticks with no help (`validation/ruler.py`: finds the millimetre edge, tells it from an inch edge, refines over hundreds of ticks; right on 21 of the lab's 22 ruler photos, checked by eye)
-- [ ] Port the ruler reader to the browser for photos without the sheet; inch-only rulers aren't read
-- [ ] Record pixels per mm for each setup and check it against a ruler image
-- [ ] Measure a printed legacy checkerboard square with a ruler. The notes say 10 mm; the ImageJ results imply 10.07 mm.
+- [ ] Check the marker scale against a ruler on the first real sheet photos (it should agree to well under 1%)
 - [ ] Set file naming and folder layout. The metadata fields are already decided in the spec: sample ID, date, operator, lab, setup, site.
 
-**In:** A photo on a printed sheet (or the lab's legacy checkerboard).  
+**In:** A photo on a printed sheet: white grid, black grid or checkerboard.  
 **Out:** Flattened grid image, layout, px per mm, white balance, scale flags.  
 **Watch for:** Glare, shadows and scale errors. Fixing them at capture is cheaper than in code, and a scale error moves every particle.
 
@@ -67,7 +62,6 @@ Folder: [pipeline/mippr/segmentation/](../pipeline/mippr/segmentation/README.md)
 
 - [x] Build a classical baseline: difference from the known background, hysteresis threshold, half-maximum edge placement
 - [x] Segment box by box on the three printed grids, each box against its own background colour, with no template photo (synthetic tests)
-- [x] Legacy board: difference from an empty-board photo, brightness-matched square by square
 - [x] Handle printed lines: the difference is bridged across lines and label corners, so a line never becomes a particle
 - [x] Keep fibers that cross a printed line in one piece (`flag_line`)
 - [x] Handle touching particles: avoided by design (one particle per box). Two blobs in a box are kept as separate rows with `flag_multi_blob`.
@@ -76,7 +70,7 @@ Folder: [pipeline/mippr/segmentation/](../pipeline/mippr/segmentation/README.md)
 - [ ] Handle translucent films and clear particles. Low-contrast outlines are flagged for review for now.
 - [ ] Detect thin fibers (about 24 µm wide, under one pixel on a sheet photo) as faint lines, so their length can be measured
 - [ ] Test grid segmentation on real phone photos of the printed sheets
-- [ ] Score segmentation on the labelled set: detection recall and precision, outline overlap. On the lab's two ruler photos every particle was found.
+- [ ] Score segmentation on labelled photos of the printed sheets: detection recall and precision, outline overlap. (On the lab's older ruler photos, used only as a check, 650 particles paired reliably.)
 - [ ] Optional: compare with a learned segmenter (Cellpose, SAM or a small U-Net), only if the threshold falls short
 
 **In:** Flattened grid image and layout from part 1.  
@@ -116,7 +110,7 @@ Folder: [pipeline/mippr/color/](../pipeline/mippr/color/README.md).
 - [x] List color classes: 13 classes. Clear and white are kept separate by opacity; multicolor means a second, clearly different color covers ≥ 20%.
 - [x] Measure mean and SD of CIE Lab per particle, ignoring edge pixels, plus a hex code
 - [x] Classify every pixel into a colour class (provisional Lab rules) and record the main colour, the second colour and its share (`color_secondary`, `color_secondary_fraction`)
-- [ ] Fit the colour rules to labelled particles. Tried on the lab's photos (`validation/fit_colors.py`): no gain (90.9% vs 90.8%), because the photos aren't white-balanced (a purple-blue cast on every particle) and almost all particles are black. Needs white-balanced photos of the printed sheets with coloured particles; the rules stay `0.1-provisional`.
+- [ ] Fit the colour rules to labelled particles photographed on the sheets (white-balanced by the grey patch). Tried on the lab's older photos (`validation/fit_colors.py`): no gain (90.9% vs 90.8%), because the photos aren't white-balanced (a purple-blue cast on every particle) and almost all particles are black. Needs white-balanced photos of the printed sheets with coloured particles; the rules stay `0.1-provisional`.
 - [ ] Add a reference swatch and Lab range per color class to the spec (once the color reference is settled in part 1)
 - [ ] Check clear vs white on real photos on both backgrounds
 
@@ -134,7 +128,7 @@ Folder: [pipeline/mippr/morphology/](../pipeline/mippr/morphology/README.md) (ru
 
 - [x] List morphology classes with a written visual rule for each: fragment, rubbery fragment, fiber, film, foam, pellet, other. A fiber is length:width ≥ 3:1. Rubbery fragment was added on November 11 from the lab's records.
 - [x] Classify fiber, pellet and film by rules (v2): length:width ≥ 3 (centre-line ratio for particles that bend), round and solid for pellet, low opacity for film. The thresholds are provisional.
-- [ ] Tune the rule thresholds on the lab's labels. The lab records some ≥ 3:1 particles as fragments, so the fiber rule may need a thinness condition.
+- [ ] Tune the rule thresholds on labelled particles photographed on the sheets. The lab records some ≥ 3:1 particles as fragments, so the fiber rule may need a thinness condition.
 - [ ] Cut particle crops with the background blanked (`crop_particle`), for training and inference
 - [ ] Train an image model on crops + shape values (v3) for fragment, rubbery fragment and foam. Compare a classifier chain with one multi-task model.
 - [ ] Decide when the model may overrule a rule (decided that it may; set the confidence from validation data)
@@ -173,6 +167,8 @@ Folder: [pipeline/mippr/review/](../pipeline/mippr/review/README.md) (rules for 
 
 Folder: [validation/](../validation/README.md). The lab's data stays in Drive.
 
+The app only takes photos on the three printed backgrounds, so the labelled set, the gold set and the pass marks are built from photos on the sheets. The lab's older photos (a ruler on white or black paper, and the old 12 × 24 checkerboard) are only a cross-check of the measurement code. The quickest route to a labelled set on the sheets: re-photograph the lab's already-labelled particles, one per box, recording which well went into which box, so the hand labels carry over.
+
 - [x] Find out whether a labeled set already exists from past hand-classification (open question 4). It does: about 4,600 particles with shape and colour, and about 4,000 with hand-measured length and width, in the Drive ParticleCount spreadsheets ([LAB_DATA.md](LAB_DATA.md)).
 - [x] Match the lab's "Rows A–H" photos to their spreadsheet rows by sample and well (`validation/lab_photo_check.py`; 20 photos so far)
 - [x] Compare automated sizes with the lab's ImageJ results on the fragment_area sample. Median differences across 24 particles: area +0.5%, Feret −0.2%, min Feret +0.1%.
@@ -180,9 +176,10 @@ Folder: [validation/](../validation/README.md). The lab's data stays in Drive.
 - [ ] Ask the lab how length and width are measured, and why width is larger than length in SF_02/SF_03
 - [x] Run the photo check on more samples and collect the matches into one table: 20 photos, 1,210 particles paired, 8 photos reliable ([report](../validation/reports/lab_photos.md)). The size gap varies by photo (+12% to −2%), so it comes from the lab's scale settings, not the app. SF_04 has no sheet in Drive.
 - [ ] Compare automated sizes with manual caliper or microscope measurements on 50 particles
+- [ ] Re-photograph the lab's labelled particles on the printed sheets (all three backgrounds), with a well-to-box list, so their hand labels and sizes carry over
 - [ ] Shoot a pilot batch of 50 to 100 particles on the printed sheets, covering every class
 - [ ] Choose an annotation tool (CVAT, Label Studio or similar) and set it up with the class list from the spec
-- [ ] Outline particles and tag color and morphology on at least 300 particles, including film, foam and clear particles
+- [ ] Outline particles and tag color and morphology on at least 300 particles on the sheets, including film, foam and clear particles
 - [ ] Have a second person label a 20% subset independently
 - [ ] Measure agreement between labelers (Cohen's kappa for classes, overlap for outlines)
 - [ ] Resolve disagreements and update the class spec from what you learn
@@ -232,7 +229,7 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
   - Write a marching-squares step for the sub-pixel perimeter and a skeleton step for fiber length, which OpenCV.js lacks.
 - [ ] Run batches in the browser on the user's machine (no processing server)
 - [ ] Build the upload and progress screens, and a results table with overlays
-- [ ] Support scale entry for photos without the printed sheet, with clear guidance on how to take the photo
+- [ ] Photo guidance on the site: print at actual size, whole sheet in frame with all four markers, even light, no flash; and the message shown when a photo has no sheet
 - [ ] Export CSV and the overlay image, plus a PDF or HTML summary
 - [ ] Host on Cloudflare Pages from the GitHub repo, with upload size limits
 - [x] Run the tests on every push (GitHub Actions: pipeline, ruler reader, browser parity tests, plan in sync)
@@ -244,7 +241,7 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
 
 **In:** The pipeline (parts 1–6), validation results.  
 **Out:** A batch tool, a hosted app and a public repository.  
-**Watch for:** Community photos will vary far more than lab photos. Plan for quality checks on upload and for retraining with corrected labels.
+**Watch for:** Community photos will vary far more than lab photos, even on the same printed sheets (printers, paper, phones, light). Plan for quality checks on upload and for retraining with corrected labels.
 
 ## 9. Storage
 

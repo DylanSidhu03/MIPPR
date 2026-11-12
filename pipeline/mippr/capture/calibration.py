@@ -221,8 +221,9 @@ def check_quality(photo, sheet=None, limits=QualityLimits(), metrics=None):
     m = metrics if metrics is not None else measure_quality(photo, sheet)
     probs = []
     if m["markers_found"] is None:
-        probs.append(Problem("no_markers", "No MIPPR sheet found. Photograph the whole printed sheet, with all "
-                             "four black corner squares in view.", 0, 4))
+        probs.append(Problem("no_markers", "No MIPPR sheet found. Photos must be taken on one of the printed "
+                             "MIPPR backgrounds (white grid, black grid or checkerboard), with the whole "
+                             "sheet and all four black corner squares in view.", 0, 4))
     elif m["missing_corners"]:
         probs.append(Problem("marker_missing", f"Corner marker missing ({', '.join(m['missing_corners'])}). Keep "
                              "all four black corner squares in the photo, uncovered and in focus.",

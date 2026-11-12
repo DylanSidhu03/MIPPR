@@ -17,8 +17,6 @@ SIEVE_MM = 0.5
 NEAR_CUTOFF = 0.10  # +-10% around the sieve size
 LOW_CONTRAST = 100.0  # provisional; on the sample the pale A4 fragment is 92, all others >= 141
 MERGED_SOLIDITY = 0.75  # provisional
-MERGED_AREA_X_MEDIAN = 3.0  # provisional; area this many times the image's median area
-MERGED_MIN_PARTICLES = 3  # the area rule needs a median to compare against
 
 SIZE_BINS = [(0.0, 0.5, "<0.5"), (0.5, 1.0, "0.5-1"), (1.0, 2.0, "1-2"), (2.0, 5.0, "2-5"), (5.0, float("inf"), ">5")]
 MORPHOLOGY = MORPHOLOGY_CLASSES
@@ -79,15 +77,13 @@ def size_class(length_mm):
     return ""
 
 
-def flags(m, median_area_mm2=None, scale_flag=False, multi_blob=False):
+def flags(m, scale_flag=False, multi_blob=False):
     """True/false quality flags for one measured particle. Empty where not available yet."""
     length, width = m["feret_max_um"] / 1000, m["feret_min_um"] / 1000
     unresolved = bool(m.get("width_unresolved"))
-    big = (median_area_mm2 is not None
-           and m["area_um2"] / 1e6 > MERGED_AREA_X_MEDIAN * median_area_mm2)
     return {
         "flag_edge": bool(m.get("_touches_edge")),
-        "flag_merged": bool(m["solidity"] < MERGED_SOLIDITY or big),
+        "flag_merged": bool(m["solidity"] < MERGED_SOLIDITY),  # two blobs in one box: flag_multi_blob
         "flag_low_confidence": "",  # needs colour rules (v2) or the morphology model (v3)
         "flag_scale": bool(scale_flag),  # markers missing, or the user corrected the scale
         "flag_near_cutoff": bool(SIEVE_MM * (1 - NEAR_CUTOFF) <= length <= SIEVE_MM * (1 + NEAR_CUTOFF)),
@@ -150,21 +146,17 @@ def particle_ids(measurements):
 
 
 def build_rows(measurements, sample_id, picture_label, image_id, metadata, app_version, mm_per_px, processed_at,
-               background_type="checkerboard", scale_source="checkerboard", scale_flag=False, merged_area_rule=True):
+               background_type, scale_source="markers", scale_flag=False):
     """Per-particle rows, named, ordered and filled as in docs/OUTPUT_CSV.md.
 
-    `merged_area_rule=False` uses solidity alone for flag_merged. On the printed grids
-    particles sit one per box, so touching particles are rare and sizes on one sheet
-    vary too much for the area rule; flag_multi_blob covers two blobs in a box.
+    `background_type` is the printed sheet's (white_grid, black_grid or checkerboard);
+    `scale_source` is `markers`, or `user_corrected` after the 100 mm line check.
     """
-    areas = [m["area_um2"] / 1e6 for m in measurements]
-    use_area = merged_area_rule and len(areas) >= MERGED_MIN_PARTICLES
-    median_area = statistics.median(areas) if use_area else None
     ids, multi = particle_ids(measurements)
     rows = []
     for i in sorted(range(len(measurements)), key=lambda i: measurements[i]["particle"]):
         m = measurements[i]
-        f = flags(m, median_area, scale_flag, m.get("box") in multi)
+        f = flags(m, scale_flag, m.get("box") in multi)
         px = m["_px"]
         length = m["feret_max_um"] / 1000
         morph, source, mconf, runner, rconf = morphology(m)

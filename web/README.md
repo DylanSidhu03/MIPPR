@@ -43,7 +43,7 @@ Everything else in `src/` is still a stub (each function throws "not implemented
 
 The official 4.10.0 build includes ArUco (checked November 12, 2026): `cv.getPredefinedDictionary(cv.DICT_4X4_50)`, `cv.aruco_DetectorParameters`, `cv.aruco_RefineParameters` and `cv.aruco_ArucoDetector(...).detectMarkers(img, corners, ids, rejected)`. Note the `aruco_` prefixes: there is no `cv.ArucoDetector`. On the synthetic photos it finds the same markers as Python's `cv2.aruco` (OpenCV 5.0.0) with identical corners (0 px difference), in Node and in Chromium. 4.12.0 behaves the same; 5.0.0 also works but returns `ids` as 1 x N, which `detectMarkers` handles.
 
-Missing from the 4.10.0 build, and needed later: `cornerSubPix` (checkerboard crossing refinement in `sheet.py`), `findChessboardCorners` (legacy board), `boxPoints` and `getTextSize`. These need small JS versions, or a custom build.
+Missing from the 4.10.0 build, and needed later: `cornerSubPix` (checkerboard crossing refinement in `sheet.py`), `boxPoints` and `getTextSize`. These need small JS versions, or a custom build. (`findChessboardCorners` is missing too, but isn't needed: the app only takes the printed sheets, found by their markers.)
 
 ## Tests
 
@@ -70,11 +70,12 @@ Serve the repo root (`python -m http.server`) and open `/web/` to try the page; 
 - [x] Serve the printable PDFs from `backgrounds/` (links on `index.html`)
 - [ ] Port parts 1–5 module by module (part 1 marker stage done: layout, marker detection, homography, sheet rectification), each passing the parity tests. The marching-squares outline and the skeleton step need their own code (not in OpenCV.js).
 - [ ] Batch processing in the browser on the user's machine, with a clear message for each failed photo (quality check, part 1)
-- [ ] Scale entry for photos without the printed sheet (a ruler), with guidance
+- [ ] Photo guidance: print at actual size, whole sheet and all four markers in frame, even light, no flash. A photo without the markers is refused with that message (the app only takes the three printed backgrounds).
 - [ ] Export the files above; a PDF or HTML summary
 - [ ] Python batch command for the lab (`pipeline/mippr/batch.py`, planned)
 - [ ] Cloudflare Pages deployment from the GitHub repo; upload size limits
-- [ ] License, contribution notes, automated tests on each push
+- [x] Automated tests on each push
+- [ ] License and contribution notes
 - [ ] Methods page (class definitions, calibration, accuracy, known limits) and a 1.0 release with a changelog
 - [ ] Pilot with two or three outside users
 

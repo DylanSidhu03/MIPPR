@@ -105,7 +105,8 @@ def layout_from_marker_ids(ids):
             lay = Layout(bg, paper)
             if set(ids) & set(lay.marker_ids()):
                 return lay
-    raise ValueError("No MIPPR sheet markers found in the photo.")
+    raise ValueError("No MIPPR sheet markers found in the photo. Photos must be taken on one of the printed "
+                     "MIPPR backgrounds (white grid, black grid or checkerboard), with all four corner markers in view.")
 
 
 # ── Drawing ────────────────────────────────────────────────────────────────

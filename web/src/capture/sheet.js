@@ -132,7 +132,10 @@ export function layoutFromMarkerIds(ids) {
       if (lay.markerIds().some((i) => wanted.has(i))) return lay;
     }
   }
-  throw new Error("No MIPPR sheet markers found in the photo.");
+  throw new Error(
+    "No MIPPR sheet markers found in the photo. Photos must be taken on one of the printed " +
+      "MIPPR backgrounds (white grid, black grid or checkerboard), with all four corner markers in view."
+  );
 }
 
 // ── Finding the sheet in a photo ───────────────────────────────────────────

@@ -16,12 +16,11 @@ sub-folder per part, each with its own README:
 
 Validation scripts (part 7) are in [../validation/](../validation/README.md).
 
-There are two methods:
-- **grid** (primary): the Drive spec v0.6 printed grid sheets, with one
-  particle per box and corner markers
-- **legacy**: the lab's existing checkerboard photos, using the
-  template-difference idea from
-  [fragment_area](https://github.com/Moore-Institute-4-Plastic-Pollution-Res/fragment_area)
+Every photo is taken on one of the three printed backgrounds (Drive spec v0.6):
+white grid, black grid or checkerboard, with one particle per box. The corner
+markers give the scale, the flattening and the background type, so a photo
+without them is refused. (The lab's older photos are used only to check the
+measurement code; that code is in [../validation/](../validation/README.md).)
 
 This is the reference the browser app (part 8, `web/`) is ported from and checked
 against, so it uses only operations OpenCV.js has (ArUco
@@ -39,9 +38,6 @@ cd pipeline
 # 2. Measure a photo of particles on it, one particle per box
 ../.venv/bin/python -m mippr.cli grid PHOTO.jpg --sample-id S042 --photo 1 \
     --date 2026-11-04 --operator DS --lab "Moore Institute" --setup "phone, overhead" --site "Site 3" --out out/
-
-# The lab's existing photos: particle photo + empty-board photo of the 12 x 24 checkerboard
-../.venv/bin/python -m mippr.cli legacy PARTICLE.jpg TEMPLATE.jpg --square-mm 10 --sample-id S042 --out out/
 
 ../.venv/bin/python -m pytest tests
 ```
@@ -78,11 +74,6 @@ The output folder gets:
 - `run.json`: settings, scale, markers found, white balance and the photo quality check (`quality`: problems and the numbers behind them), so a run can be reproduced
 - `NOTE.txt`: the statement that classification is visual only
 
-`--square-mm` (legacy mode only) is the side of one printed square of the lab's
-board. The lab's notes say 1 cm, and the ImageJ results imply 10.07 mm.
-**Measure the printed board with a ruler**: every length scales with this
-number, and areas with its square.
-
 ## How the grid pipeline works
 
 1. **Find the sheet.** Detect the ArUco corner markers, which give the
@@ -99,10 +90,17 @@ number, and areas with its square.
    is compared with its own box's color, so on the checkerboard each half of a
    particle across a black/white edge is judged against its own box. Along the
    lines the difference is bridged from both sides, so a line never becomes a
-   particle but a fiber crossing it stays whole. Hysteresis threshold and
-   half-maximum edges are as in the legacy method.
-5. **Measure and classify** (spec v0.3; `measurement/`, `color/`, `morphology/`). As well as the size and shape
-   columns:
+   particle but a fiber crossing it stays whole. Particles are detected with a
+   hysteresis threshold, and each outline is placed where the difference falls
+   to half the particle's own contrast, so bright and faint particles get the
+   same treatment (`segmentation/edges.py`).
+5. **Measure and classify** (spec v0.3; `measurement/`, `color/`, `morphology/`). Measurement
+   is deterministic geometry with ImageJ conventions (area as a pixel count, Feret
+   diameters over pixel edges): area, convex area and perimeter, a sub-pixel
+   perimeter (the most accurate in `validation/perimeter_study.py`) plus an
+   ImageJ-compatible one, length and width (max and min Feret), circular
+   equivalent diameter, aspect ratio, circularity, solidity, and mean and SD of
+   CIE Lab. As well as these:
    - **length along the fiber** (`fiber_length_mm`): the skeleton's longest path,
      smoothed, with its ends trimmed where it runs into corners and the true end
      length added back. It is within about 1–3% on curved and straight test shapes.
@@ -126,92 +124,16 @@ There are synthetic results in `results/synthetic_grid_sample/`:
 - the CSVs: 8 particles, including a fiber crossing a line, two blobs in H4
   and a particle cut by the edge
 
-## How the legacy method works (checkerboard + empty-board photo)
+## Checks against the lab's own measurements
 
-1. **Find the board** (`capture/board.py`). OpenCV's chessboard detector finds the
-   11 × 23 inner corners, which are then refined to sub-pixel accuracy.
-2. **Flatten it.** Each square is warped onto a fixed grid (140 px per square)
-   using its own four corners. A single perspective warp left about 3 px of
-   error from lens distortion. The per-square warp gets this to 0.1 px, so the
-   particle photo and template line up pixel for pixel. Because the grid is
-   fixed, the scale is known: µm per px = square size / 140.
-3. **Compare with the template** (`segmentation/legacy.py`).
-   - Shift the template's brightness square by square to match the particle
-     photo. In the sample, blacks were 3× brighter in one shot.
-   - Take the largest colour-channel difference.
-   - Bridge the difference across each printed square edge, so a mid-tone
-     particle lying on a gridline is not cut in two.
-   - Detect particles with hysteresis thresholding. Near gridlines, slivers
-     under 3 px wide are ignored, because misalignment and colour fringing
-     leave thin lines there.
-4. **Place the edge.** Each particle's outer outline is set where the
-   difference falls to half the particle's own contrast (the half-maximum
-   rule), so bright and faint particles get the same treatment. The interior is
-   never cut.
-5. **Measure** (`measurement/geometry.py`). This is deterministic geometry with ImageJ
-   conventions: area as a pixel count, Feret diameters over pixel edges. The
-   outputs are:
-   - area, convex area and convex perimeter
-   - perimeter, from a sub-pixel outline (the most accurate method in
-     `validation/perimeter_study.py`), plus an ImageJ-compatible perimeter and
-     circularity
-   - length and width (max and min Feret)
-   - circular equivalent diameter and size class
-   - centroid and bounding box (pixels), centroid in mm
-   - aspect ratio, circularity and solidity
-   - mean and SD of CIE Lab from the mask's interior, plus a hex code
-   - the well label (A–L, 1–12) as printed on the board
-6. **Export** (`export.py`). Converts to mm and sets the flags (edge,
-   merged, near cutoff, min width, low contrast, scale). Writes `particles.csv`
-   and `summary.csv` as defined in `docs/OUTPUT_CSV.md`, with review and
-   provenance columns ready for the review screen.
-
-## Results on the lab's sample photo
-
-Files are in `results/fragment_area_sample/`. The comparison uses
-`validation/compare_imagej.py` against `fragment_area/results/area_results.csv`.
-
-- **Detections.** MIPPR finds 24 particles. ImageJ found 26 objects, which are
-  24 particles plus two specks of 1 and 7 px. One of those specks is a piece of
-  a particle that ImageJ split in two. No false detections and no misses.
-- **Agreement with ImageJ** across the 24 particles:
-
-  | Metric | Median difference | Middle 80% of particles |
-  |---|---|---|
-  | Area | +0.5% | −1.9% to +25.6% |
-  | Max Feret | −0.2% | −2.3% to +6.6% |
-  | Min Feret | +0.1% | −2.2% to +9.4% |
-  | Perimeter (ImageJ method) | −0.9% | −2.6% to +6.9% |
-  | Circularity (ImageJ method) | +3.0% | −0.3% to +5.8% |
-
-  The large area differences are particles where ImageJ's threshold missed part
-  of the particle. The clearest case is the pale lavender fragment in A4,
-  where ImageJ found 0.34 mm². MIPPR now covers almost all of it, and flags it
-  `flag_low_contrast`.
-- **Sub-pixel circularity** reads about 0.08–0.10 higher than ImageJ, because
-  ImageJ's pixel-staircase outline makes particles look less round. On shapes
-  with a known answer the sub-pixel method is the most accurate
-  (`validation/reports/perimeter_study.txt`). Which one is the headline number is a
-  provisional decision; see spec section 5.
-- **Run time** is about 5 s per photo pair on a laptop CPU.
-
-ImageJ is not ground truth either. Validation still needs hand or caliper
-measurements of real particles (stage 8 / open question 6).
-
-## Findings that affect the imaging protocol (stage 2)
-
-- **Resolution is the main limit.** These photos come out to about 75 µm per
-  px, so a 500 µm particle is only about 7 px across, and edge pixels make up
-  a large share of its area. Fibers under about 150 µm wide (2 px) cannot be
-  told apart from gridline residue at this resolution. Shooting closer, or at
-  a higher resolution, would help more than any code change.
-- **The template-difference approach works well.** It needs an empty-board
-  photo taken with the same setup. The camera may move a little between shots,
-  because the per-square warp absorbs it.
-- **Exposure can differ between the two shots**, because it is corrected
-  square by square. Fixed lighting still helps colour measurements.
-- **The board looks the same rotated 180°**, so photos must be taken with the
-  labels upright for well IDs to be right.
+These use the lab's older photos (a ruler on paper, and the old 12 × 24
+checkerboard with an empty-board photo). They are not app inputs; they only check
+that the measurement code agrees with the lab's hand and ImageJ numbers. See
+[../validation/](../validation/README.md):
+- the old checkerboard sample against the lab's ImageJ results: median area +0.5%,
+  Feret −0.2% (`validation/legacy/`, `validation/results/fragment_area_sample/`)
+- 20 "Rows A–H" ruler photos against the lab's spreadsheets
+  ([report](../validation/reports/lab_photos.md))
 
 ## Known gaps
 
@@ -221,24 +143,14 @@ measurements of real particles (stage 8 / open question 6).
 - Touching particles are not split. The grid design avoids them (one
   particle per box); two blobs in a box get `flag_multi_blob`.
 - The photo quality check (`capture/calibration.py`, `check_quality`) is tuned on
-  synthetic photos only, and runs in grid mode only, not legacy.
-- Clear films are the expected worst case and need test photos. The pale A4
-  fragment is now outlined but flagged for review.
+  synthetic photos only.
+- Clear films are the expected worst case and need test photos on the black grid.
 - The marching-squares step behind the sub-pixel perimeter uses scikit-image.
   The browser port will need its own version, about 60 lines, because
   OpenCV.js doesn't include it.
 - Particle crops (needed for the v3 model and possibly for Supabase, Drive
   9b) are not written yet.
 - The colour rules and the fiber, pellet and film thresholds are provisional
-  starting values. They still need fitting to the lab's labelled particles.
+  starting values. They need fitting on labelled particles photographed on the sheets.
 - The skeleton step uses scikit-image and SciPy; the browser port needs its own
   thinning and a shortest-path search over skeleton pixels.
-
-## Checking against the lab's hand measurements
-
-`validation/lab_photo_check.py` compares the app with the lab's ParticleCount
-spreadsheets on their "Rows A–H" layout photos. Those photos show particles laid out
-in 8 columns on a white background with a steel ruler. The script reads the scale
-from the ruler ticks, finds and measures the particles, matches them to spreadsheet
-wells by column and position, and reports agreement. Results are in
-[docs/LAB_DATA.md](../docs/LAB_DATA.md).

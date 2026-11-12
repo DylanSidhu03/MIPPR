@@ -13,8 +13,8 @@ needed:
 3. Along the printed lines (and the checkerboard's box edges) the difference
    is bridged from both sides, so a line itself never becomes a particle but
    a fiber crossing it stays in one piece.
-4. Hysteresis threshold, half-maximum edge placement and hole filling are
-   shared with the template-difference method (legacy.py).
+4. Hysteresis threshold, half-maximum edge placement and hole filling
+   (edges.py).
 
 Everything here exists in OpenCV.js.
 """
@@ -23,7 +23,7 @@ from dataclasses import dataclass
 import cv2
 import numpy as np
 
-from .legacy import _fill_holes, _hysteresis, _refine_edges
+from .edges import fill_holes, hysteresis, refine_edges
 
 
 @dataclass
@@ -162,9 +162,9 @@ def _bridge(d, layout, b, half, outer):
 def segment_grid(img, layout, px_per_mm, params=GridSegmentParams()):
     """Return (labels, diff, band): int32 labels (0 = background), the difference map and the line band."""
     diff, band = difference(img, layout, px_per_mm, params)
-    mask = _fill_holes(_hysteresis(diff, params.low, params.high, band))
+    mask = fill_holes(hysteresis(diff, params.low, params.high, band))
     if params.edge_fraction:
-        mask = _refine_edges(mask, diff, params.edge_fraction)
+        mask = refine_edges(mask, diff, params.edge_fraction)
     n, labels, stats, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8), connectivity=8)
     out = np.zeros_like(labels)
     k = 0

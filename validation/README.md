@@ -4,11 +4,14 @@ The known answers that every other part is tuned and judged against: the lab's h
 
 **Method:** labelled data and comparison. Nothing here runs in the app.
 
+**The app only takes photos on the three printed backgrounds**, so the labelled set, the gold set and the pass mark come from photos on the sheets. The lab's older photos (a ruler on white or black paper; the old 12 × 24 checkerboard) are used here only to check the measurement code against the lab's numbers. The quickest route to labelled sheet photos: re-photograph the lab's already-labelled particles on the sheets, one per box, with a list of which well went into which box.
+
 ## In → Out
 
 | In | Out |
 |---|---|
-| The lab's ParticleCount spreadsheets and photos (Drive; summarized in [docs/LAB_DATA.md](../docs/LAB_DATA.md)) | Tuned thresholds for parts 2–5 |
+| Labelled particles photographed on the printed sheets (the lab's labels carried over by well, and new labels) | Tuned thresholds for parts 2–5 |
+| The lab's ParticleCount spreadsheets and older photos (Drive; [docs/LAB_DATA.md](../docs/LAB_DATA.md)), as a cross-check | |
 | The app's output on the same particles | A training set for the v3 model (part 5), split by sample |
 | New labels from review (part 6) | A fixed gold test set (part 10) |
 | | Agreement reports: detection, size error, colour and shape confusion |
@@ -23,17 +26,19 @@ The lab's data stays in Drive and is not committed here: it's the lab's, and the
 | `ruler.py` | Reads the scale from a ruler with no help (millimetre edge, told apart from an inch edge), and masks the ruler out. `--check-image` writes a picture to check it by eye |
 | `run_lab_photos.py` + `lab_photos.csv` | Runs the check on a list of photos and writes one summary table |
 | `test_ruler.py` | Tests the ruler reader on drawn rulers with a known scale |
-| `compare_imagej.py` | Compares with the lab's ImageJ results on the fragment_area sample (median area +0.5%, Feret −0.2%) |
+| `legacy/` | The lab's old 12 × 24 checkerboard with an empty-board photo (`run.py`, `board.py`, `segment.py`, tests): not an app input, kept to compare with the lab's ImageJ results |
+| `compare_imagej.py` | Compares with the lab's ImageJ results on the fragment_area sample (median area +0.5%, Feret −0.2%; `results/fragment_area_sample/`) |
 | `perimeter_study.py` | Perimeter methods on shapes with a known answer (`reports/perimeter_study.txt`) |
 
 ## To build
 
-- [ ] **Settle the scale gap with the lab:** measure one particle with calipers. Until then the lab's sizes can't be ground truth.
+- [ ] **Settle the scale gap with the lab:** measure one particle with calipers. The lab's older sizes vary by session (+12% to −2% against the ruler), so they can't be ground truth as they are.
 - [x] **Run `lab_photo_check.py` on more photos** and collect the matches into one table: 20 photos from EX_01, EX_02, OC_03, OC_05–07 and an LFB (see `reports/lab_photos.md`).
 - [ ] SF_04 photos: their sheet (SF_04) isn't in Drive's ParticleCount folder.
-- [ ] **Build the labelled set:** matched photo crops + the lab's shape and colour labels, split into train / validation / test **by sample**.
+- [ ] **Re-photograph the lab's labelled particles on the printed sheets** (all three backgrounds), with a well-to-box list, so their hand labels carry over. Then measure a few with calipers as the size reference.
+- [ ] **Build the labelled set** from those sheet photos: crops + the lab's shape and colour labels, split into train / validation / test **by sample**.
 - [ ] **A second person labels 20%** of particles independently, to get the agreement ceiling (Cohen's kappa for classes).
-- [ ] **New labels for missing classes:** film, foam, clear particles, and photos on the printed sheets.
+- [ ] **New labels for missing classes** on the sheets: film, foam, clear particles.
 - [ ] **Agree the pass mark** (open question 6) after seeing the agreement per class.
 - [ ] **The validation report:**
   - detection recall and precision

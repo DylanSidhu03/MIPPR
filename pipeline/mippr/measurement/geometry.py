@@ -20,14 +20,10 @@ import cv2
 import numpy as np
 from skimage.measure import find_contours
 
-from ..capture.board import SQUARES_X
 from ..color.rules import color_classes
-from ..segmentation.legacy import edge_level, grid_band
+from ..segmentation.edges import edge_level
 from .fiber import fiber_metrics
 from .opacity import opacity
-
-WELL_COLUMNS = "ABCDEFGHIJKL"  # printed right to left across the top of the lab board
-
 
 def _hull_of_pixel_corners(contour):
     pts = contour.reshape(-1, 2).astype(np.float32)
@@ -169,18 +165,6 @@ def feret(hull):
     return float(dist[i, j]), min_width, angle
 
 
-def well_id(cx, cy, px_per_square):
-    """Well label for a point on the rectified board: column letter + row number.
-
-    Columns are lettered A-L from right to left; rows are numbered 1-12 from the
-    top, two squares per number, matching the printed labels when the photo is
-    taken with the board upright.
-    """
-    col = int(cx // px_per_square)
-    row = int(cy // (2 * px_per_square))
-    return f"{WELL_COLUMNS[SQUARES_X - 1 - col]}{row + 1}"
-
-
 def _color_stats(img_bgr, mask):
     """Mean and standard deviation of RGB, HSV and Lab inside the mask.
 
@@ -211,27 +195,22 @@ def _color_stats(img_bgr, mask):
     return out
 
 
-def measure(labels, img_bgr, um_per_px, px_per_square=None, diff=None, edge_fraction=0.5, edge_margin_px=3,
+def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margin_px=3,
             box_fn=None, line_mask=None, color_img=None, bg_img=None, min_width_px=2.0):
     """One dict per particle with geometry in um / um^2 and colour statistics.
 
     Pass the difference map from segmentation so perimeters follow the sub-pixel edge.
-    Each particle gets a `box` label: from `box_fn(cx, cy)` on the printed grids, or
-    the well on the lab's legacy checkerboard (`px_per_square`). `line_mask` marks
-    printed lines for the line flag; `color_img` (e.g. white-balanced) is used for
-    color statistics instead of `img_bgr`. `bg_img` is the background expected behind
-    each pixel (same colour space as `color_img`): the box colours on the printed grids,
-    the empty-board photo on the legacy board. It gives `opacity`.
+    Each particle gets a `box` label from `box_fn(cx, cy)` (the printed box it lies in).
+    `line_mask` marks printed lines for the line flag; `color_img` (e.g. white-balanced)
+    is used for color statistics instead of `img_bgr`. `bg_img` is the background
+    expected behind each pixel (same colour space as `color_img`): the printed box
+    colours. It gives `opacity`.
 
     Also measured (spec v0.3): the length and mean width along the particle's centre
     line (`fiber_length_um`, `fiber_width_um`), whether the width is too thin to
     resolve (under `min_width_px`), and the colour classes (main, second, share).
     """
     rows = []
-    if line_mask is None and px_per_square:
-        line_mask = grid_band(labels.shape, px_per_square, 0)  # pixels on a printed square edge
-    if box_fn is None and px_per_square:
-        box_fn = lambda x, y: well_id(x, y, px_per_square)  # noqa: E731
     for lbl in range(1, int(labels.max()) + 1):
         mask = labels == lbl
         area_px = int(mask.sum())

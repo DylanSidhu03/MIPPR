@@ -20,7 +20,6 @@ Turn a phone or camera photo into a flat, correctly scaled, colour-corrected ima
 |---|---|
 | `sheet.py` | The printable sheets (layout, vector PDF, PNG), ArUco marker detection, homography, and refinement from the grid's own line crossings (about 0.1 px in synthetic tests) |
 | `calibration.py` | White balance from the printed white patch; the grey patch is checked. The photo quality check (`check_quality`, below) |
-| `board.py` | Legacy: the lab's 12 × 24 checkerboard (chessboard corners, per-square warp) |
 | `synthetic.py` | Fake photos (tilt, lens distortion, uneven light, blur, noise) for tests |
 | `../../scripts/preview_backgrounds.py` | Renders the sheet design options side by side |
 | `../../../backgrounds/` | The printed sheets this part generates |
@@ -32,7 +31,6 @@ Turn a phone or camera photo into a flat, correctly scaled, colour-corrected ima
 - [ ] **Uneven light on the black grid:** it has no white boxes, so the shadow check doesn't run there yet.
 - [ ] **Test on real phone photos** of the printed sheets: flattening, scale against a ruler, white balance.
 - [ ] **Colour reference:** decide whether colour patches (not only white and grey) are needed for the colour classes.
-- [ ] **Scale fallback** for photos without the printed sheet (a ruler, like the lab's photos): the ruler-tick reader in `validation/lab_photo_check.py` is a starting point.
 
 ## Photo quality check
 
@@ -76,8 +74,9 @@ on all three backgrounds:
 - **Every other degradation** (overexposure ×1.25, a glare spot, a shadow over half the
   sheet, a blue-channel curve, a covered marker) gives only its own code. The good
   photos give none. `tests/test_quality.py` checks this for each background.
-- **Lab photo** `EX_01_S01_Rows_A-H.jpg` (no sheet, ruler, white paper at 254). It reports
-  `no_markers` and `overexposed` (61% of the photo is pure white), and no blur (edge width 5.3 px).
+- **A photo without the sheet** (the lab's older `EX_01_S01_Rows_A-H.jpg`: ruler, white paper at 254)
+  is refused: `no_markers`, with a message to photograph it on a printed background. Its
+  other checks still run, to say what else to fix (here `overexposed`; no blur).
 
 ## Open decisions
 
@@ -86,4 +85,4 @@ on all three backgrounds:
 
 ## Watch for
 
-Glare and shadows. Fixing them at capture is cheaper than fixing them in code. On the black grid, glare is only caught where it is brighter than paper (a spot of about 2 mm or more in tests). The lab's photos showed a constant 8–10% size gap that traces to scale. Calibration errors move every particle, so check them first.
+Glare and shadows. Fixing them at capture is cheaper than fixing them in code. On the black grid, glare is only caught where it is brighter than paper (a spot of about 2 mm or more in tests). On the lab's older photos the hand sizes were up to 12% off, depending on the session's scale setting: calibration errors move every particle, which is why the scale comes from the printed markers.

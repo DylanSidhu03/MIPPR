@@ -44,7 +44,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from mippr.color.rules import lab_cie  # noqa: E402
 from mippr.export import morphology  # noqa: E402
 from mippr.measurement.geometry import measure  # noqa: E402
-from mippr.segmentation.legacy import _fill_holes, _refine_edges  # noqa: E402
+from mippr.segmentation.edges import fill_holes, refine_edges  # noqa: E402
 from ruler import find_ruler  # noqa: E402
 
 PREVIEW_W = 1200
@@ -122,7 +122,7 @@ def find_particles(img, px_per_mm, exclude=None, high=60, low=25, min_size_mm=0.
         return lut[lab]
 
     labels = relabel(diff > low)
-    labels = relabel(_refine_edges(_fill_holes(labels > 0), diff, 0.5))
+    labels = relabel(refine_edges(fill_holes(labels > 0), diff, 0.5))
     return labels, diff, bg, background
 
 
@@ -291,7 +291,7 @@ def detect(img, a):
     print(f"scale: {ppm:.3f} px/mm (spread {sd:.3f}, {how}), {1000 / ppm:.1f} um/px")
     labels, diff, bg, background = find_particles(img, ppm, exclude, roi=a.roi)
     print(f"background: {background}")
-    measured = measure(labels, img, 1000 / ppm, None, diff, 0.5, 3, bg_img=bg)
+    measured = measure(labels, img, 1000 / ppm, diff, 0.5, 3, bg_img=bg)
     particles = []
     for m in measured:
         if m["feret_max_um"] > MAX_LENGTH_MM * 1000:

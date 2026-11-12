@@ -22,7 +22,7 @@ Classes: clear, white, black, grey, blue, green, red, yellow, orange, brown, pin
 
 ## To build
 
-- [ ] **Fit the hue and lightness ranges** to the lab's labelled particles (about 4,600 with colours; part 7). Until then they are provisional (`COLOR_RULES_VERSION = "0.1-provisional"`).
+- [ ] **Fit the hue and lightness ranges** to labelled particles photographed on the sheets and white-balanced by the grey patch (part 7). A first try on the lab's older photos gave no gain: they have a colour cast and no white reference. Until then they are provisional (`COLOR_RULES_VERSION = "0.1-provisional"`).
 - [ ] **A reference swatch and Lab range per class**, written into the spec, once the colour reference on the sheets is settled (part 1).
 - [ ] **Check clear vs white** on real photos on both backgrounds.
 - [ ] **Set the `flag_low_confidence` threshold** from validation data.

@@ -2,7 +2,7 @@
 
 Shapes are drawn at 16x resolution and averaged down, like a camera sensor
 integrating light over each pixel, then lightly blurred. The mask is taken at
-half coverage, the same rule segmentation/legacy.py uses for particle edges.
+half coverage, the same rule segmentation/edges.py uses for particle edges.
 
     python validation/perimeter_study.py
 """

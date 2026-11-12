@@ -1,4 +1,4 @@
-"""Find the checkerboard in a photo and warp it to a flat, top-down grid.
+"""The lab's old 12 x 24 checkerboard (validation only): find it in a photo and warp it flat.
 
 The lab board is 12 squares wide and 24 tall, so it has 11 x 23 inner
 corners. Warping every photo onto the same grid aligns a particle photo with

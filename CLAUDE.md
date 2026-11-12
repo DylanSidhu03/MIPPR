@@ -157,5 +157,6 @@ Everything above this section is an exact copy of `CLAUDE.md` in the team's Goog
 - [docs/CLASSIFICATION_SPEC.md](docs/CLASSIFICATION_SPEC.md) and [docs/OUTPUT_CSV.md](docs/OUTPUT_CSV.md) hold the details.
 - [docs/PIPELINE.md](docs/PIPELINE.md) is the task plan, kept in sync with GitHub issues #1–#11 and the tracker via `scripts/sync_plan.py`.
 - [pipeline/](pipeline/README.md) is the Python reference pipeline. The repo is organized by the 10 project parts; see the table in [README.md](README.md).
+- **Working assumption (user, November 12, 2026):** every photo is taken on one of the three printed backgrounds. There is no ruler fallback, manual scale entry or legacy-checkerboard mode in the app; the lab's older photos are used only in `validation/` to check the measurement code.
 
 If Drive conflicts with a technical decision, Drive wins and the technical decision is revisited.

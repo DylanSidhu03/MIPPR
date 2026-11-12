@@ -75,11 +75,9 @@ class Decision:
 class MeasureContext:
     """What measure() was given for one photo, so an edited outline is measured the same way.
 
-    The pipeline (cli.run_grid / run_legacy) has all of these in hand when it measures:
-    `image` is the rectified photo, `background` the expected background behind each pixel
-    (measure()'s `bg_img`), and the rest are measure()'s keyword arguments. On the legacy
-    board, pass `median_area_mm2` (the image's median particle area) to use the area rule
-    for flag_merged; leave it None on the printed grids (solidity only).
+    The pipeline (cli.run_grid) has all of these in hand when it measures: `image` is the
+    rectified grid, `background` the expected background behind each pixel (measure()'s
+    `bg_img`), and the rest are measure()'s keyword arguments.
     """
     image: np.ndarray
     mm_per_px: float
@@ -88,10 +86,8 @@ class MeasureContext:
     color_img: np.ndarray = None
     line_mask: np.ndarray = None
     box_fn: object = None
-    px_per_square: float = None
     edge_fraction: float = 0.5
     edge_margin_px: int = 3
-    median_area_mm2: float = None
 
     def kwargs(self):
         return {k: getattr(self, k) for k in self.__dataclass_fields__ if k not in ("image", "mm_per_px", "background")}
@@ -221,7 +217,7 @@ def outline_mask(outline, shape):
 
 
 def remeasure(row, outline, image, mm_per_px, background=None, *, diff=None, color_img=None, line_mask=None,
-              box_fn=None, px_per_square=None, edge_fraction=0.5, edge_margin_px=3, median_area_mm2=None):
+              box_fn=None, edge_fraction=0.5, edge_margin_px=3):
     """The row with every measured, derived and predicted value recomputed from an edited outline.
 
     `outline` is a polygon in the rectified image's px (or a boolean mask of it), `image`
@@ -235,15 +231,14 @@ def remeasure(row, outline, image, mm_per_px, background=None, *, diff=None, col
     Sets outline_edited. review_status is left for apply() to set.
     """
     mask = outline_mask(outline, image.shape)
-    (m,) = measure(mask.astype(np.int32), image, mm_per_px * 1000, px_per_square, diff, edge_fraction,
+    (m,) = measure(mask.astype(np.int32), image, mm_per_px * 1000, diff, edge_fraction,
                    edge_margin_px, box_fn=box_fn, line_mask=line_mask, color_img=color_img, bg_img=background)
     (new,) = build_rows([m], row["sample_id"], row["picture_label"], row["image_id"],
                         {k: row.get(k, "") for k in METADATA}, __version__, mm_per_px, row.get("processed_at", ""),
                         background_type=row.get("background_type", ""), scale_source=row.get("scale_source", ""),
                         scale_flag=_true(row.get("flag_scale")))
-    # Flags that depend on the other particles in the photo: two blobs in the box, and the
-    # legacy board's area rule for flag_merged.
-    new.update(flags(m, median_area_mm2, _true(row.get("flag_scale")), _true(row.get("flag_multi_blob"))))
+    # flag_multi_blob depends on the other particles in the box, so it comes from the row.
+    new.update(flags(m, _true(row.get("flag_scale")), _true(row.get("flag_multi_blob"))))
     out = dict(row)
     out.update({k: new[k] for k in REMEASURED})
     if row.get("color_label_original") not in ("", None):

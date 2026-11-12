@@ -6,10 +6,10 @@
     # A photo of particles on a printed sheet, one particle per box
     python -m mippr.cli grid photo.jpg --sample-id S042 --photo 1 --out results/
 
-    # The lab's existing photos: particle photo + empty-board photo of the 12 x 24 checkerboard
-    python -m mippr.cli legacy particle.jpg template.jpg --square-mm 10 --sample-id S042 --out results/
+Photos must be taken on one of the three printed backgrounds (white grid, black grid,
+checkerboard): the corner markers give the scale, the flattening and the background type.
 
-`grid` and `legacy` write particles.csv (one row per particle) and
+`grid` writes particles.csv (one row per particle) and
 summary.csv (one row per sample), both as defined in docs/OUTPUT_CSV.md, plus
 overlay.png (outlines and particle IDs), run.json (settings and versions) and
 NOTE.txt.
@@ -26,13 +26,11 @@ import cv2
 import numpy as np
 
 from . import __version__
-from .capture.board import find_board
 from .capture.calibration import check_quality, measure_quality, white_balance
 from .capture.sheet import BACKGROUNDS, PAPERS, Layout, find_sheet, save_sheet
 from .export import COLUMNS, METADATA, NOTE, SUMMARY_COLUMNS, build_rows, build_summary
 from .measurement.geometry import measure
 from .segmentation.grid import GridSegmentParams, background_image, box_of, line_band, segment_grid
-from .segmentation.legacy import SegmentParams, segment
 
 
 def draw_overlay(img, labels, measured, rows):
@@ -102,7 +100,7 @@ def run_grid(photo_path, out_dir, sample_id="sample", photo=1, metadata=None, li
     if corrected:  # the printer scaled the sheet: every printed length is off by the same factor
         mm_per_px *= line_mm / 100.0
     # flag_edge: within the masked border band of the grid's outer edge, so possibly cut off
-    measured = measure(labels, rect, mm_per_px * 1000, None, diff, params.edge_fraction,
+    measured = measure(labels, rect, mm_per_px * 1000, diff, params.edge_fraction,
                        edge_margin_px=int(np.ceil(outer)) + 2,
                        box_fn=lambda x, y: lay.box_label(*box_of(lay, ppm, x, y)), line_mask=near_line,
                        color_img=balanced, bg_img=background_image(balanced, lay, ppm, params.inset_frac))
@@ -111,7 +109,7 @@ def run_grid(photo_path, out_dir, sample_id="sample", photo=1, metadata=None, li
                       datetime.now(timezone.utc).isoformat(timespec="seconds"),
                       background_type=lay.background,
                       scale_source="user_corrected" if corrected else "markers",
-                      scale_flag=corrected or sheet.markers_found < 4, merged_area_rule=False)
+                      scale_flag=corrected or sheet.markers_found < 4)
     _write(out_dir, rows, draw_overlay(balanced, labels, measured, rows), {
         "mode": "grid", "photo": str(photo_path), "sample_id": sample_id, "picture_label": label,
         **(metadata or {}), "background_type": lay.background, "paper": lay.paper,
@@ -119,30 +117,6 @@ def run_grid(photo_path, out_dir, sample_id="sample", photo=1, metadata=None, li
         "markers_found": sheet.markers_found, "px_per_mm": ppm, "mm_per_px": mm_per_px,
         "printed_line_mm": line_mm, "white_balance": wb,
         "quality": {"problems": [p.as_dict() for p in problems], "metrics": quality}, "params": vars(params)})
-    return rows
-
-
-def run_legacy(particle_path, template_path, square_mm, out_dir, sample_id="sample", photo=1, metadata=None,
-               px_per_square=140, params=SegmentParams()):
-    particle = cv2.imread(str(particle_path))
-    template = cv2.imread(str(template_path))
-    if particle is None or template is None:
-        raise ValueError("Could not read one of the images.")
-    rect_p = find_board(particle, px_per_square).rectify(particle)
-    rect_t = find_board(template, px_per_square).rectify(template)
-    labels, diff = segment(rect_p, rect_t, px_per_square, params)
-    um_per_px = square_mm * 1000 / px_per_square
-    # The empty-board photo is the background behind every pixel (for opacity).
-    measured = measure(labels, rect_p, um_per_px, px_per_square, diff, params.edge_fraction,
-                       params.edge_margin_px, bg_img=rect_t)
-    label = picture_label(sample_id, photo)
-    rows = build_rows(measured, sample_id, label, image_id(particle_path), metadata or {}, __version__,
-                      um_per_px / 1000, datetime.now(timezone.utc).isoformat(timespec="seconds"))
-    _write(out_dir, rows, draw_overlay(rect_p, labels, measured, rows), {
-        "mode": "legacy", "particle": str(particle_path), "template": str(template_path),
-        "sample_id": sample_id, "picture_label": label, **(metadata or {}),
-        "square_mm": square_mm, "px_per_square": px_per_square, "mm_per_px": um_per_px / 1000,
-        "params": vars(params)})
     return rows
 
 
@@ -169,14 +143,6 @@ def main(argv=None):
     g.add_argument("--line-mm", type=float, help="measured length of the printed 100 mm line, if it isn't 100 mm")
     common(g)
 
-    lg = sub.add_parser("legacy", help="the lab's 12 x 24 checkerboard: particle photo + empty-board photo")
-    lg.add_argument("particle")
-    lg.add_argument("template")
-    lg.add_argument("--square-mm", type=float, required=True,
-                    help="side of one printed checkerboard square in mm (measure it with a ruler)")
-    lg.add_argument("--px-per-square", type=int, default=140)
-    common(lg)
-
     a = ap.parse_args(argv)
     try:
         if a.cmd == "sheet":
@@ -188,11 +154,7 @@ def main(argv=None):
             print(f"{lay.rows} x {lay.cols} boxes of {lay.box_mm:g} mm -> {stem}.pdf (print at actual size)")
             return
         meta = {k: getattr(a, k) for k in METADATA}
-        if a.cmd == "grid":
-            rows = run_grid(a.image, a.out, a.sample_id, a.photo, meta, a.line_mm)
-        else:
-            rows = run_legacy(a.particle, a.template, a.square_mm, a.out, a.sample_id, a.photo, meta,
-                              a.px_per_square)
+        rows = run_grid(a.image, a.out, a.sample_id, a.photo, meta, a.line_mm)
     except ValueError as e:
         sys.exit(f"error: {e}")
     flagged = sum(bool(r["review_reason"]) for r in rows)

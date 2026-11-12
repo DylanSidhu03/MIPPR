@@ -16,7 +16,7 @@ Training the morphology model (part 5) and keeping it up to date: periodic, manu
 
 | File | Does |
 |---|---|
-| `build_dataset.py` | Crops and labels from the lab's matched photos and database snapshots; split by sample; the gold set is held out and never trained on |
+| `build_dataset.py` | Crops and labels from photos on the printed sheets: the lab's labelled particles re-photographed on the sheets (labels carried over by well), and database snapshots; split by sample; the gold set is held out and never trained on |
 | `train.py` | Train on crops + shape values + background type; compare a classifier chain with one multi-task model |
 | `evaluate.py` | Accuracy per class, confusion matrix, calibration of the confidences |
 | `export_onnx.py` | Export for ONNX Runtime Web; check the browser gives the same answers |
@@ -27,7 +27,7 @@ All are stubs today.
 ## To build
 
 - [ ] The gold test set: expert-labelled, fixed, never used for training (built in part 7)
-- [ ] The first model (v3) on the lab's labels: fragment, rubbery fragment, fiber; plus new labels for film and foam
+- [ ] The first model (v3) on the lab's labelled particles re-photographed on the three sheets: fragment, rubbery fragment, fiber; plus new labels for film and foam. Background type is an input (one shared model, Drive decision).
 - [ ] Augmentation: rotations, flips, small perspective changes, mild brightness and white-balance jitter. No hue shifts (colour is a label); limit scaling, since size matters.
 - [ ] The retraining routine: export a snapshot, build the dataset, train, evaluate, gate, publish the version
 - [ ] Where training runs (open question 8) and who runs it after the practicum (open question 7)

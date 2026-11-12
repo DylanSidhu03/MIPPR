@@ -18,7 +18,7 @@ Find each particle in its box and draw its outline. Errors here carry into every
 | File | Does |
 |---|---|
 | `grid.py` | Box-by-box segmentation on the printed grids. Each box's own background colour; lines and label corners bridged so fibers crossing them stay whole; hysteresis threshold; half-maximum edges |
-| `legacy.py` | The lab's checkerboard: difference from an empty-board photo, with the same threshold and edge steps (shared helpers live here) |
+| `edges.py` | The steps every outline goes through: hysteresis threshold, hole filling, half-maximum edge placement |
 
 ## To build
 
@@ -26,7 +26,7 @@ Find each particle in its box and draw its outline. Errors here carry into every
 - [ ] **Thin fibers** (about 24 µm wide, under one pixel on a sheet photo): detect them as faint lines so their length can be measured (`flag_width_unresolved`).
 - [ ] **Particle crops** with the background blanked, for the v3 model and possibly for storage (Drive 9b). Planned: `crop_particle` in `../morphology/model.py`.
 - [ ] **Test on real phone photos** of the printed sheets, especially particles across a black/white edge on the checkerboard (open question 1).
-- [ ] **Score against the labelled set** (part 7): detection recall and precision, outline overlap.
+- [ ] **Score against labelled photos of the sheets** (part 7): detection recall and precision, outline overlap.
 - [ ] Optional: compare with a learned segmenter (Cellpose, SAM, a small U-Net), only if the threshold falls short.
 
 ## Watch for

@@ -118,7 +118,7 @@ The check now reads each ruler on its own, works on black backgrounds and on pla
 
 ## What this means for MIPPR
 
-1. **Open question 4 is answered: a labelled set exists.** About 4,600 particles have shape and colour, and about 4,000 have hand-measured length and width. Many can be matched to photos by sample ID and well. This is the validation set for stage 8 and the starting training set for v3.
+1. **Open question 4 is answered: a labelled set exists.** About 4,600 particles have shape and colour, and about 4,000 have hand-measured length and width. The particles are still in their labelled wells, so re-photographing them on the printed sheets (one per box, with a well-to-box list) turns these labels into the app's first labelled set: the validation set and the starting training set for v3. The lab's older photos themselves are not app inputs (the app only takes the three printed backgrounds); they serve as a cross-check of the measurement code.
 2. **The shape classes need a decision** (Drive question 3):
    - Rubbery fragment is the second most common shape and has no class.
    - Line and line bundle have no class either.

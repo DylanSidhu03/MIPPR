@@ -17,9 +17,9 @@ create table images (
   sample          uuid not null references samples (id) on delete cascade,
   image_id        text not null,          -- file name + hash, e.g. particle-3f9c21ab
   picture_label   text not null,          -- e.g. S042-P01
-  background_type text not null,          -- white_grid, black_grid, checkerboard
+  background_type text not null check (background_type in ('white_grid', 'black_grid', 'checkerboard')),
   mm_per_px       double precision not null,
-  scale_source    text not null,          -- markers, checkerboard, user_corrected
+  scale_source    text not null check (scale_source in ('markers', 'user_corrected')),  -- user_corrected: 100 mm line entered
   storage_path    text,                   -- photo in Supabase Storage, if stored (9b)
   app_version     text not null,
   processed_at    timestamptz not null,

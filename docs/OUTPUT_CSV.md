@@ -50,7 +50,7 @@ Columns appear in this order. Empty means "not available in this release" or "no
 | `sample_id` | Recorded | Typed at upload | v1 |
 | `picture_label` | Recorded | Readable label for the photo: sample ID plus photo number, e.g. `S042-P01`, `S042-P02`. Shown on the overlay. | v1 |
 | `image_id` | Recorded | File name plus a short hash of the file, e.g. `particle-3f9c21ab`. This is the unique technical key; image-level settings (scale, background) apply to all its particles. | v1 |
-| `particle_id` | Recorded | The printed box label, e.g. `B4` (row letter + column number), unique within the photo. If a box holds more than one blob, they become `B4-1`, `B4-2`, ... (top to bottom, then left to right), and each gets `flag_multi_blob`. On the lab's legacy 12 × 24 checkerboard the well label is used the same way. | v1 |
+| `particle_id` | Recorded | The printed box label, e.g. `B4` (row letter + column number), unique within the photo. If a box holds more than one blob, they become `B4-1`, `B4-2`, ... (top to bottom, then left to right), and each gets `flag_multi_blob`. | v1 |
 | `particle_ref` | Recorded | `picture_label` + `particle_id`, e.g. `S042-P01-B4`: unique across the whole sample | v1 |
 | `date`, `operator`, `lab`, `setup`, `site` | Recorded | Entered by the user once per upload and repeated on every row, so files from different labs and setups can be combined | v1 |
 
@@ -122,8 +122,8 @@ These keep old ImageJ results comparable. On real particles the sub-pixel `circu
 
 | Column | Rule | From |
 |---|---|---|
-| `flag_edge` | The outline is within 3 px of the edge of the particle zone (the board) or photo. The particle may be cut off. It is kept, not dropped, so the reviewer decides. | v1 |
-| `flag_merged` | Solidity < 0.75, **or** (legacy board only) area > 3 × the image's median particle area, with 3 or more particles. Both thresholds are provisional. On the printed grids only the solidity rule is used: particles sit one per box, sizes on one sheet vary too much for the area rule, and `flag_multi_blob` covers two blobs in a box. | v1 |
+| `flag_edge` | The outline is within 3 px of the grid's outer edge or the photo's. The particle may be cut off. It is kept, not dropped, so the reviewer decides. | v1 |
+| `flag_merged` | Solidity < 0.75 (provisional). Particles sit one per box, so touching particles are rare; `flag_multi_blob` covers two blobs in a box. | v1 |
 | `flag_low_confidence` | Color or morphology confidence below the threshold. The **threshold is still to be decided** from v2/v3 data; empty until then. | v2 / v3 |
 | `flag_scale` | Markers not all found, or the user corrected the scale | v1 |
 | `flag_near_cutoff` | `length_mm` between 0.45 and 0.55 (±10% of the sieve size) | v1 |
@@ -155,9 +155,9 @@ These keep old ImageJ results comparable. On real particles the sub-pixel `circu
 
 | Column | Type | How it is produced | From |
 |---|---|---|---|
-| `background_type` | Recorded | `white_grid`, `black_grid` or `checkerboard`, read from the corner marker IDs. The lab's legacy board (no markers) is also `checkerboard`, with `scale_source = checkerboard`. | v1 |
+| `background_type` | Recorded | `white_grid`, `black_grid` or `checkerboard`, read from the corner marker IDs. Every photo is on one of these three sheets; a photo without the markers is refused. | v1 |
 | `mm_per_px` | Recorded | Scale of the corrected image | v1 |
-| `scale_source` | Recorded | `markers` (printed sheets), `checkerboard` (legacy board: from the square corners and the entered square size) or `user_corrected` (the printed 100 mm line measured differently and its length was entered) | v1 |
+| `scale_source` | Recorded | `markers`, or `user_corrected` when the printed 100 mm line measured differently and its true length was entered | v1 |
 | `app_version`, `color_rules_version`, `model_version` | Recorded | Versions of the code, color rules and model used. The last two are empty until v2/v3. | v1 |
 | `processed_at` | Recorded | Date and time of processing (UTC, ISO 8601) | v1 |
 
@@ -232,6 +232,7 @@ Column names stay the same across releases. Columns not yet available are left e
   - `flag_line` and `flag_multi_blob` added, with one row per blob
   - `background_type` values are `white_grid`, `black_grid` and `checkerboard`
   - on grids, the merged flag uses solidity only
+- **November 12, 2026:** photos are always on one of the three printed sheets. The lab's old checkerboard is no longer an app input (it is kept in `validation/legacy/` to compare with the lab's ImageJ results), so `scale_source = checkerboard` and the area rule for `flag_merged` are gone.
 - **No "likely plastic" column:** it stays out of scope, unless the lab asks for it.
 
 ## 8b. Decisions on November 11, 2026 (standard backgrounds and the lab's records)
