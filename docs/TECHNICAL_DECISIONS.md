@@ -7,7 +7,7 @@ Technical choices made in coding sessions, within the conceptual decisions in Go
 - This file and the documents it links hold the **technical decisions**, which are made after reviewing Drive.
 - If a Drive change conflicts with something here, Drive wins and the technical decision is revisited.
 
-Details live in [CLASSIFICATION_SPEC.md](CLASSIFICATION_SPEC.md), [OUTPUT_CSV.md](OUTPUT_CSV.md) and [prototype/README.md](../prototype/README.md).
+Details live in [CLASSIFICATION_SPEC.md](CLASSIFICATION_SPEC.md), [OUTPUT_CSV.md](OUTPUT_CSV.md) and [pipeline/README.md](../pipeline/README.md).
 
 ## Decisions
 
@@ -20,7 +20,7 @@ Details live in [CLASSIFICATION_SPEC.md](CLASSIFICATION_SPEC.md), [OUTPUT_CSV.md
 
 ### Perimeter method (October 27, 2026, provisional)
 
-- The sub-pixel outline is the headline perimeter and circularity. It was most accurate on shapes with known perimeters: worst error 9% versus 13–20%, and under 1.2% change with rotation (`prototype/results/perimeter_study.txt`).
+- The sub-pixel outline is the headline perimeter and circularity. It was most accurate on shapes with known perimeters: worst error 9% versus 13–20%, and under 1.2% change with rotation (`validation/reports/perimeter_study.txt`).
 - ImageJ-compatible columns are kept alongside, because sub-pixel circularity reads about 0.08–0.10 higher than ImageJ.
 - Which one summaries use is decided after validation against hand measurements.
 
@@ -91,6 +91,15 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 - **Tar:** an optional reviewer tag `tar_like`; no automatic detection.
 - **Validation:** match the lab's plate photos to their spreadsheet rows and compare per class; the pass mark is set after.
 
+### Repository organized by the 10 parts (November 12, 2026)
+
+- The plan, the issues (#1–#10) and the folders follow the project's 10 parts: capture and calibration, segmentation, measurement, colour, morphology, review, ground truth and validation, app, storage, and retraining. The old 11-stage plan was folded in, and #11 was closed.
+- `prototype/` became `pipeline/`, the Python reference pipeline, with one sub-package per processing part (`mippr/capture`, `segmentation`, `measurement`, `color`, `morphology`, `review`).
+- Validation scripts moved to `validation/`.
+- `web/`, `database/` and `training/` hold the planned pieces: READMEs, stub modules with their planned signatures, and a draft Supabase schema.
+- `web/src/` mirrors the Python parts so each piece can be ported and checked against the Python results (parity tests).
+- Proposed, to confirm: plain ES modules with no build step for the web app.
+
 ### Repository (October 28 – November 4, 2026)
 
 - The plan, issues and tracker are kept in sync from `docs/PIPELINE.md` with `scripts/sync_plan.py`.
@@ -128,7 +137,7 @@ Tested on synthetic photos: perspective tilt, barrel lens distortion up to k1 = 
 
 ## Findings from the lab's photos (November 11, 2026)
 
-Two of the lab's "Rows A–H" photos (EX_01_S01, EX_01_S03) were checked against their hand measurements with `prototype/scripts/lab_photo_check.py`. Details in [LAB_DATA.md](LAB_DATA.md).
+Two of the lab's "Rows A–H" photos (EX_01_S01, EX_01_S03) were checked against their hand measurements with `validation/lab_photo_check.py`. Details in [LAB_DATA.md](LAB_DATA.md).
 
 - **Detection:** every particle found on both photos, matched to its well by column and position (r = 0.98 and 1.00 between the app's and the hand lengths).
 - **Scale gap:** the app's sizes, using the ruler in each photo, are a constant 8% and 10.3% larger than the sheet's. On S03 the ratio is the same for every particle, so the outlines agree and only the scale differs. This needs the lab's answer before the sheets can serve as size ground truth.

@@ -90,7 +90,7 @@ Each comes with a `MatchValue` (library match score). Wells sent to the plate re
 
 ## Checking the app against the hand measurements (November 11, 2026)
 
-`prototype/scripts/lab_photo_check.py` reads the scale from the ruler's 0.5 mm ticks, finds the dark particles, measures them with the pipeline's own code, and matches them to the sheet's wells by column and position.
+`validation/lab_photo_check.py` reads the scale from the ruler's 0.5 mm ticks, finds the dark particles, measures them with the pipeline's own code, and matches them to the sheet's wells by column and position.
 
 | Photo | Scale (ruler) | Particles found / in sheet | Matched | Length correlation | App vs hand (length) | App vs hand (width) |
 |---|---|---|---|---|---|---|

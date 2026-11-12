@@ -2,7 +2,7 @@
 
 This document defines what the app exports. For each column it gives what the column holds, how it is produced, who creates or changes it, and which release first fills it. Code builds toward this file, and readers of exported files can use it as a reference.
 
-It merges the team's *Output CSV: data dictionary and rationale* (Draft 1, October 28, 2026) with the classification spec decisions ([CLASSIFICATION_SPEC.md](CLASSIFICATION_SPEC.md)). The two were reconciled on November 2, 2026, and updated for the Drive spec v0.6 grid backgrounds on November 4, 2026. The Drive doc holds the conceptual definitions; this file holds the technical details. The prototype in [prototype/](../prototype/README.md) writes exactly these columns.
+It merges the team's *Output CSV: data dictionary and rationale* (Draft 1, October 28, 2026) with the classification spec decisions ([CLASSIFICATION_SPEC.md](CLASSIFICATION_SPEC.md)). The two were reconciled on November 2, 2026, and updated for the Drive spec v0.6 grid backgrounds on November 4, 2026. The Drive doc holds the conceptual definitions; this file holds the technical details. The prototype in [pipeline/](../pipeline/README.md) writes exactly these columns.
 
 The app describes particles that have already been hand-picked. It does not decide whether a particle is plastic or identify its polymer, which would need FTIR or Raman. Every export includes `NOTE.txt` saying so.
 

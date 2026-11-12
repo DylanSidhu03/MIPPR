@@ -1,7 +1,7 @@
 """Keep docs/pipeline-tracker.html (and GitHub issue text) in step with docs/PIPELINE.md.
 
     python scripts/sync_plan.py                 # rewrite the tracker's stage data
-    python scripts/sync_plan.py --issues DIR    # also write one issue body per stage to DIR
+    python scripts/sync_plan.py --issues DIR    # also write one issue body per part to DIR
                                                 # (--branch NAME to link to a branch other than main)
 
 PIPELINE.md is the source. The tracker starts with the tasks ticked there
@@ -16,8 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 PIPELINE = ROOT / "docs" / "PIPELINE.md"
 TRACKER = ROOT / "docs" / "pipeline-tracker.html"
 REPO_URL = "https://github.com/DylanSidhu03/MIPPR/blob/{branch}"
-IDS = ["scope", "capture", "truth", "prep", "seg", "measure", "classify", "validate", "batch", "web", "release"]
-STORAGE_KEY = "mippr-pipeline-v2"  # bump whenever the task list changes, so saved ticks don't shift onto other tasks
+APP_PART = 8  # the decision point (build the web app?) is shown at the top of this part's issue
+IDS = ["capture", "segment", "measure", "color", "morphology", "review", "truth", "app", "storage", "retrain"]
+STORAGE_KEY = "mippr-pipeline-v3"  # bump whenever the task list changes, so saved ticks don't shift onto other tasks
 
 
 def parse():
@@ -112,7 +113,7 @@ def issue_bodies(stages, branch):
         anchor = re.sub(r"[^a-z0-9 -]", "", s["title"].lower()).replace(" ", "-")
         lines = [f"**Goal:** {s['goal']}", ""]
         lines += [n for n in s["notes"]] + ([""] if s["notes"] else [])
-        if num == 10:
+        if num == APP_PART:
             lines += ["**Decision point first.** " + " ".join(gate["notes"]), ""]
             lines += [f"- [{'x' if t['done'] else ' '}] {t['text']}" for t in gate["tasks"]] + ["", "**Tasks**", ""]
         for t in s["tasks"]:
@@ -122,7 +123,7 @@ def issue_bodies(stages, branch):
                   f"See [docs/PIPELINE.md]({url}/docs/PIPELINE.md#{anchor})."]
         # Relative repo links in PIPELINE.md would break inside an issue.
         body = "\n".join(lines)
-        body = re.sub(r"\]\((?:\.\./)?(CLAUDE\.md|prototype/[^)]*)\)", rf"]({url}/\1)", body)
+        body = re.sub(r"\]\((?:\.\./)?(CLAUDE\.md|pipeline/[^)]*|web/[^)]*|validation/[^)]*|database/[^)]*|training/[^)]*)\)", rf"]({url}/\1)", body)
         body = re.sub(r"\]\(([A-Z_]+\.md)\)", rf"]({url}/docs/\1)", body)
         bodies[num] = body
     return bodies

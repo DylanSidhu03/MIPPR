@@ -1,6 +1,6 @@
 # Classification spec (v0.3)
 
-What the pipeline measures and decides for every particle, and what the output looks like. Annotators, the prototype and the web app all follow this. Decisions were made on October 27, 2026 (issue #1). Items marked **provisional** may change once validation data exists. v0.2 (November 2, 2026) merges in the team's Output CSV draft. Units are now mm, and the full column list lives in [OUTPUT_CSV.md](OUTPUT_CSV.md). v0.3 (November 11, 2026) adds section 0 (how each value is obtained from the photo), rule-based morphology from v2, opacity, fiber length along the fiber, rubbery fragment, and the second colour. These follow the standard printed backgrounds and the lab's existing records ([LAB_DATA.md](LAB_DATA.md)).
+What the pipeline measures and decides for every particle, and what the output looks like. Annotators, the Python pipeline and the web app all follow this. Decisions were made on October 27, 2026 (issue #1). Items marked **provisional** may change once validation data exists. v0.2 (November 2, 2026) merges in the team's Output CSV draft. Units are now mm, and the full column list lives in [OUTPUT_CSV.md](OUTPUT_CSV.md). v0.3 (November 11, 2026) adds section 0 (how each value is obtained from the photo), rule-based morphology from v2, opacity, fiber length along the fiber, rubbery fragment, and the second colour. These follow the standard printed backgrounds and the lab's existing records ([LAB_DATA.md](LAB_DATA.md)).
 
 **Scope.** Particles that were hand-picked from the >500 µm fraction and photographed on a standard background. Primarily the printed white grid, black grid and checkerboard sheets (Drive v0.6, [backgrounds/](../backgrounds/README.md)); the lab's 12 × 24 checkerboard is supported as legacy. The app measures and visually classifies them. It does **not** test whether a particle is plastic or which polymer it is; that would need FTIR/Raman.
 
@@ -109,7 +109,7 @@ A reviewer sets `review_status` (`auto`, `confirmed`, `corrected`, `rejected`). 
 
 ## 5. Perimeter and circularity (provisional)
 
-Circularity = 4π × area / perimeter². Perimeter can be measured several ways, and the choice changes circularity by up to 0.1. `prototype/scripts/perimeter_study.py` tested five methods on shapes with known perimeters, drawn the way a camera sees them:
+Circularity = 4π × area / perimeter². Perimeter can be measured several ways, and the choice changes circularity by up to 0.1. `validation/perimeter_study.py` tested five methods on shapes with known perimeters, drawn the way a camera sees them:
 
 | Method | Perimeter error, worst case | Change with rotation | vs the lab's old ImageJ numbers |
 |---|---|---|---|

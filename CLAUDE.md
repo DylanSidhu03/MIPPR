@@ -156,6 +156,6 @@ Everything above this section is an exact copy of `CLAUDE.md` in the team's Goog
 - [docs/TECHNICAL_DECISIONS.md](docs/TECHNICAL_DECISIONS.md) is the log of technical decisions and prototype findings.
 - [docs/CLASSIFICATION_SPEC.md](docs/CLASSIFICATION_SPEC.md) and [docs/OUTPUT_CSV.md](docs/OUTPUT_CSV.md) hold the details.
 - [docs/PIPELINE.md](docs/PIPELINE.md) is the task plan, kept in sync with GitHub issues #1–#11 and the tracker via `scripts/sync_plan.py`.
-- [prototype/](prototype/README.md) is the Python prototype.
+- [pipeline/](pipeline/README.md) is the Python reference pipeline. The repo is organized by the 10 project parts; see the table in [README.md](README.md).
 
 If Drive conflicts with a technical decision, Drive wins and the technical decision is revisited.

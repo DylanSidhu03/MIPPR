@@ -1,0 +1,44 @@
+# Part 7: Ground truth and validation
+
+The known answers that every other part is tuned and judged against: the lab's hand-labelled particles, new labels, and the reports that show whether the app is good enough to trust.
+
+**Method:** labelled data and comparison. Nothing here runs in the app.
+
+## In → Out
+
+| In | Out |
+|---|---|
+| The lab's ParticleCount spreadsheets and photos (Drive; summarized in [docs/LAB_DATA.md](../docs/LAB_DATA.md)) | Tuned thresholds for parts 2–5 |
+| The app's output on the same particles | A training set for the v3 model (part 5), split by sample |
+| New labels from review (part 6) | A fixed gold test set (part 10) |
+| | Agreement reports: detection, size error, colour and shape confusion |
+
+The lab's data stays in Drive and is not committed here: it's the lab's, and the terms are open question 9. Scripts read it from a local folder.
+
+## What exists
+
+| File | Does |
+|---|---|
+| `lab_photo_check.py` | Matches the app's particles to the lab's spreadsheet rows on their "Rows A–H" ruler photos, and reports agreement. EX_01_S01 and S03 so far: every particle found, r = 0.98 and 1.00, sizes a constant 8% and 10.3% larger |
+| `compare_imagej.py` | Compares with the lab's ImageJ results on the fragment_area sample (median area +0.5%, Feret −0.2%) |
+| `perimeter_study.py` | Perimeter methods on shapes with a known answer (`reports/perimeter_study.txt`) |
+
+## To build
+
+- [ ] **Settle the scale gap with the lab:** measure one particle with calipers. Until then the lab's sizes can't be ground truth.
+- [ ] **Run `lab_photo_check.py` on more photos** (other EX_01 samples, EX_02, SF_04, OC) and collect the matches into one table.
+- [ ] **Build the labelled set:** matched photo crops + the lab's shape and colour labels, split into train / validation / test **by sample**.
+- [ ] **A second person labels 20%** of particles independently, to get the agreement ceiling (Cohen's kappa for classes).
+- [ ] **New labels for missing classes:** film, foam, clear particles, and photos on the printed sheets.
+- [ ] **Agree the pass mark** (open question 6) after seeing the agreement per class.
+- [ ] **The validation report:**
+  - detection recall and precision
+  - size error in mm
+  - confusion matrices for colour and shape
+  - how many particles need review
+  - time saved versus the manual workflow
+  - a test on a second setup or lab
+
+## Watch for
+
+Don't tune on the test set. A model only proven on the pilot setup isn't a standard method.

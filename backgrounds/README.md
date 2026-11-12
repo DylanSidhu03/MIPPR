@@ -10,7 +10,7 @@ Grid backgrounds to photograph hand-picked particles on (Drive spec v0.6, "Stand
 
 **How to use them:**
 - Print at **actual size (100%)**, not "fit to page", on matte paper.
-- Check the 100 mm line at the bottom with a ruler. If it isn't 100 mm, enter its true length in the app (`--line-mm` in the prototype).
+- Check the 100 mm line at the bottom with a ruler. If it isn't 100 mm, enter its true length in the app (`--line-mm` in the Python pipeline).
 - Place one particle per box, in the middle, not touching a line and clear of the small box label in the top-left corner.
 - Photograph from roughly overhead in diffuse, even light, no flash, with all four corner markers in the frame.
 
@@ -20,9 +20,9 @@ Grid backgrounds to photograph hand-picked particles on (Drive spec v0.6, "Stand
 - four corner markers (ArUco 4x4_50, 18 mm) that tell the app the background, paper, scale and perspective
 - white and grey patches for white balance
 
-The PDFs are vector files, so lines and markers print at the printer's full resolution. They are made by the prototype:
+The PDFs are vector files, so lines and markers print at the printer's full resolution. They are made by part 1 of the Python pipeline ([pipeline/mippr/capture/](../pipeline/mippr/capture/README.md)):
 
 ```bash
-cd prototype
+cd pipeline
 ../.venv/bin/python -m mippr.cli sheet --background white_grid --paper letter --out ../backgrounds/
 ```

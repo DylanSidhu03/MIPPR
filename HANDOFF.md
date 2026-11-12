@@ -1,3 +1,5 @@
+> **Historical (October 2026).** This was the handoff for setting up the repo. The repo is now organized by the project's 10 parts: see [README.md](README.md) and [docs/PIPELINE.md](docs/PIPELINE.md).
+
 # Handoff for the Code session
 
 Goal: get this folder onto https://github.com/DylanSidhu03/MIPPR (currently empty) so a cloud Claude session can work on it.
