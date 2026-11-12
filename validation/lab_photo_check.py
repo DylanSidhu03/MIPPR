@@ -13,8 +13,9 @@ This script:
 3. measures them with the pipeline's own measure() and v2 rules,
 4. groups them into one column per plate row in the sheet (A-H, or fewer), tries
    each column order and reading direction, and keeps the one whose lengths agree
-   best with the sheet. A column is only matched when its particle count equals
-   the sheet's, counting "Particle Missing" rows or not, whichever fits.
+   best with the sheet. Within a column, particles are aligned with the wells by
+   length, top to bottom, so extra specks and missing particles are skipped.
+   Particles away from the plate's grid (on tape or card edges) are left out.
 5. reports agreement for length, width, colour and shape.
 
 It is a validation tool, not part of the app: the photos have no printed markers.
@@ -189,53 +190,84 @@ def main_cluster(particles, k=3.0):
     return np.nonzero(group == biggest)[0]
 
 
-def match(particles, sheet):
-    """Assign wells by column and position; pick the column order and direction that agree best.
+def columns(particles, keep, ncol, iters=30):
+    """Column index (0 = leftmost) for each kept particle: 1-D k-means on x, started from the widest gaps."""
+    xs = np.array([particles[i]["x"] for i in keep])
+    order = np.argsort(xs)
+    col = np.zeros(len(keep), int)
+    if ncol > 1:
+        for c in np.sort(np.argsort(np.diff(xs[order]))[-(ncol - 1):]):
+            col[order[c + 1:]] += 1
+    for _ in range(iters):
+        centres = np.array([xs[col == c].mean() if (col == c).any() else np.nan for c in range(ncol)])
+        centres = np.sort(centres[~np.isnan(centres)])
+        if len(centres) < ncol:
+            break
+        new = np.abs(xs[:, None] - centres[None, :]).argmin(axis=1)
+        if (new == col).all():
+            break
+        col = new
+    return col
 
-    One column per plate row present in the sheet. Rows whose particle is noted
-    missing are left out of a column's count when that makes the counts agree.
+
+def align(app, hand, gap=0.6):
+    """Best order-preserving pairing of two length lists (top to bottom), allowing skips on both sides.
+
+    Score per pair: 1 - |log(app/hand)|, so similar lengths pair up; skipping costs `gap`.
+    Extra specks and missing particles become skips instead of breaking the column.
+    """
+    n, m = len(app), len(hand)
+    S = np.zeros((n + 1, m + 1))
+    S[:, 0] = -gap * np.arange(n + 1)
+    S[0, :] = -gap * np.arange(m + 1)
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            pair = 1 - abs(np.log(app[i - 1] / hand[j - 1])) if app[i - 1] > 0 and hand[j - 1] > 0 else -1
+            S[i, j] = max(S[i - 1, j - 1] + pair, S[i - 1, j] - gap, S[i, j - 1] - gap)
+    pairs, i, j = [], n, m
+    while i > 0 and j > 0:
+        pair = 1 - abs(np.log(app[i - 1] / hand[j - 1])) if app[i - 1] > 0 and hand[j - 1] > 0 else -1
+        if np.isclose(S[i, j], S[i - 1, j - 1] + pair):
+            if pair > 0:
+                pairs.append((i - 1, j - 1))
+            i, j = i - 1, j - 1
+        elif np.isclose(S[i, j], S[i - 1, j] - gap):
+            i -= 1
+        else:
+            j -= 1
+    return pairs[::-1], float(S[n, m])
+
+
+def match(particles, sheet):
+    """Assign wells: one column per plate row in the sheet (A-H, or fewer), particles in a column
+    aligned top to bottom with its wells by length (skips allowed for specks and missing
+    particles). Tries each column order and reading direction and keeps the best total score.
     """
     row_of = lambda w: (int(w[1:]) - 1) // 12  # noqa: E731
     letters = sorted({row_of(w) for w in sheet})
     ncol = len(letters)
-    expected = [sum(1 for w in sheet if row_of(w) == L) for L in letters]
     keep = main_cluster(particles)
-    for _ in range(20):
-        # cut at the ncol - 1 widest gaps; a "column" far smaller than any plate row is
-        # stray specks (or a bit of ruler): drop those points and cut again
-        xs = np.array([particles[i]["x"] for i in keep])
-        order = np.argsort(xs)
-        col_k = np.zeros(len(keep), int)
-        if ncol > 1:
-            for c in np.sort(np.argsort(np.diff(xs[order]))[-(ncol - 1):]):
-                col_k[order[c + 1:]] += 1
-        counts = np.bincount(col_k, minlength=ncol)
-        small = [c for c in range(ncol) if counts[c] < max(2, 0.4 * min(expected))]
-        if not small:
-            break
-        keep = keep[~np.isin(col_k, small)]
     col = np.full(len(particles), -1)
-    col[keep] = col_k
-    present = lambda w: sheet[w].get("L") not in (None, "")  # noqa: E731
+    col[keep] = columns(particles, keep, ncol)
+    measured = [w for w in sheet if sheet[w].get("L") not in (None, "")]
     best = None
     for rtl in (True, False):
         for top_down in (True, False):
-            m = {}
+            m, total = {}, 0.0
             for c in range(ncol):
                 idx = sorted((i for i in range(len(particles)) if col[i] == c),
                              key=lambda i: particles[i]["y"], reverse=not top_down)
                 letter = letters[ncol - 1 - c] if rtl else letters[c]
-                wells = sorted(w for w in sheet if row_of(w) == letter)
-                if len(wells) != len(idx):
-                    wells = [w for w in wells if present(w)]
-                if len(wells) == len(idx):
-                    m.update(zip(idx, wells))
-            pairs = [(particles[i]["length_mm"], float(sheet[w]["L"]) / 1000) for i, w in m.items() if present(w)]
-            if len(pairs) >= 5:
-                r = float(np.corrcoef(*zip(*pairs))[0, 1])
-                if best is None or r > best[0]:
-                    best = (r, m, rtl, top_down)
-    return best, [int((col == c).sum()) for c in range(ncol)] + [int((col < 0).sum())]
+                wells = sorted(w for w in measured if row_of(w) == letter)
+                pairs, score = align([particles[i]["length_mm"] for i in idx],
+                                     [float(sheet[w]["L"]) / 1000 for w in wells])
+                m.update({idx[a]: wells[b] for a, b in pairs})
+                total += score
+            if len(m) >= 5 and (best is None or total > best[0]):
+                pairs = [(particles[i]["length_mm"], float(sheet[w]["L"]) / 1000) for i, w in m.items()]
+                best = (total, float(np.corrcoef(*zip(*pairs))[0, 1]), m, rtl, top_down)
+    per_col = [int((col == c).sum()) for c in range(ncol)] + [int((col < 0).sum())]
+    return (best[1:] if best else None), per_col
 
 
 def detect(img, a):
