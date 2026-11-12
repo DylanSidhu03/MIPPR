@@ -116,7 +116,7 @@ Folder: [pipeline/mippr/color/](../pipeline/mippr/color/README.md).
 - [x] List color classes: 13 classes. Clear and white are kept separate by opacity; multicolor means a second, clearly different color covers ≥ 20%.
 - [x] Measure mean and SD of CIE Lab per particle, ignoring edge pixels, plus a hex code
 - [x] Classify every pixel into a colour class (provisional Lab rules) and record the main colour, the second colour and its share (`color_secondary`, `color_secondary_fraction`)
-- [ ] Fit the colour rules to the lab's labelled particles (about 4,600 with colours). The rules are provisional (`0.1-provisional`) until then.
+- [ ] Fit the colour rules to labelled particles. Tried on the lab's photos (`validation/fit_colors.py`): no gain (90.9% vs 90.8%), because the photos aren't white-balanced (a purple-blue cast on every particle) and almost all particles are black. Needs white-balanced photos of the printed sheets with coloured particles; the rules stay `0.1-provisional`.
 - [ ] Add a reference swatch and Lab range per color class to the spec (once the color reference is settled in part 1)
 - [ ] Check clear vs white on real photos on both backgrounds
 
@@ -176,9 +176,9 @@ Folder: [validation/](../validation/README.md). The lab's data stays in Drive.
 - [x] Find out whether a labeled set already exists from past hand-classification (open question 4). It does: about 4,600 particles with shape and colour, and about 4,000 with hand-measured length and width, in the Drive ParticleCount spreadsheets ([LAB_DATA.md](LAB_DATA.md)).
 - [x] Match the lab's "Rows A–H" photos to their spreadsheet rows by sample and well (`validation/lab_photo_check.py`; done for EX_01_S01 and S03)
 - [x] Compare automated sizes with the lab's ImageJ results on the fragment_area sample. Median differences across 24 particles: area +0.5%, Feret −0.2%, min Feret +0.1%.
-- [ ] Settle the scale gap with the lab: on the ruler photos the app's sizes are a constant 8% and 10.3% larger than the sheet values. Measure one particle with calipers.
+- [ ] Settle the scale gap with the lab: the app's sizes are 8–12% larger than the sheet on five EX_01 photos but within 2% on three others. Measure one particle from EX_01_S07 with calipers.
 - [ ] Ask the lab how length and width are measured, and why width is larger than length in SF_02/SF_03
-- [ ] Run the photo check on more samples (EX_01, EX_02, SF_04, OC) and collect the matches into one table
+- [x] Run the photo check on more samples and collect the matches into one table: 20 photos, 1,210 particles paired, 8 photos reliable ([report](../validation/reports/lab_photos.md)). The size gap varies by photo (+12% to −2%), so it comes from the lab's scale settings, not the app. SF_04 has no sheet in Drive.
 - [ ] Compare automated sizes with manual caliper or microscope measurements on 50 particles
 - [ ] Shoot a pilot batch of 50 to 100 particles on the printed sheets, covering every class
 - [ ] Choose an annotation tool (CVAT, Label Studio or similar) and set it up with the class list from the spec

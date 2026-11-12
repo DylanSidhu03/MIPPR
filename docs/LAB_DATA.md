@@ -7,8 +7,8 @@ Summary of the hand-classification spreadsheets in the Drive folder **ParticleCo
 - **11 spreadsheets parsed in full** (4,599 rows): EX_01, EX_02, SF_02, OC_05_07, OC_08_09, PalisadesFire, SealBeach, Win_IDC, HKS_IDC, Angela_IDC, AE_IDC.
 - **SF_03** was read as text, not parsed, so it is not in the counts below. It has the same pattern as SF_02: rubbery fragments, fibers with polymer IDs, and width often larger than length.
 - **Gyre Library plate-reader sheet**: read as text up to plate 5 (the tool cut it off). It has shape and colour but no sizes or polymer types.
-- **Not read yet:** OC_01_03 (its download comes back inline, too large to handle that way).
-- **Photos:** two "Rows A–H" photos were checked against their sheet rows on November 11 (see *Checking the app against the hand measurements* below).
+- **OC_01_03** (`OC_01_03_particle_count.xlsx`) was read as text on November 12: OC_02 DS1/US1 fibers with polymer IDs, OC_03 DS1/US1 wells (many white and blue fragments), two LFB plates (PA66 spikes, about 3.5–4 mm), air-blank fibers (counted, not analysed) and OC_SA/OC_DP fragments with ATR polymer IDs but no sizes. Not in the counts below.
+- **Photos:** 20 "Rows A–H" photos were checked against their sheet rows on November 11–12 (see *Checking the app against the hand measurements* below, and [validation/reports/lab_photos.md](../validation/reports/lab_photos.md)).
 
 ## Spreadsheet layout
 
@@ -108,6 +108,14 @@ Each comes with a `MatchValue` (library match score). Wells sent to the plate re
   A ruler on the background plane can't be off by 8–10%. Either the lab's scale setting is off, and their recorded sizes are about 8–10% too small, or the hand values come from a different step (another image, a resized copy, or a fixed per-setup scale).
 - **Shape:** the lab calls some particles with length:width ≥ 3 (by its own numbers) fragments, so it doesn't use a strict 3:1 rule for fibers. Its fibers are thin threads (median width 24 µm). The app's first version also over-read chunky, elongated fragments; that is fixed. The centre-line length now only counts for a particle that bends.
 
+### 20 photos (November 12, 2026)
+
+The check now reads each ruler on its own, works on black backgrounds and on plates with fewer rows, and pairs particles with wells even when specks or missing particles break the counts. Full table: [validation/reports/lab_photos.md](../validation/reports/lab_photos.md).
+
+- **8 photos pair reliably** (650 particles, r = 0.91–1.00); the rest have too many specks or broken outlines.
+- **The size gap varies by photo:** EX_01_S01, S03, S05, S06, S07 are 8–12% larger than the sheet, but EX_01_S08, OC_03_DS1 and EX_02_S08 agree within 2%. So it isn't the app's scale; the lab's ImageJ scale was probably set per session.
+- **Colour:** 96% agreement on white backgrounds (almost all black particles), 24.5% on black ones, where white and pale blue particles read as grey. The photos have a strong colour cast and no white reference, so the colour rules weren't changed.
+
 ## What this means for MIPPR
 
 1. **Open question 4 is answered: a labelled set exists.** About 4,600 particles have shape and colour, and about 4,000 have hand-measured length and width. Many can be matched to photos by sample ID and well. This is the validation set for stage 8 and the starting training set for v3.
@@ -123,7 +131,7 @@ Each comes with a `MatchValue` (library match score). Wells sent to the plate re
 
 ## Questions for the lab
 
-- **Scale:** how is the ImageJ scale set for the "Rows A–H" photos? On EX_01_S01 and S03 the app's sizes, using the ruler in each photo, are 8% and 10.3% larger than the sheet values, with identical outlines. Measuring one particle with calipers would settle which is right.
+- **Scale:** how is the ImageJ scale set for the "Rows A–H" photos, and was it set again each session? Using the ruler in each photo, the app's sizes are 8–12% larger than the sheet on EX_01_S01, S03, S05, S06 and S07, but within 2% on EX_01_S08, OC_03_DS1 and EX_02_S08. Measuring one particle from EX_01_S07 with calipers would settle it.
 - **Fibers:** is a fiber a thin thread (like the F-numbered fibers), rather than anything with length:width ≥ 3? Some ≥ 3:1 particles are recorded as fragments.
 
 - How are ParticleLength and ParticleWidth measured (tool, and which axes)? Why is width larger than length in SF_02/SF_03?

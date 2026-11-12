@@ -3,7 +3,9 @@
     python validation/fit_colors.py RESULTS_DIR [--fit]
 
 RESULTS_DIR holds the JSON files from lab_photo_check.py (run_lab_photos.py), which
-keep up to 300 CIE Lab pixels for each matched particle. The particle label is decided
+keep up to 300 CIE Lab pixels for each matched particle. Only photos whose matching
+can be trusted are used (length r >= 0.9, at most 1.3x as many detections as sheet
+rows), unless --all-photos. The particle label is decided
 from those pixels with the pipeline's own rule (color.rules.label_from_lab); the
 pixels are not median-filtered first, unlike in the pipeline, which makes little
 difference to the class shares.
@@ -37,10 +39,18 @@ def lab_label(s):
     return LAB_NAMES.get(s, s)
 
 
-def load(results_dir):
+def reliable(d, min_r=0.9, max_extra=1.3):
+    """A photo whose matching can be trusted: lengths correlate and detection isn't swamped by specks."""
+    return (d.get("correlation", 0) >= min_r and d.get("n_sheet")
+            and d.get("n_found", 0) <= max_extra * d["n_sheet"])
+
+
+def load(results_dir, all_photos=False):
     rows = []
     for f in sorted(p for p in Path(results_dir).glob("*.json") if not p.name.endswith(".particles.json")):
         d = json.loads(f.read_text())
+        if not all_photos and not reliable(d):
+            continue
         for r in d.get("rows", []):
             hand = lab_label(r["hand_color"])
             if hand in ("", "unknown") or not r.get("lab_px"):
@@ -102,8 +112,9 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("results")
     ap.add_argument("--fit", action="store_true")
+    ap.add_argument("--all-photos", action="store_true", help="include photos whose matching is unreliable")
     a = ap.parse_args()
-    rows = load(a.results)
+    rows = load(a.results, a.all_photos)
     print(f"{len(rows)} particles with a lab colour, from {len({r['sample'] for r in rows})} samples")
     print("lab colours:", dict(Counter(r["hand"] for r in rows).most_common()))
     pred = predict(rows)

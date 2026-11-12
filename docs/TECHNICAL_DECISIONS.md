@@ -174,6 +174,8 @@ Two of the lab's "Rows A–H" photos (EX_01_S01, EX_01_S03) were checked against
 
 - **Detection:** every particle found on both photos, matched to its well by column and position (r = 0.98 and 1.00 between the app's and the hand lengths).
 - **Scale gap:** the app's sizes, using the ruler in each photo, are a constant 8% and 10.3% larger than the sheet's. On S03 the ratio is the same for every particle, so the outlines agree and only the scale differs. This needs the lab's answer before the sheets can serve as size ground truth.
+- **20 photos (November 12):** [validation/reports/lab_photos.md](../validation/reports/lab_photos.md). On the 8 that pair reliably (650 particles, r = 0.91–1.00) the gap ranges from +12% to −2% by photo, so it comes from the lab's per-session scale, not a constant error in the app. Pairing now aligns each column with its wells by length, skipping specks and missing particles.
+- **Colour on these photos:** 96% agreement on white backgrounds (nearly all black particles), 24.5% on black ones. Every particle carries a purple-blue cast and the backgrounds are clipped, so fitting the limits gave nothing (90.9% vs 90.8%; 88.6% held out). The rules stay provisional until white-balanced sheet photos exist.
 - **Fiber rule:** the centre-line length:width now only counts for particles that bend (centre line ≥ 1.1 × straight length), because it over-read chunky, elongated fragments. The lab also records some ≥ 3:1 particles as fragments, so the 3:1 rule may need a thinness condition.
 
 ## Open technical questions
