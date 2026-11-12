@@ -18,13 +18,14 @@ The printed background makes most of this deterministic: the app knows the scale
 | White balance | colour correction | The printed white and grey patches |
 | Find each particle | the **outline** (mask) and its box (`particle_id`) | **Threshold**: difference from the box's own known background colour, hysteresis threshold, half-maximum edge. Printed lines and label corners are masked. |
 | Measure | length, width, area, perimeter, convex values, CED, fiber length | **Geometry** from the outline × scale |
+| Size uncertainty | `size_uncertainty`, length and width at the outer and inner edge | **Geometry**: the outline redrawn with the edge at 40% and 60% of the particle's contrast; how much the length changes |
 | Shape ratios | aspect ratio, circularity, solidity | **Derived** from the measurements |
 | Opacity | how much of the background shows through | **Measured**: particle contrast against the known background of its box |
 | Colour values | Lab mean and spread, hex, second colour and its share | **Measured** inside the outline after white balance |
 | Size class, size flags | `size_class`, `flag_near_cutoff`, `flag_min_width`, `flag_width_unresolved` | **Fixed thresholds** |
 | Colour label | one of 13 classes | **Rules** on Lab, opacity and the second colour (v2) |
 | Morphology label | one of 7 classes | **Rules** for fiber, pellet and film (v2); **image model** for the rest (v3) |
-| Quality flags | edge, line, multi-blob, merged, low contrast, scale, low confidence | **Thresholds** and checks |
+| Quality flags | edge, line, multi-blob, merged, low contrast, size uncertain, scale, low confidence | **Thresholds** and checks; each threshold is set in testing on labelled particles, then applied unchanged in use |
 | Review | confirmed / corrected / rejected, reviewer tags (e.g. tar-like) | **A person** |
 | Polymer | `polymer_confirmed`, `polymer_method` | **The lab** (FTIR/Raman), not the app |
 
@@ -98,6 +99,7 @@ Each flag is its own True/False column. `review_reason` lists the ones that are 
 | `flag_line` | The outline reaches a printed line or box edge (long fibers crossing into the next box) | now |
 | `flag_multi_blob` | More than one blob in one box; each gets its own row (`B4-1`, `B4-2`) | now |
 | `flag_width_unresolved` | Width under about 2 pixels (thin fibers); `width_mm` left empty | v1 |
+| `flag_size_uncertain` | The size depends strongly on where the edge is drawn: the length changes by more than 10% (provisional) between edges at 40% and 60% of the particle's contrast | v1 |
 | `flag_bundle` | Fiber bundle (the lab's "Line Bundle" / "fiber bundle"); set by a reviewer, later by the model | v2 / v3 |
 | `flag_low_confidence` | Color or morphology confidence is below a threshold, still to be decided | v2 / v3 |
 

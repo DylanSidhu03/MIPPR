@@ -91,6 +91,16 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 - **Tar:** an optional reviewer tag `tar_like`; no automatic detection.
 - **Validation:** match the lab's plate photos to their spreadsheet rows and compare per class; the pass mark is set after.
 
+### What the labelled particles test, and the size check (November 12, 2026)
+
+Decided with the user:
+- **The labelled particles test results, not isolation.** They show whether the app gets each particle's size, colour and morphology right, compared box by box with the lab's answer. Finding particles is mostly solved by one particle per box, so there are no hand-drawn outlines; detection is counted from the well-to-box list, and an outline is only looked at when that particle's size or shape came out wrong.
+- **Testing sets thresholds; use applies them.** In testing, the known answers show which signals go with wrong results, and each flag's threshold is set from that. In use there are no known answers: the same checks run on every particle with those thresholds, and flagged particles go first in the review list. Reviewer corrections are used to check the thresholds again at each retraining, and a threshold changes only in a new, versioned release.
+- **Size check:** `measurement/uncertainty.py` redraws each outline with the edge at 40% and 60% of the particle's contrast (instead of 50%) and records `length_mm_outer`, `length_mm_inner`, `width_mm_outer`, `width_mm_inner` and `size_uncertainty` = (outer − inner length) ÷ length. Above 0.10 (provisional) it sets `flag_size_uncertain`. The outer outline always contains the drawn one and the inner lies within it, keeping every piece that touches the particle (a fiber crossing a line can break at 60%).
+  - On synthetic blurred particles the value rises with blur and is largest on small particles: the 40–60% shift is about half the blur width at each end. On the synthetic sheet photo (10.7 px/mm) particles under about 1 mm already pass 0.10, as does the fiber crossing a line, whose thin end fades. Calibration will decide the threshold, possibly a separate one for fibers.
+  - On the lab's old checkerboard sample (24 particles) the median is 0.04 and one particle passes 0.10. The faint lavender fragment ImageJ under-measured (A4-2) is not that one: the check measures how ambiguous the edge is relative to the particle's own contrast, and a faint particle can still have a sharp edge. `flag_low_contrast` covers faint particles, so the two flags complement each other; testing will show how much each catches.
+- **Caliper reference:** 30–50 particles measured with calipers decide which is right where the app and the lab's sizes disagree.
+
 ### Photos are always on one of the three printed backgrounds (November 12, 2026)
 
 Decided by the user: the project runs on the assumption that every photo is taken on one of the three printed backgrounds (white grid, black grid, checkerboard). So:

@@ -70,7 +70,7 @@ Folder: [pipeline/mippr/segmentation/](../pipeline/mippr/segmentation/README.md)
 - [ ] Handle translucent films and clear particles. Low-contrast outlines are flagged for review for now.
 - [ ] Detect thin fibers (about 24 µm wide, under one pixel on a sheet photo) as faint lines, so their length can be measured
 - [ ] Test grid segmentation on real phone photos of the printed sheets
-- [ ] Score segmentation on labelled photos of the printed sheets: detection recall and precision, outline overlap. (On the lab's older ruler photos, used only as a check, 650 particles paired reliably.)
+- [ ] Check segmentation on labelled photos of the printed sheets: detection counted from the well-to-box list, and outlines looked at where a particle's size or shape came out wrong (part 7). No hand-drawn outlines. (On the lab's older ruler photos, used only as a check, 650 particles paired reliably.)
 - [ ] Optional: compare with a learned segmenter (Cellpose, SAM or a small U-Net), only if the threshold falls short
 
 **In:** Flattened grid image and layout from part 1.  
@@ -92,6 +92,8 @@ Folder: [pipeline/mippr/measurement/](../pipeline/mippr/measurement/README.md).
 - [x] Measure opacity against the known background of each box (`opacity`): a lower bound on one background, measured directly across a checkerboard edge
 - [x] Convert pixels to mm and mm² with the stored scale; flag particles near the 500 µm cutoff or narrower than it
 - [x] Leave width empty with `flag_width_unresolved` when a particle is under about 2 px wide
+- [x] Measure how much each size depends on where the edge is drawn (`measurement/uncertainty.py`): length and width with the edge at 40% and 60% of the particle's contrast, `size_uncertainty`, and `flag_size_uncertain` above a provisional 0.10
+- [ ] Set the `flag_size_uncertain` threshold in testing (part 7), separately for fibers if their fading ends need it
 - [ ] Later decision: which perimeter method gives the headline circularity (sub-pixel or ImageJ-compatible; spec section 5)
 - [ ] Check opacity on real photos of clear films, against the opposite background
 
@@ -150,7 +152,7 @@ Folder: [pipeline/mippr/review/](../pipeline/mippr/review/README.md) (rules for 
 - [x] Decide the review columns: `review_status`, `*_original` labels, `outline_edited`, reviewer, role and time; rejected rows stay in particles.csv and leave the summary
 - [x] Apply reviewer decisions (`review/corrections.py`): confirm, reject, relabel, edit outline (re-measured exactly as the pipeline would), tag; original labels kept
 - [ ] Split and merge: decide the new particle IDs and what happens to the merged-away row
-- [x] Order the review list: flagged and low-confidence particles first, then unflagged, reviewed, rejected (`review_queue`)
+- [x] Order the review list: flagged and low-confidence particles first, then unflagged, reviewed, rejected (`review_queue`). Flagged includes `flag_size_uncertain`, so sizes the app isn't sure of are checked first.
 - [ ] Set the `flag_low_confidence` threshold from validation data
 - [ ] Build the review screen: outlines on the photo, accept / reject / relabel / redraw, keyboard shortcuts, tar-like and bundle tags
 - [ ] Count how many particles need review and how long it takes
@@ -169,6 +171,10 @@ Folder: [validation/](../validation/README.md). The lab's data stays in Drive.
 
 The app only takes photos on the three printed backgrounds, so the labelled set, the gold set and the pass marks are built from photos on the sheets. The lab's older photos (a ruler on white or black paper, and the old 12 × 24 checkerboard) are only a cross-check of the measurement code. The quickest route to a labelled set on the sheets: re-photograph the lab's already-labelled particles, one per box, recording which well went into which box, so the hand labels carry over.
 
+**What the labelled particles test** (decided November 12): whether the app gets each particle's **size, colour and morphology** right, compared box by box with the lab's answer. Finding particles in the photo is mostly solved by the one-per-box design, so it isn't labelled separately: no hand-drawn outlines. An outline is looked at only when that particle's size or shape comes out wrong, to see why.
+
+**Testing, then use.** In testing, the known answers show which flags go with wrong results, and that sets each flag's threshold (for example, above what `size_uncertainty` sizes turn out wrong). In use there are no known answers: the same checks run on every particle with those thresholds, and flagged particles go to a reviewer first. Reviewer corrections are later used to check the thresholds again (part 10).
+
 - [x] Find out whether a labeled set already exists from past hand-classification (open question 4). It does: about 4,600 particles with shape and colour, and about 4,000 with hand-measured length and width, in the Drive ParticleCount spreadsheets ([LAB_DATA.md](LAB_DATA.md)).
 - [x] Match the lab's "Rows A–H" photos to their spreadsheet rows by sample and well (`validation/lab_photo_check.py`; 20 photos so far)
 - [x] Compare automated sizes with the lab's ImageJ results on the fragment_area sample. Median differences across 24 particles: area +0.5%, Feret −0.2%, min Feret +0.1%.
@@ -177,16 +183,20 @@ The app only takes photos on the three printed backgrounds, so the labelled set,
 - [x] Run the photo check on more samples and collect the matches into one table: 20 photos, 1,210 particles paired, 8 photos reliable ([report](../validation/reports/lab_photos.md)). The size gap varies by photo (+12% to −2%), so it comes from the lab's scale settings, not the app. SF_04 has no sheet in Drive.
 - [ ] Compare automated sizes with manual caliper or microscope measurements on 50 particles
 - [ ] Re-photograph the lab's labelled particles on the printed sheets (all three backgrounds), with a well-to-box list, so their hand labels and sizes carry over
+- [ ] Compare box by box: length and width against the lab's sizes, colour and morphology against the lab's labels; report agreement per class and the confusion between classes
+- [ ] Count detection from the well-to-box list: boxes with a particle the app missed, and extra detections in boxes listed empty
+- [ ] Measure 30–50 of those particles with calipers, to decide which is right where the app and the lab's sizes disagree (the lab's older sizes vary by session)
+- [ ] Set each flag's threshold from the results: `flag_size_uncertain` (which `size_uncertainty` goes with a wrong size), `flag_low_contrast`, `flag_merged`, and `flag_low_confidence` once confidences exist. Record how many wrong results each flag catches and how many it misses.
 - [ ] Shoot a pilot batch of 50 to 100 particles on the printed sheets, covering every class
 - [ ] Choose an annotation tool (CVAT, Label Studio or similar) and set it up with the class list from the spec
-- [ ] Outline particles and tag color and morphology on at least 300 particles on the sheets, including film, foam and clear particles
+- [ ] Label colour and morphology (one label per box, no outlines) on at least 300 more particles on the sheets, including film, foam and clear particles
 - [ ] Have a second person label a 20% subset independently
-- [ ] Measure agreement between labelers (Cohen's kappa for classes, overlap for outlines)
+- [ ] Measure agreement between labelers (Cohen's kappa for classes)
 - [ ] Resolve disagreements and update the class spec from what you learn
 - [ ] Split into train, validation and test sets by sample, not by image
 - [ ] Agree how close to hand measurements counts as validated (open question 6), after seeing the agreement per class
 - [ ] Run the pipeline once on the held-out test set and do not tune on it
-- [ ] Report detection recall and precision, class confusion matrices, and size error in mm
+- [ ] Report size error in mm, class confusion matrices for colour and morphology, detection counts, and what each flag catches
 - [ ] Compare model-versus-human agreement with human-versus-human agreement
 - [ ] Time the manual workflow against the pipeline on the same batch
 - [ ] Run a small test on images from a second setup or lab
@@ -275,6 +285,7 @@ Folder: [training/](../training/README.md). Periodic and manual, not continuous 
 - [ ] Build a fixed, expert-labelled gold test set that is never used for training
 - [ ] Set up the retraining routine: snapshot, build the dataset, train, evaluate, gate, publish (`training/` stubs)
 - [ ] Version every model and record its gold-set scores (`model_versions`), so past results stay reproducible
+- [ ] At each retraining, check the flag thresholds against reviewer corrections (which flagged particles were really wrong, and which wrong ones weren't flagged); change a threshold only by a new, versioned release, never automatically
 - [ ] Decide where training runs: a lab GPU machine or free notebooks (open question 8)
 - [ ] Set a plan for who answers issues and retrains the model after the practicum (open question 7)
 - [ ] Publish models (GitHub releases, Hugging Face or Zenodo)

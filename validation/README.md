@@ -36,6 +36,8 @@ The lab's data stays in Drive and is not committed here: it's the lab's, and the
 - [x] **Run `lab_photo_check.py` on more photos** and collect the matches into one table: 20 photos from EX_01, EX_02, OC_03, OC_05–07 and an LFB (see `reports/lab_photos.md`).
 - [ ] SF_04 photos: their sheet (SF_04) isn't in Drive's ParticleCount folder.
 - [ ] **Re-photograph the lab's labelled particles on the printed sheets** (all three backgrounds), with a well-to-box list, so their hand labels carry over. Then measure a few with calipers as the size reference.
+- [ ] **Compare box by box** on those sheet photos: size against the lab's sizes and calipers, colour and morphology against the lab's labels. Count missed and extra detections from the well-to-box list. Outlines are only looked at where a size or shape came out wrong; no hand-drawn outlines.
+- [ ] **Set the flag thresholds** from the results: which `size_uncertainty`, contrast and solidity values go with wrong results. In use, the same checks run with these thresholds and send flagged particles to review first.
 - [ ] **Build the labelled set** from those sheet photos: crops + the lab's shape and colour labels, split into train / validation / test **by sample**.
 - [ ] **A second person labels 20%** of particles independently, to get the agreement ceiling (Cohen's kappa for classes).
 - [ ] **New labels for missing classes** on the sheets: film, foam, clear particles.

@@ -36,6 +36,7 @@ create table particles (
   length_mm             double precision,
   width_mm              double precision,
   fiber_length_mm       double precision,
+  size_uncertainty      double precision,  -- how much the length depends on where the edge is drawn
   area_mm2              double precision,
   perimeter_mm          double precision,
   aspect_ratio          double precision,

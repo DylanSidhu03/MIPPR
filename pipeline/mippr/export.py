@@ -17,13 +17,17 @@ SIEVE_MM = 0.5
 NEAR_CUTOFF = 0.10  # +-10% around the sieve size
 LOW_CONTRAST = 100.0  # provisional; on the sample the pale A4 fragment is 92, all others >= 141
 MERGED_SOLIDITY = 0.75  # provisional
+# Size uncertainty: relative change in length when the edge moves from 40% to 60% of the
+# particle's contrast (measurement/uncertainty.py). Provisional starting value; it is set
+# by testing on labelled particles photographed on the sheets (docs/PIPELINE.md part 7).
+SIZE_UNCERTAIN = 0.10
 
 SIZE_BINS = [(0.0, 0.5, "<0.5"), (0.5, 1.0, "0.5-1"), (1.0, 2.0, "1-2"), (2.0, 5.0, "2-5"), (5.0, float("inf"), ">5")]
 MORPHOLOGY = MORPHOLOGY_CLASSES
 COLORS = COLOR_CLASSES
 FLAGS = ["flag_edge", "flag_merged", "flag_low_confidence", "flag_scale",
          "flag_near_cutoff", "flag_min_width", "flag_low_contrast", "flag_line", "flag_multi_blob",
-         "flag_width_unresolved", "flag_bundle"]
+         "flag_width_unresolved", "flag_size_uncertain", "flag_bundle"]
 METADATA = ("date", "operator", "lab", "setup", "site")
 
 COLUMNS = [
@@ -35,6 +39,7 @@ COLUMNS = [
     # Size (mm)
     "length_mm", "width_mm", "area_mm2", "perimeter_mm", "ced_mm", "fiber_length_mm", "size_length_source",
     "size_class",
+    "length_mm_outer", "length_mm_inner", "width_mm_outer", "width_mm_inner", "size_uncertainty",
     "convex_area_mm2", "convex_perimeter_mm",
     # Shape
     "aspect_ratio", "circularity", "solidity",
@@ -77,9 +82,17 @@ def size_class(length_mm):
     return ""
 
 
+def size_uncertainty(m):
+    """(length with the edge at 40% - length at 60%) / length at 50%; None without the edge check."""
+    if m.get("length_um_outer") is None or not m["feret_max_um"]:
+        return None
+    return (m["length_um_outer"] - m["length_um_inner"]) / m["feret_max_um"]
+
+
 def flags(m, scale_flag=False, multi_blob=False):
     """True/false quality flags for one measured particle. Empty where not available yet."""
     length, width = m["feret_max_um"] / 1000, m["feret_min_um"] / 1000
+    su = size_uncertainty(m)
     unresolved = bool(m.get("width_unresolved"))
     return {
         "flag_edge": bool(m.get("_touches_edge")),
@@ -93,6 +106,7 @@ def flags(m, scale_flag=False, multi_blob=False):
         "flag_line": bool(m.get("_touches_line")),
         "flag_multi_blob": bool(multi_blob),
         "flag_width_unresolved": unresolved,
+        "flag_size_uncertain": "" if su is None else bool(su > SIZE_UNCERTAIN),
         "flag_bundle": "",  # set by a reviewer; later by the model (v3)
     }
 
@@ -145,6 +159,16 @@ def particle_ids(measurements):
     return ids, {b for b, idx in by_box.items() if b and len(idx) > 1}
 
 
+def _size_range(m):
+    if m.get("length_um_outer") is None:
+        return {}
+    unresolved = m.get("width_unresolved")
+    return {"length_mm_outer": m["length_um_outer"] / 1000, "length_mm_inner": m["length_um_inner"] / 1000,
+            "width_mm_outer": "" if unresolved else m["width_um_outer"] / 1000,
+            "width_mm_inner": "" if unresolved else m["width_um_inner"] / 1000,
+            "size_uncertainty": size_uncertainty(m)}
+
+
 def build_rows(measurements, sample_id, picture_label, image_id, metadata, app_version, mm_per_px, processed_at,
                background_type, scale_source="markers", scale_flag=False):
     """Per-particle rows, named, ordered and filled as in docs/OUTPUT_CSV.md.
@@ -176,6 +200,7 @@ def build_rows(measurements, sample_id, picture_label, image_id, metadata, app_v
             "area_mm2": m["area_um2"] / 1e6, "perimeter_mm": m["perimeter_um"] / 1000,
             "ced_mm": m["ced_um"] / 1000, "fiber_length_mm": fiber_length,
             "size_length_source": "fiber_length" if fiber else "max_feret", "size_class": size_class(size_length),
+            **_size_range(m),
             "convex_area_mm2": m["convex_area_um2"] / 1e6, "convex_perimeter_mm": m["convex_perimeter_um"] / 1000,
             "aspect_ratio": m["aspect_ratio"], "circularity": m["circularity"], "solidity": m["solidity"],
             "perimeter_imagej_mm": m["perimeter_imagej_um"] / 1000, "circularity_imagej": m["circularity_imagej"],

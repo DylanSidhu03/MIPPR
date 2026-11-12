@@ -117,6 +117,11 @@ The output folder gets:
    Flags: `flag_line` (reaches a line), `flag_multi_blob` (more than one blob
    in a box), `flag_edge` (at the grid's outer edge), plus the size and
    contrast flags.
+7. **Check how sure the size is** (`measurement/uncertainty.py`). The outline is
+   drawn again with the edge at 40% and 60% of the particle's contrast. If the
+   length changes by more than 10% (`size_uncertainty`, a provisional threshold to
+   be set by testing on labelled particles), the particle gets `flag_size_uncertain`
+   and goes first in the review list.
 
 There are synthetic results in `results/synthetic_grid_sample/`:
 - the photo

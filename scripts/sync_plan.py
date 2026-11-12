@@ -19,7 +19,7 @@ TRACKER = ROOT / "docs" / "pipeline-tracker.html"
 REPO_URL = "https://github.com/DylanSidhu03/MIPPR/blob/{branch}"
 APP_PART = 8  # the decision point (build the web app?) is shown at the top of this part's issue
 IDS = ["capture", "segment", "measure", "color", "morphology", "review", "truth", "app", "storage", "retrain"]
-STORAGE_KEY = "mippr-pipeline-v5"  # bump whenever the task list changes, so saved ticks don't shift onto other tasks
+STORAGE_KEY = "mippr-pipeline-v6"  # bump whenever the task list changes, so saved ticks don't shift onto other tasks
 
 
 def parse():

@@ -24,12 +24,20 @@ from ..color.rules import color_classes
 from ..segmentation.edges import edge_level
 from .fiber import fiber_metrics
 from .opacity import opacity
+from .uncertainty import size_range
 
 def _hull_of_pixel_corners(contour):
     pts = contour.reshape(-1, 2).astype(np.float32)
     offs = np.array([[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]], np.float32)
     corners = (pts[:, None, :] + offs[None]).reshape(-1, 2)
     return cv2.convexHull(corners).reshape(-1, 2).astype(np.float64)
+
+
+def feret_px(mask):
+    """(max Feret, min Feret) in px of a mask, over the outer edges of its pixels (ImageJ convention)."""
+    contours, _ = cv2.findContours(mask.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    f_max, f_min, _ = feret(_hull_of_pixel_corners(np.vstack(contours)))
+    return f_max, f_min
 
 
 def subpixel_outline(mask, diff=None, level=None, pad=4):
@@ -209,6 +217,8 @@ def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margi
     Also measured (spec v0.3): the length and mean width along the particle's centre
     line (`fiber_length_um`, `fiber_width_um`), whether the width is too thin to
     resolve (under `min_width_px`), and the colour classes (main, second, share).
+    With `diff`, also the length and width with the edge drawn at 40% and 60% of the
+    particle's contrast (`length_um_outer` / `_inner`, `width_um_outer` / `_inner`).
     """
     rows = []
     for lbl in range(1, int(labels.max()) + 1):
@@ -267,6 +277,10 @@ def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margi
          row["color_secondary"], row["color_secondary_fraction"]) = color_classes(cimg, mask, row["opacity"])
         # Used for review flags (export.py), not written to the CSV.
         row["_contrast"] = level / edge_fraction if level is not None else float("nan")
+        # How much the size depends on where the edge is drawn (measurement/uncertainty.py)
+        if diff is not None:
+            r = size_range(mask, diff, feret_px, edge_fraction)
+            row.update({f"{k.replace('_px_', '_um_')}": v * u for k, v in r.items()})
         row["_touches_line"] = bool(line_mask is not None and (mask & line_mask).any())
         h, w = labels.shape
         e = edge_margin_px

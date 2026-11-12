@@ -74,6 +74,8 @@ Columns appear in this order. Empty means "not available in this release" or "no
 | `fiber_length_mm` | Measured | Length along the fiber's centre line (skeleton) × scale, so curved fibers are not under-measured. Filled for particles classed as fiber; empty otherwise. | v2 |
 | `size_length_source` | Derived | Which length `size_class` and summaries use: `fiber_length` for fibers, `max_feret` for everything else | v2 |
 | `size_class` | Derived | `length_mm` (`fiber_length_mm` for fibers) sorted into bins: `<0.5`, `0.5-1`, `1-2`, `2-5`, `>5`. Each bin includes its lower bound. `>5` marks particles above the usual 5 mm microplastic limit. | v1 |
+| `length_mm_outer`, `length_mm_inner`, `width_mm_outer`, `width_mm_inner` | Measured | Length and width (max and min Feret) with the particle's edge drawn at 40% (outer) and 60% (inner) of its contrast, instead of 50%. Always outer ≥ `length_mm` ≥ inner. Widths are empty with `flag_width_unresolved`. | v1 |
+| `size_uncertainty` | Derived | (`length_mm_outer` − `length_mm_inner`) ÷ `length_mm`: how much the size depends on where the edge is drawn. Near 0 for a sharp particle; large for a faint, clear, blurred or very small one. It is a warning sign, not an error bar: the testing phase measures how often particles above a given value are really wrong (section 9). | v1 |
 | `convex_area_mm2`, `convex_perimeter_mm` | Measured | Area and perimeter of the convex outline. Saturna reports both; solidity uses the convex area. | v1 |
 
 Length and width follow ImageJ's convention: they are measured over the outer edges of the boundary pixels. Every size column depends on `mm_per_px`. If the scale is wrong, all of them are wrong by the same factor, which is why the printed 100 mm check line exists.
@@ -132,6 +134,7 @@ These keep old ImageJ results comparable. On real particles the sub-pixel `circu
 | `flag_line` | The outline reaches a printed line (the line plus a 0.25 mm margin), a box edge on the checkerboard, or the printed label in a box's corner. Common for long fibers that cross into a neighbouring box; they are kept in one piece. | v1 |
 | `flag_multi_blob` | More than one blob in the same box (Drive v0.6: one particle per box). Each blob gets its own row. | v1 |
 | `flag_width_unresolved` | Width under about 2 pixels, too thin to measure from the photo; `width_mm` is empty | v1 |
+| `flag_size_uncertain` | `size_uncertainty` > 0.10 (provisional). The threshold is set in testing: the labelled particles show above which value sizes turn out wrong. In use, flagged particles go first in the review list. Empty when the check couldn't run. | v1 |
 | `flag_bundle` | A fiber bundle (the lab's "Line Bundle" / "fiber bundle"), labelled fiber; set by a reviewer, later by the model | v2 / v3 |
 | `review_reason` | Every flag that is True, without the `flag_` prefix, separated by semicolons, e.g. `edge;min_width` | v1 |
 
@@ -233,6 +236,7 @@ Column names stay the same across releases. Columns not yet available are left e
   - `background_type` values are `white_grid`, `black_grid` and `checkerboard`
   - on grids, the merged flag uses solidity only
 - **November 12, 2026:** photos are always on one of the three printed sheets. The lab's old checkerboard is no longer an app input (it is kept in `validation/legacy/` to compare with the lab's ImageJ results), so `scale_source = checkerboard` and the area rule for `flag_merged` are gone.
+- **November 12, 2026 (size check):** `length_mm_outer`, `length_mm_inner`, `width_mm_outer`, `width_mm_inner`, `size_uncertainty` and `flag_size_uncertain` added, so a size that depends strongly on where the edge is drawn is flagged for review.
 - **No "likely plastic" column:** it stays out of scope, unless the lab asks for it.
 
 ## 8b. Decisions on November 11, 2026 (standard backgrounds and the lab's records)
@@ -246,11 +250,11 @@ Column names stay the same across releases. Columns not yet available are left e
   - `flag_width_unresolved` for fibers too thin to measure, and `flag_bundle` for fiber bundles
   - the reviewer tag `tar_like`
 - **Colour:** always the nearest class with a confidence; no automatic "unknown".
-- **Validation:** compare with the lab's hand measurements by matching their plate photos to spreadsheet rows.
+- **Validation:** compare with the lab's hand measurements by matching their plate photos to spreadsheet rows. (Superseded November 12: validation uses the lab's labelled particles photographed on the sheets, compared box by box; see PIPELINE.md part 7.)
 
 ## 9. Still to be decided
 
 - The confidence threshold for `flag_low_confidence` (from v2/v3 validation data).
 - Which perimeter method is the headline circularity (sub-pixel or ImageJ-compatible).
-- The provisional thresholds: merged solidity 0.75, merged area 3 × median, low contrast 100.
+- The provisional thresholds: merged solidity 0.75, low contrast 100, size uncertainty 0.10. Each is set the same way: run the app on labelled particles photographed on the sheets, see which values go with wrong sizes or labels, and pick the threshold from that (docs/PIPELINE.md, part 7). Fibers may need their own size-uncertainty threshold, since their thin ends fade.
 - The rule thresholds for fiber, pellet and film, and how `opacity` is computed on each background, tuned on labelled particles.

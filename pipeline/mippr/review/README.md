@@ -39,7 +39,7 @@ Plain, deterministic Python, so the review screen can port it line by line. Noth
   - Unknown actions, classes, tags or roles, a bad time, or a decision for another particle raise `ValueError`.
 - **`remeasure(row, outline, image, mm_per_px, background, **measure_kwargs)`**: rasterises the polygon (vertices at pixel centres, as OpenCV contours) and runs the same `measure()` and `export.build_rows()` as the pipeline, so the pipeline's own mask gives back the pipeline's row exactly (tested on the synthetic grid sample). Keeps identifiers, sample details, review columns, tags, and any label a reviewer already corrected. `MeasureContext` holds what `measure()` was given for the photo.
 - **`apply_all(rows, decisions, contexts)`**: decisions in time order; `contexts` maps `image_id` to a `MeasureContext`.
-- **`review_queue(rows)`**: unreviewed flagged rows first, then unreviewed unflagged, then reviewed, then rejected. Within the first two groups the lowest colour or morphology confidence comes first (the `flag_low_confidence` threshold isn't decided).
+- **`review_queue(rows)`**: unreviewed flagged rows first (any flag, including `flag_size_uncertain` for sizes that depend strongly on where the edge is drawn), then unreviewed unflagged, then reviewed, then rejected. Within the first two groups the lowest colour or morphology confidence comes first (the `flag_low_confidence` threshold isn't decided).
 - **`kept(rows)`**: rows that count in `summary.csv`; `export.build_summary` already leaves rejected rows out.
 
 Tests: `tests/test_review.py`.

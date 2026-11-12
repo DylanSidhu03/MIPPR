@@ -26,7 +26,7 @@ Find each particle in its box and draw its outline. Errors here carry into every
 - [ ] **Thin fibers** (about 24 µm wide, under one pixel on a sheet photo): detect them as faint lines so their length can be measured (`flag_width_unresolved`).
 - [ ] **Particle crops** with the background blanked, for the v3 model and possibly for storage (Drive 9b). Planned: `crop_particle` in `../morphology/model.py`.
 - [ ] **Test on real phone photos** of the printed sheets, especially particles across a black/white edge on the checkerboard (open question 1).
-- [ ] **Score against labelled photos of the sheets** (part 7): detection recall and precision, outline overlap.
+- [ ] **Check against labelled photos of the sheets** (part 7): detection counted from the well-to-box list (missed particles, extra detections); outlines are looked at where a particle's size or shape came out wrong. No hand-drawn outlines are needed.
 - [ ] Optional: compare with a learned segmenter (Cellpose, SAM, a small U-Net), only if the threshold falls short.
 
 ## Watch for
