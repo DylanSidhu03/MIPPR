@@ -94,6 +94,7 @@ Folder: [pipeline/mippr/measurement/](../pipeline/mippr/measurement/README.md).
 - [x] Leave width empty with `flag_width_unresolved` when a particle is under about 2 px wide
 - [x] Measure how much each size depends on where the edge is drawn (`measurement/uncertainty.py`): length and width with the edge at 40% and 60% of the particle's contrast, `size_uncertainty`, and `flag_size_uncertain` above a provisional 0.10
 - [ ] Set the `flag_size_uncertain` threshold in testing (part 7), separately for fibers if their fading ends need it
+- [ ] Decide how max Feret is measured: over pixel corners (ImageJ's convention, now) it reads about 1.25 px long even on a perfect disc; at a whole-sheet photo's 10 px/mm that is +0.12 mm, about 6% on a 2 mm particle and 25% near the 0.5 mm cutoff. Option: a sub-pixel Feret from the outline as the headline, with the ImageJ value kept alongside (as for perimeter).
 - [ ] Later decision: which perimeter method gives the headline circularity (sub-pixel or ImageJ-compatible; spec section 5)
 - [ ] Check opacity on real photos of clear films, against the opposite background
 
@@ -181,6 +182,7 @@ The app only takes photos on the three printed backgrounds, so the labelled set,
 - [ ] Settle the scale gap with the lab: the app's sizes are 8–12% larger than the sheet on five EX_01 photos but within 2% on three others. Measure one particle from EX_01_S07 with calipers.
 - [ ] Ask the lab how length and width are measured, and why width is larger than length in SF_02/SF_03
 - [x] Run the photo check on more samples and collect the matches into one table: 20 photos, 1,210 particles paired, 8 photos reliable ([report](../validation/reports/lab_photos.md)). The size gap varies by photo (+12% to −2%), so it comes from the lab's scale settings, not the app. SF_04 has no sheet in Drive.
+- [x] Build the box-by-box check (`validation/sheet_check.py`), the lab's photo guide (`validation/PHOTO_PROTOCOL.md`) and the well-to-box, calipers and label templates; tested end to end on synthetic sheet photos
 - [ ] Re-photograph the lab's labelled particles on the printed sheets (all three backgrounds), with a well-to-box list, so their hand labels and sizes carry over
 - [ ] Compare box by box: length and width against the lab's sizes, colour and morphology against the lab's labels; report agreement per class and the confusion between classes
 - [ ] Count detection from the well-to-box list: boxes with a particle the app missed, and extra detections in boxes listed empty

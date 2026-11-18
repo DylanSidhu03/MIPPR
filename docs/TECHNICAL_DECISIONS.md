@@ -91,6 +91,11 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 - **Tar:** an optional reviewer tag `tar_like`; no automatic detection.
 - **Validation:** match the lab's plate photos to their spreadsheet rows and compare per class; the pass mark is set after.
 
+### The box-by-box check (November 18, 2026)
+
+- `validation/sheet_check.py` takes photos of labelled particles on the sheets, the well-to-box list and the lab's spreadsheets (and calipers where measured), runs the normal pipeline, and reports per background and class: size error, colour and morphology agreement with the confusions, missed and extra detections, and for each flag (and each `size_uncertainty` threshold) how many wrong sizes it catches and how many right ones it flags. Calipers are the size reference where present. The lab's photo guide and templates are in `validation/`.
+- **Finding on its first (synthetic) run: max Feret reads long.** Measured over the outer corners of boundary pixels (ImageJ's convention, chosen so results compare with the lab's ImageJ numbers), max Feret is about +1.25 px on a perfect disc, at any size; min Feret is exact. At a whole-sheet photo's ~10 px/mm that is +0.12 mm: ~6% on a 2 mm particle, ~25% near the 0.5 mm cutoff, so it also shifts `flag_near_cutoff` and the size classes. On the synthetic sheet photos 2–3 mm discs came out 8–12% long (the rest from rendering and blur). **To decide:** keep ImageJ's convention, or make a sub-pixel Feret from the outline the headline length and keep the ImageJ value alongside, as already done for perimeter. The labelled sheet photos will show how much it matters on real particles.
+
 ### What the labelled particles test, and the size check (November 12, 2026)
 
 Decided with the user:

@@ -25,7 +25,10 @@ The lab's data stays in Drive and is not committed here: it's the lab's, and the
 | `lab_photo_check.py` | Matches the app's particles to the lab's spreadsheet rows (.xlsx or .csv) on their "Rows A–H" ruler photos, and reports agreement for size, colour and shape. White or black backgrounds; any number of plate rows. Saves each matched particle's colour pixels for fitting the colour rules |
 | `ruler.py` | Reads the scale from a ruler with no help (millimetre edge, told apart from an inch edge), and masks the ruler out. `--check-image` writes a picture to check it by eye |
 | `run_lab_photos.py` + `lab_photos.csv` | Runs the check on a list of photos and writes one summary table |
-| `test_ruler.py` | Tests the ruler reader on drawn rulers with a known scale |
+| `sheet_check.py` | **The main check.** Photos of the lab's labelled particles on the printed sheets + the well-to-box list + the lab's spreadsheets (+ calipers): compares size, colour and morphology box by box, counts missed and extra particles, and tables which flag values catch wrong sizes (for setting thresholds). Writes `report.md` and `particles.csv` |
+| `lab_sheets.py` | Reads the lab's ParticleCount spreadsheets and maps their names to the app's classes |
+| `PHOTO_PROTOCOL.md`, `templates/` | The lab's guide for photographing labelled particles, and the well-to-box, calipers and new-label templates |
+| `test_ruler.py`, `test_sheet_check.py` | Tests: the ruler reader on drawn rulers; the sheet check end to end on synthetic sheet photos with known answers |
 | `legacy/` | The lab's old 12 × 24 checkerboard with an empty-board photo (`run.py`, `board.py`, `segment.py`, tests): not an app input, kept to compare with the lab's ImageJ results |
 | `compare_imagej.py` | Compares with the lab's ImageJ results on the fragment_area sample (median area +0.5%, Feret −0.2%; `results/fragment_area_sample/`) |
 | `perimeter_study.py` | Perimeter methods on shapes with a known answer (`reports/perimeter_study.txt`) |
