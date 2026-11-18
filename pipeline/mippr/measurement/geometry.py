@@ -19,13 +19,14 @@ import math
 
 import cv2
 import numpy as np
+from scipy import ndimage
 from skimage.measure import find_contours
 
 from ..color.rules import color_classes
 from ..segmentation.edges import edge_level
 from .fiber import fiber_metrics
 from .opacity import opacity
-from .uncertainty import size_range
+from .uncertainty import REACH_PX, size_range
 
 def _hull_of_pixel_corners(contour):
     pts = contour.reshape(-1, 2).astype(np.float32)
@@ -262,18 +263,26 @@ def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margi
     particle's contrast (`length_um_outer` / `_inner`, `width_um_outer` / `_inner`).
     """
     rows = []
-    for lbl in range(1, int(labels.max()) + 1):
-        mask = labels == lbl
+    h, w = labels.shape
+    pad = REACH_PX + 2  # every step below looks at most this far round the particle (as web/src measure())
+    for lbl, found in enumerate(ndimage.find_objects(labels), 1):
+        if found is None:
+            continue
+        # Work in a window round the particle: the same numbers as the whole image, much faster.
+        oy, ox = max(0, found[0].start - pad), max(0, found[1].start - pad)
+        win = (slice(oy, min(h, found[0].stop + pad)), slice(ox, min(w, found[1].stop + pad)))
+        mask = labels[win] == lbl
         area_px = int(mask.sum())
         if area_px == 0:
             continue
+        d_win = diff[win] if diff is not None else None
         m8 = mask.astype(np.uint8)
         contours, _ = cv2.findContours(m8, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         contour = max(contours, key=len)
         hull = _hull_of_pixel_corners(contour)
         f_max, f_min, f_angle = feret(hull)
-        level = edge_level(mask, diff, edge_fraction) if diff is not None else None
-        outline = subpixel_outline(mask, diff, level)
+        level = edge_level(mask, d_win, edge_fraction) if diff is not None else None
+        outline = subpixel_outline(mask, d_win, level)
         perim, outline_area = _polygon_length_area(outline)
         outline_hull = cv2.contourArea(cv2.convexHull(outline.astype(np.float32)))
         perim_ij = perimeter_imagej(mask)
@@ -281,8 +290,8 @@ def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margi
         convex_area = cv2.contourArea(hull.astype(np.float32))
         convex_perim = cv2.arcLength(hull.astype(np.float32), True)
         ys, xs = np.nonzero(mask)
-        cx, cy = xs.mean(), ys.mean()
-        x0, x1, y0, y1 = xs.min(), xs.max(), ys.min(), ys.max()
+        cx, cy = xs.mean() + ox, ys.mean() + oy
+        x0, x1, y0, y1 = xs.min() + ox, xs.max() + ox, ys.min() + oy, ys.max() + oy
         (_, _), (rw, rh), _ = cv2.minAreaRect(hull.astype(np.float32))
         u, u2 = um_per_px, um_per_px ** 2
         row = {
@@ -317,23 +326,23 @@ def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margi
             "solidity_subpixel": min(1.0, outline_area / outline_hull) if outline_hull > 0 else float("nan"),
         }
         cimg = img_bgr if color_img is None else color_img
+        cimg = cimg[win]
         row.update(_color_stats(cimg, mask))
         fl_px, fw_px, uniform = fiber_metrics(mask)
         row["fiber_length_um"] = fl_px * u
         row["fiber_width_um"] = fw_px * u
         row["fiber_uniform"] = uniform  # evenly thick along its length, so the centre-line numbers apply
         row["width_unresolved"] = bool(min(fw_px if uniform else f_min, f_min) < min_width_px)
-        row["opacity"] = opacity(cimg, bg_img, mask) if bg_img is not None and not row["width_unresolved"] else None
+        row["opacity"] = opacity(cimg, bg_img[win], mask) if bg_img is not None and not row["width_unresolved"] else None
         (row["color_label"], row["color_confidence"],
          row["color_secondary"], row["color_secondary_fraction"]) = color_classes(cimg, mask, row["opacity"])
         # Used for review flags (export.py), not written to the CSV.
         row["_contrast"] = level / edge_fraction if level is not None else float("nan")
         # How much the size depends on where the edge is drawn (measurement/uncertainty.py)
         if diff is not None:
-            r = size_range(mask, diff, feret_px, edge_fraction)
+            r = size_range(mask, d_win, feret_px, edge_fraction)
             row.update({f"{k.replace('_px_', '_um_')}": v * u for k, v in r.items()})
-        row["_touches_line"] = bool(line_mask is not None and (mask & line_mask).any())
-        h, w = labels.shape
+        row["_touches_line"] = bool(line_mask is not None and (mask & line_mask[win]).any())
         e = edge_margin_px
         row["_touches_edge"] = bool(x0 < e or y0 < e or x1 >= w - e or y1 >= h - e)
         row["_px"] = {"cx": cx, "cy": cy, "x": int(x0), "y": int(y0), "w": int(x1 - x0 + 1), "h": int(y1 - y0 + 1)}

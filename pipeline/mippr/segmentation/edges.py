@@ -57,13 +57,19 @@ def refine_edges(mask, diff, fraction, grow=2):
     half-maximum rule places the edge the same way for bright and faint
     particles and for sharp or soft photos.
     """
-    n, labels = cv2.connectedComponents(mask.astype(np.uint8), connectivity=8)
+    n, labels, stats, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8), connectivity=8)
     out = np.zeros(mask.shape, bool)
     kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (2 * grow + 1, 2 * grow + 1))
+    h, w = mask.shape
+    pad = grow + 1  # each particle is worked on in its box plus this margin: the same result, much faster
     for lbl in range(1, n):
-        region = labels == lbl
+        x, y, bw, bh = stats[lbl, :4]
+        y0, x0 = max(0, y - pad), max(0, x - pad)
+        win = (slice(y0, min(h, y + bh + pad)), slice(x0, min(w, x + bw + pad)))
+        region = labels[win] == lbl
+        d = diff[win]
         near = cv2.dilate(region.astype(np.uint8), kernel).astype(bool)
-        refined = near & (diff >= edge_level(region, diff, fraction, grow))
+        refined = near & (d >= edge_level(region, d, fraction, grow))
         # Only the outer edge may move. Inside, the difference can dip below the
         # edge level, e.g. where a mid-tone particle lies across a blurred box
         # edge, and that must not cut the particle.
@@ -74,5 +80,5 @@ def refine_edges(mask, diff, fraction, grow=2):
             continue
         overlap = np.bincount(parts[region], minlength=k)
         overlap[0] = 0
-        out |= parts == int(np.argmax(overlap))
+        out[win] |= parts == int(np.argmax(overlap))
     return fill_holes(out)

@@ -72,9 +72,9 @@
     "major_mm": 2.122643543249743,
     "minor_mm": 2.0870352059332546,
     "feret_ratio": 1.0578717443996903,
-    "perimeter_subpixel_mm": 6.594914269809488,
-    "circularity_subpixel": 0.9991340542504147,
-    "solidity_subpixel": 0.9999998521794647,
+    "perimeter_subpixel_mm": 6.59491426980949,
+    "circularity_subpixel": 0.9991340542511178,
+    "solidity_subpixel": 0.9999998836025492,
     "color_L": 44.9120312777679,
     "color_a": 59.90634441087613,
     "color_b": 39.25075528700906,
@@ -128,7 +128,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:06:12+00:00"
+    "processed_at": "2026-11-18T21:30:48+00:00"
    },
    {
     "sample_id": "S1",
@@ -152,7 +152,7 @@
     "centroid_x_mm": 79.61277968151582,
     "centroid_y_mm": 65.9789356984479,
     "length_mm": 9.164249618729302,
-    "width_mm": 1.0257402198289416,
+    "width_mm": 1.0257402198289407,
     "area_mm2": 7.454545454545454,
     "perimeter_mm": 20.23350386317489,
     "ced_mm": 3.080815161731231,
@@ -166,16 +166,16 @@
     "size_uncertainty": 0.12123557474339622,
     "convex_area_mm2": 8.541322314049587,
     "convex_perimeter_mm": 19.328179706226695,
-    "aspect_ratio": 9.515426288963953,
+    "aspect_ratio": 9.515426288963965,
     "circularity": 0.2288172901222619,
     "solidity": 0.872762457668118,
-    "roundness": 0.10509250659214356,
-    "major_mm": 9.503416595969146,
-    "minor_mm": 0.9987378712597736,
-    "feret_ratio": 8.934279305395263,
-    "perimeter_subpixel_mm": 19.33390436570047,
-    "circularity_subpixel": 0.2378133473928634,
-    "solidity_subpixel": 0.9525112739051838,
+    "roundness": 0.10509250659214338,
+    "major_mm": 9.503416595969153,
+    "minor_mm": 0.998737871259773,
+    "feret_ratio": 8.934279305395272,
+    "perimeter_subpixel_mm": 19.333904365700462,
+    "circularity_subpixel": 0.23781334739429472,
+    "solidity_subpixel": 0.9525128071041836,
     "color_L": 50.3184789067142,
     "color_a": 2.793939393939394,
     "color_b": -44.29848484848485,
@@ -229,7 +229,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:06:12+00:00"
+    "processed_at": "2026-11-18T21:30:48+00:00"
    },
    {
     "sample_id": "S1",
@@ -274,8 +274,8 @@
     "major_mm": 0.834042470942608,
     "minor_mm": 0.7948352723360871,
     "feret_ratio": 1.1111111111111112,
-    "perimeter_subpixel_mm": 2.3844437954650908,
-    "circularity_subpixel": 0.9943904203156393,
+    "perimeter_subpixel_mm": 2.3844437954650988,
+    "circularity_subpixel": 0.9943904203154166,
     "solidity_subpixel": 1.0,
     "color_L": 73.92789373814043,
     "color_a": -0.7741935483870968,
@@ -330,7 +330,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:06:12+00:00"
+    "processed_at": "2026-11-18T21:30:48+00:00"
    }
   ],
   "run": {
@@ -461,11 +461,11 @@
     "solidity": 0.9459459459459459,
     "roundness": 0.9849396787658299,
     "major_mm": 2.1182743264141743,
-    "minor_mm": 2.086372434596282,
+    "minor_mm": 2.0863724345962824,
     "feret_ratio": 1.0578717443996903,
-    "perimeter_subpixel_mm": 6.588818006302665,
-    "circularity_subpixel": 0.9991641823486899,
-    "solidity_subpixel": 0.9999998141477405,
+    "perimeter_subpixel_mm": 6.588818006302668,
+    "circularity_subpixel": 0.9991641823490199,
+    "solidity_subpixel": 0.9999998672739211,
     "color_L": 42.943553178847296,
     "color_a": 59.88181818181818,
     "color_b": 40.233333333333334,
@@ -519,7 +519,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:06:14+00:00"
+    "processed_at": "2026-11-18T21:30:50+00:00"
    },
    {
     "sample_id": "S1",
@@ -543,7 +543,7 @@
     "centroid_x_mm": 79.61189200121348,
     "centroid_y_mm": 65.97825867125088,
     "length_mm": 9.164249618729302,
-    "width_mm": 1.0186862841615039,
+    "width_mm": 1.0186862841615025,
     "area_mm2": 7.429752066115703,
     "perimeter_mm": 20.23350386317489,
     "ced_mm": 3.0756875878665397,
@@ -557,16 +557,16 @@
     "size_uncertainty": 0.12123557474339622,
     "convex_area_mm2": 8.520661157024794,
     "convex_perimeter_mm": 19.32804536819458,
-    "aspect_ratio": 9.548308113114992,
+    "aspect_ratio": 9.548308113115041,
     "circularity": 0.22805625700655593,
     "solidity": 0.871968962172648,
-    "roundness": 0.10473059605465174,
-    "major_mm": 9.503978220526504,
-    "minor_mm": 0.9953573039261691,
-    "feret_ratio": 8.996145095123701,
+    "roundness": 0.1047305960546512,
+    "major_mm": 9.503978220526529,
+    "minor_mm": 0.9953573039261664,
+    "feret_ratio": 8.996145095123712,
     "perimeter_subpixel_mm": 19.329036397677445,
-    "circularity_subpixel": 0.23725939796370604,
-    "solidity_subpixel": 0.9526164758489588,
+    "circularity_subpixel": 0.23725939796244397,
+    "solidity_subpixel": 0.95261574772062,
     "color_L": 44.79660966365237,
     "color_a": 4.249619482496195,
     "color_b": -44.55251141552512,
@@ -620,7 +620,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:06:14+00:00"
+    "processed_at": "2026-11-18T21:30:50+00:00"
    },
    {
     "sample_id": "S1",
@@ -665,9 +665,9 @@
     "major_mm": 0.8011748203734134,
     "minor_mm": 0.8011748203734134,
     "feret_ratio": 1.0999438818457405,
-    "perimeter_subpixel_mm": 2.3470218232679207,
-    "circularity_subpixel": 0.9945521076185744,
-    "solidity_subpixel": 1.0,
+    "perimeter_subpixel_mm": 2.3470218232679243,
+    "circularity_subpixel": 0.9945521077289983,
+    "solidity_subpixel": 0.9999980134811459,
     "color_L": 63.20486815415823,
     "color_a": 0.9310344827586207,
     "color_b": 64.86206896551724,
@@ -721,7 +721,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:06:14+00:00"
+    "processed_at": "2026-11-18T21:30:50+00:00"
    }
   ],
   "run": {
@@ -854,9 +854,9 @@
     "major_mm": 2.123781211294995,
     "minor_mm": 2.102637934455761,
     "feret_ratio": 1.0524972553834961,
-    "perimeter_subpixel_mm": 6.61532759040236,
-    "circularity_subpixel": 0.9991356827831819,
-    "solidity_subpixel": 1.0,
+    "perimeter_subpixel_mm": 6.615327590402362,
+    "circularity_subpixel": 0.9991356827835204,
+    "solidity_subpixel": 0.9999999481981429,
     "color_L": 44.91795509744684,
     "color_a": 59.89728096676737,
     "color_b": 39.2416918429003,
@@ -910,7 +910,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:06:16+00:00"
+    "processed_at": "2026-11-18T21:30:52+00:00"
    },
    {
     "sample_id": "S2",
@@ -934,7 +934,7 @@
     "centroid_x_mm": 79.86641781243586,
     "centroid_y_mm": 66.20826800738764,
     "length_mm": 9.200906617204218,
-    "width_mm": 1.0235192650420633,
+    "width_mm": 1.0235192650420608,
     "area_mm2": 7.381009719008263,
     "perimeter_mm": 20.421370530150753,
     "ced_mm": 3.0655820743075677,
@@ -948,16 +948,16 @@
     "size_uncertainty": 0.1212355747433964,
     "convex_area_mm2": 8.559805289256197,
     "convex_perimeter_mm": 19.376406955372204,
-    "aspect_ratio": 9.388703592265163,
+    "aspect_ratio": 9.388703592265168,
     "circularity": 0.22241079912878392,
     "solidity": 0.8622871046228711,
-    "roundness": 0.10651097781208528,
-    "major_mm": 9.393247423756154,
-    "minor_mm": 1.000483967935119,
-    "feret_ratio": 8.989480639454394,
-    "perimeter_subpixel_mm": 17.507896448167795,
-    "circularity_subpixel": 0.28619894570125426,
-    "solidity_subpixel": 0.9968640756019959,
+    "roundness": 0.10651097781208524,
+    "major_mm": 9.393247423756158,
+    "minor_mm": 1.0004839679351187,
+    "feret_ratio": 8.989480639454417,
+    "perimeter_subpixel_mm": 17.50789644816779,
+    "circularity_subpixel": 0.2861989456938393,
+    "solidity_subpixel": 0.9968625340941135,
     "color_L": 44.79722323712093,
     "color_a": 4.228260869565218,
     "color_b": -44.537267080745345,
@@ -1011,7 +1011,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:06:16+00:00"
+    "processed_at": "2026-11-18T21:30:52+00:00"
    },
    {
     "sample_id": "S2",
@@ -1056,9 +1056,9 @@
     "major_mm": 0.8246436719987948,
     "minor_mm": 0.8103383498112288,
     "feret_ratio": 1.1111111111111112,
-    "perimeter_subpixel_mm": 2.3836122660785874,
-    "circularity_subpixel": 0.9945610050589515,
-    "solidity_subpixel": 1.0,
+    "perimeter_subpixel_mm": 2.383612266078591,
+    "circularity_subpixel": 0.9945610050075352,
+    "solidity_subpixel": 0.9999990170626177,
     "color_L": 73.96584440227704,
     "color_a": -0.9032258064516129,
     "color_b": 66.2258064516129,
@@ -1112,7 +1112,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:06:16+00:00"
+    "processed_at": "2026-11-18T21:30:52+00:00"
    }
   ],
   "run": {
@@ -1212,7 +1212,7 @@
     "centroid_x_mm": 17.55197369863014,
     "centroid_y_mm": 17.567322009132422,
     "length_mm": 2.3126309450493827,
-    "width_mm": 2.1939543521231255,
+    "width_mm": 2.1939543521231246,
     "area_mm2": 3.6602167296,
     "perimeter_mm": 6.9735087042462505,
     "ced_mm": 2.1587803691964433,
@@ -1232,10 +1232,10 @@
     "roundness": 0.987935073040554,
     "major_mm": 2.171922169364999,
     "minor_mm": 2.145718087030008,
-    "feret_ratio": 1.0540925533894594,
+    "feret_ratio": 1.0540925533894598,
     "perimeter_subpixel_mm": 6.567321518557475,
-    "circularity_subpixel": 0.9973986956301274,
-    "solidity_subpixel": 0.9999929050378776,
+    "circularity_subpixel": 0.9973986956303932,
+    "solidity_subpixel": 0.9999929059163957,
     "color_L": 45.82669196710942,
     "color_a": 57.16774193548387,
     "color_b": 35.729032258064514,
@@ -1289,7 +1289,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:06:18+00:00"
+    "processed_at": "2026-11-18T21:30:54+00:00"
    }
   ],
   "run": {
