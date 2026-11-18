@@ -115,6 +115,7 @@
     "color_label_original": "",
     "morphology_label_original": "",
     "outline_edited": false,
+    "derived_from": "",
     "tar_like": "",
     "reviewed_by": "",
     "reviewer_role": "",
@@ -127,7 +128,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:55:02+00:00"
+    "processed_at": "2026-11-18T21:06:12+00:00"
    },
    {
     "sample_id": "S1",
@@ -215,6 +216,7 @@
     "color_label_original": "",
     "morphology_label_original": "",
     "outline_edited": false,
+    "derived_from": "",
     "tar_like": "",
     "reviewed_by": "",
     "reviewer_role": "",
@@ -227,7 +229,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:55:02+00:00"
+    "processed_at": "2026-11-18T21:06:12+00:00"
    },
    {
     "sample_id": "S1",
@@ -315,6 +317,7 @@
     "color_label_original": "",
     "morphology_label_original": "",
     "outline_edited": false,
+    "derived_from": "",
     "tar_like": "",
     "reviewed_by": "",
     "reviewer_role": "",
@@ -327,7 +330,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:55:02+00:00"
+    "processed_at": "2026-11-18T21:06:12+00:00"
    }
   ],
   "run": {
@@ -503,6 +506,7 @@
     "color_label_original": "",
     "morphology_label_original": "",
     "outline_edited": false,
+    "derived_from": "",
     "tar_like": "",
     "reviewed_by": "",
     "reviewer_role": "",
@@ -515,7 +519,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:55:05+00:00"
+    "processed_at": "2026-11-18T21:06:14+00:00"
    },
    {
     "sample_id": "S1",
@@ -603,6 +607,7 @@
     "color_label_original": "",
     "morphology_label_original": "",
     "outline_edited": false,
+    "derived_from": "",
     "tar_like": "",
     "reviewed_by": "",
     "reviewer_role": "",
@@ -615,7 +620,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:55:05+00:00"
+    "processed_at": "2026-11-18T21:06:14+00:00"
    },
    {
     "sample_id": "S1",
@@ -703,6 +708,7 @@
     "color_label_original": "",
     "morphology_label_original": "",
     "outline_edited": false,
+    "derived_from": "",
     "tar_like": "",
     "reviewed_by": "",
     "reviewer_role": "",
@@ -715,7 +721,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:55:05+00:00"
+    "processed_at": "2026-11-18T21:06:14+00:00"
    }
   ],
   "run": {
@@ -891,6 +897,7 @@
     "color_label_original": "",
     "morphology_label_original": "",
     "outline_edited": false,
+    "derived_from": "",
     "tar_like": "",
     "reviewed_by": "",
     "reviewer_role": "",
@@ -903,7 +910,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:55:07+00:00"
+    "processed_at": "2026-11-18T21:06:16+00:00"
    },
    {
     "sample_id": "S2",
@@ -991,6 +998,7 @@
     "color_label_original": "",
     "morphology_label_original": "",
     "outline_edited": false,
+    "derived_from": "",
     "tar_like": "",
     "reviewed_by": "",
     "reviewer_role": "",
@@ -1003,7 +1011,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:55:07+00:00"
+    "processed_at": "2026-11-18T21:06:16+00:00"
    },
    {
     "sample_id": "S2",
@@ -1091,6 +1099,7 @@
     "color_label_original": "",
     "morphology_label_original": "",
     "outline_edited": false,
+    "derived_from": "",
     "tar_like": "",
     "reviewed_by": "",
     "reviewer_role": "",
@@ -1103,7 +1112,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:55:07+00:00"
+    "processed_at": "2026-11-18T21:06:16+00:00"
    }
   ],
   "run": {
@@ -1267,6 +1276,7 @@
     "color_label_original": "",
     "morphology_label_original": "",
     "outline_edited": false,
+    "derived_from": "",
     "tar_like": "",
     "reviewed_by": "",
     "reviewer_role": "",
@@ -1279,7 +1289,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:55:08+00:00"
+    "processed_at": "2026-11-18T21:06:18+00:00"
    }
   ],
   "run": {

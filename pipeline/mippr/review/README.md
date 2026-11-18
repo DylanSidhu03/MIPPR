@@ -34,7 +34,7 @@ Plain, deterministic Python, so the review screen can port it line by line. Noth
   - `relabel`: new `color_label` (one of the 13 classes, or `unknown`) and/or `morphology_label` (the 7 classes). The prediction goes to `*_original` on the first correction only; relabelling back to the prediction clears it.
   - `edit_outline`: re-measures the new polygon with `remeasure` and sets `outline_edited`; needs the photo's `MeasureContext`.
   - `tag`: `tar_like` and `flag_bundle` (True/False); `review_reason` is updated. The status is not changed.
-  - `split`, `merge`: raise `NotImplementedError` (see below).
+  - `split`, `merge`: change the list of rows, so they go through `apply_all` (or `split()` / `merge()`): each piece or the merged particle is re-measured from its outline; new ids B4-1, B4-2 … (merge: B4 if free); the rows replaced stay, rejected; `derived_from` names them.
   - Status is derived, not stored per action: `corrected` if any `*_original` is set or the outline was edited, otherwise `confirmed`. The latest decision's reviewer, role and time fill `reviewed_by`, `reviewer_role`, `reviewed_at`.
   - Unknown actions, classes, tags or roles, a bad time, or a decision for another particle raise `ValueError`.
 - **`remeasure(row, outline, image, mm_per_px, background, **measure_kwargs)`**: rasterises the polygon (vertices at pixel centres, as OpenCV contours) and runs the same `measure()` and `export.build_rows()` as the pipeline, so the pipeline's own mask gives back the pipeline's row exactly (tested on the synthetic grid sample). Keeps identifiers, sample details, review columns, tags, and any label a reviewer already corrected. `MeasureContext` holds what `measure()` was given for the photo.
@@ -47,7 +47,7 @@ Tests: `tests/test_review.py`.
 ## To build
 
 - [x] **`corrections.py`**: apply a decision to a row; re-measure an edited outline; review order.
-- [ ] **Split and merge**: `remeasure` already measures any mask; still to decide are the new `particle_id`s (B4-1, B4-2?) and what happens to the row merged away (rejected, or removed).
+- [x] **Split and merge** (November 18, 2026), as above.
 - [x] **The review screen** (web: `web/src/review/screen.js`, rules in `corrections.js`, parity-tested): overlay with outlines, click or keys, confirm / reject / relabel, tags. Each photo keeps its measurement inputs (`runGrid(..., {keepContext: true})`), so re-measuring works.
 - [ ] **Outline redraw** on the screen (drawing the polygon; the re-measuring behind it works).
 - [ ] **Who can review:** expert vs community role (sign-in through Supabase Auth, part 9).

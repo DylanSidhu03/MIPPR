@@ -106,9 +106,9 @@ def test_unknown_action_raises():
         apply(_rows()[0], _d("S042-P01-A1", "approve"))
 
 
-def test_split_and_merge_are_not_built_yet():
+def test_split_and_merge_go_through_apply_all():
     for action in ("split", "merge"):
-        with pytest.raises(NotImplementedError):
+        with pytest.raises(ValueError, match="apply_all"):
             apply(_rows()[0], _d("S042-P01-A1", action))
 
 
@@ -224,3 +224,64 @@ def test_edit_outline_needs_a_context(grid_sample):
     rows, masks, _ = grid_sample
     with pytest.raises(ValueError):
         apply(rows["S042-P03-D3"], _d("S042-P03-D3", "edit_outline", outline=_polygon(masks["S042-P03-D3"])))
+
+
+def test_split_into_two_pieces(grid_sample):
+    rows, masks, ctx = grid_sample
+    ref = "S042-P03-D3"
+    left = masks[ref].copy()
+    xs = np.nonzero(left.any(axis=0))[0]
+    cut = (xs.min() + xs.max()) // 2
+    left[:, cut:] = False
+    right = masks[ref] & ~left
+    right[:, cut:cut + 2] = False  # the reviewer's cut line
+    out = apply_all(list(rows.values()), [_d(ref, "split", outlines=[_polygon(left), _polygon(right)])], {rows[ref]["image_id"]: ctx})
+    assert len(out) == len(rows) + 2
+    i = [r["particle_ref"] for r in out].index(ref)
+    old, a, b = out[i], out[i + 1], out[i + 2]
+    assert old["review_status"] == "rejected" and old["reviewed_by"] == "DS"
+    assert (a["particle_id"], b["particle_id"]) == ("D3-1", "D3-2")
+    assert a["derived_from"] == b["derived_from"] == ref
+    assert a["flag_multi_blob"] is True and a["crop_file"] == "" and a["review_status"] == "corrected"
+    assert a["area_mm2"] + b["area_mm2"] == pytest.approx(old["area_mm2"], rel=0.1)
+    assert [list(r) for r in out] == [COLUMNS] * len(out)
+
+
+def test_split_skips_numbers_already_used(grid_sample):
+    rows, masks, ctx = grid_sample
+    ref = "S042-P03-H4-1"  # H4 already holds H4-1 and H4-2
+    m = masks[ref]
+    ys = np.nonzero(m.any(axis=1))[0]
+    top, bottom = m.copy(), m.copy()
+    top[(ys.min() + ys.max()) // 2:] = False
+    bottom[:(ys.min() + ys.max()) // 2 + 1] = False
+    out = apply_all(list(rows.values()), [_d(ref, "split", outlines=[top, bottom])], {rows[ref]["image_id"]: ctx})
+    assert [r["particle_id"] for r in out if r["derived_from"] == ref] == ["H4-3", "H4-4"]
+
+
+def test_merge_two_blobs(grid_sample):
+    rows, masks, ctx = grid_sample
+    a, b = "S042-P03-H4-1", "S042-P03-H4-2"
+    union = masks[a] | masks[b]
+    hull = cv2.convexHull(cv2.findNonZero(union.astype(np.uint8))).reshape(-1, 2).tolist()
+    out = apply_all(list(rows.values()), [_d(a, "merge", outline=hull, merge_with=[b])], {rows[a]["image_id"]: ctx})
+    new = [r for r in out if r["derived_from"]]
+    assert len(new) == 1 and new[0]["particle_id"] == "H4" and new[0]["derived_from"] == f"{a};{b}"
+    assert new[0]["flag_multi_blob"] is False
+    assert {r["review_status"] for r in out if r["particle_ref"] in (a, b)} == {"rejected"}
+    assert new[0]["area_mm2"] >= rows[a]["area_mm2"] + rows[b]["area_mm2"]
+    # merging again, the bare label is taken by the first merge's row
+    again = apply_all(out, [_d("S042-P03-H4", "merge", "2026-11-12T10:01:00Z", outline=hull, merge_with=["S042-P03-D3"])],
+                      {rows[a]["image_id"]: ctx})
+    assert [r["particle_id"] for r in again if r["derived_from"] == "S042-P03-H4;S042-P03-D3"] == ["H4-3"]
+
+
+@pytest.mark.parametrize("kw", [dict(action="split", outlines=[[[1, 1], [5, 1], [3, 4]]]),
+                                dict(action="merge", outline=[[1, 1], [5, 1], [3, 4]]),
+                                dict(action="merge", outline=[[1, 1], [5, 1], [3, 4]], merge_with=["S042-P03-D3", "S042-P03-D3"]),
+                                dict(action="merge", outline=[[1, 1], [5, 1], [3, 4]], merge_with=["S042-P03-Z1"])])
+def test_bad_split_and_merge(grid_sample, kw):
+    rows, _, ctx = grid_sample
+    action = kw.pop("action")
+    with pytest.raises(ValueError):
+        apply_all(list(rows.values()), [_d("S042-P03-F7", action, **kw)], {rows["S042-P03-F7"]["image_id"]: ctx})

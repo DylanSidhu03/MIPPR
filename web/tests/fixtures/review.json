@@ -94,6 +94,7 @@
    "color_label_original": "",
    "morphology_label_original": "",
    "outline_edited": false,
+   "derived_from": "",
    "tar_like": "",
    "reviewed_by": "",
    "reviewer_role": "",
@@ -194,6 +195,7 @@
    "color_label_original": "",
    "morphology_label_original": "",
    "outline_edited": false,
+   "derived_from": "",
    "tar_like": "",
    "reviewed_by": "",
    "reviewer_role": "",
@@ -294,6 +296,7 @@
    "color_label_original": "",
    "morphology_label_original": "",
    "outline_edited": false,
+   "derived_from": "",
    "tar_like": "",
    "reviewed_by": "",
    "reviewer_role": "",
@@ -322,7 +325,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -414,6 +419,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -443,7 +449,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-B2",
@@ -454,7 +462,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -546,6 +556,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -648,6 +659,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -677,7 +689,9 @@
      "color_label": "pink",
      "morphology_label": "film",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-B2",
@@ -688,7 +702,9 @@
      "color_label": "orange",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-B2",
@@ -699,7 +715,9 @@
      "color_label": "red",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-B2",
@@ -710,7 +728,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-B2",
@@ -721,7 +741,9 @@
      "color_label": "",
      "morphology_label": "fragment",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-B2",
@@ -732,7 +754,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -824,6 +848,7 @@
       "color_label_original": "red",
       "morphology_label_original": "pellet",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -926,6 +951,7 @@
       "color_label_original": "red",
       "morphology_label_original": "pellet",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "AB",
       "reviewer_role": "community",
@@ -1028,6 +1054,7 @@
       "color_label_original": "",
       "morphology_label_original": "pellet",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -1130,6 +1157,7 @@
       "color_label_original": "",
       "morphology_label_original": "pellet",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -1232,6 +1260,7 @@
       "color_label_original": "",
       "morphology_label_original": "pellet",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -1334,6 +1363,7 @@
       "color_label_original": "",
       "morphology_label_original": "pellet",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -1363,7 +1393,9 @@
      "color_label": "red",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -1455,6 +1487,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -1484,7 +1517,9 @@
      "color_label": "unknown",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-F7",
@@ -1495,7 +1530,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-F7",
@@ -1506,7 +1543,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-F7",
@@ -1517,7 +1556,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -1609,6 +1650,7 @@
       "color_label_original": "blue",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -1711,6 +1753,7 @@
       "color_label_original": "blue",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -1813,6 +1856,7 @@
       "color_label_original": "blue",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -1915,6 +1959,7 @@
       "color_label_original": "blue",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -1947,7 +1992,9 @@
      "tags": {
       "tar_like": true,
       "flag_bundle": true
-     }
+     },
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-F7",
@@ -1960,7 +2007,9 @@
      "outline": [],
      "tags": {
       "flag_bundle": false
-     }
+     },
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-F7",
@@ -1971,7 +2020,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-F7",
@@ -1984,7 +2035,9 @@
      "outline": [],
      "tags": {
       "tar_like": false
-     }
+     },
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2076,6 +2129,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": true,
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -2178,6 +2232,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": true,
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -2280,6 +2335,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": true,
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -2382,6 +2438,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": false,
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -2411,7 +2468,9 @@
      "color_label": "",
      "morphology_label": "pellet",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-K9",
@@ -2424,7 +2483,9 @@
      "outline": [],
      "tags": {
       "flag_bundle": true
-     }
+     },
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-K9",
@@ -2435,7 +2496,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2527,6 +2590,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -2629,6 +2693,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -2731,6 +2796,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -2760,7 +2826,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2783,7 +2851,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2806,7 +2876,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2829,7 +2901,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2852,7 +2926,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2875,7 +2951,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2898,7 +2976,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2921,7 +3001,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2944,7 +3026,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2967,7 +3051,9 @@
      "color_label": "teal",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -2990,7 +3076,9 @@
      "color_label": "",
      "morphology_label": "blob",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -3013,7 +3101,9 @@
      "color_label": "red",
      "morphology_label": "it's",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -3036,7 +3126,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -3061,7 +3153,9 @@
      "outline": [],
      "tags": {
       "sticky": true
-     }
+     },
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -3087,7 +3181,9 @@
      "tags": {
       "tar_like": true,
       "sticky": 1
-     }
+     },
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -3112,7 +3208,9 @@
      "outline": [],
      "tags": {
       "tar_like": 1
-     }
+     },
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -3137,7 +3235,9 @@
      "outline": [],
      "tags": {
       "tar_like": "True"
-     }
+     },
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -3160,14 +3260,16 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
    "steps": [
     {
-     "error": "split is not built yet: it turns one row into two (or two into one), which needs rules for the new particle_ids and for the row that is merged away. remeasure() already measures any mask, so it can be built on that once those rules are decided.",
-     "type": "NotImplementedError"
+     "error": "split changes the list of rows: use apply_all (or split()).",
+     "type": "ValueError"
     }
    ]
   },
@@ -3183,14 +3285,16 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
    "steps": [
     {
-     "error": "merge is not built yet: it turns one row into two (or two into one), which needs rules for the new particle_ids and for the row that is merged away. remeasure() already measures any mask, so it can be built on that once those rules are decided.",
-     "type": "NotImplementedError"
+     "error": "merge changes the list of rows: use apply_all (or merge()).",
+     "type": "ValueError"
     }
    ]
   },
@@ -3219,7 +3323,9 @@
        4
       ]
      ],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -3242,7 +3348,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": true,
@@ -3274,7 +3382,9 @@
        2
       ]
      ],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": true,
@@ -3297,7 +3407,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": null,
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": true,
@@ -3320,7 +3432,9 @@
      "color_label": "blue",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-B2",
@@ -3331,7 +3445,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": false,
@@ -3423,6 +3539,7 @@
       "color_label_original": "red",
       "morphology_label_original": "",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -3458,7 +3575,9 @@
      "color_label": "blue",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-B2",
@@ -3469,7 +3588,9 @@
      "color_label": "pink",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-F7",
@@ -3480,7 +3601,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-F7",
@@ -3491,7 +3614,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-K9",
@@ -3502,7 +3627,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-K9",
@@ -3513,7 +3640,9 @@
      "color_label": "grey",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "out": [
@@ -3603,6 +3732,7 @@
      "color_label_original": "red",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "DS",
      "reviewer_role": "expert",
@@ -3703,6 +3833,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "DS",
      "reviewer_role": "expert",
@@ -3803,6 +3934,7 @@
      "color_label_original": "yellow",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "DS",
      "reviewer_role": "expert",
@@ -3831,7 +3963,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-Q1",
@@ -3842,7 +3976,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "error": "No particle 'S1-P01-Q1' for this decision.",
@@ -3936,6 +4072,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -4036,6 +4173,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -4061,7 +4199,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "error": "Two rows share particle_ref 'S1-P01-B2'.",
@@ -4079,7 +4219,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-F7",
@@ -4090,7 +4232,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "error": "Review time 'soon' is not ISO 8601.",
@@ -4186,6 +4330,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -4286,6 +4431,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -4386,6 +4532,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -4725,6 +4872,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -4825,6 +4973,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -4925,6 +5074,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -5025,6 +5175,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -5125,6 +5276,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -5225,6 +5377,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -5337,6 +5490,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -5437,6 +5591,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -5537,6 +5692,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -5637,6 +5793,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -5737,6 +5894,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -5837,6 +5995,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -5937,6 +6096,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -6037,6 +6197,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -6137,6 +6298,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -6237,6 +6399,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -6337,6 +6500,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -6437,6 +6601,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -6555,6 +6720,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -6655,6 +6821,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -6755,6 +6922,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -6855,6 +7023,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -6955,6 +7124,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -7055,6 +7225,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -7155,6 +7326,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -7255,6 +7427,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -7355,6 +7528,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -7455,6 +7629,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -7555,6 +7730,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -7655,6 +7831,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -7773,6 +7950,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -7873,6 +8051,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -7973,6 +8152,7 @@
      "color_label_original": "",
      "morphology_label_original": "",
      "outline_edited": false,
+     "derived_from": "",
      "tar_like": "",
      "reviewed_by": "",
      "reviewer_role": "",
@@ -8261,7 +8441,9 @@
        188
       ]
      ],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": true,
@@ -8353,6 +8535,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": true,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -9215,7 +9398,9 @@
        714
       ]
      ],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": true,
@@ -9307,6 +9492,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": true,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -9433,7 +9619,9 @@
        1382
       ]
      ],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": true,
@@ -9525,6 +9713,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": true,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -9554,7 +9743,9 @@
      "color_label": "",
      "morphology_label": "film",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-B2",
@@ -9766,7 +9957,9 @@
        188
       ]
      ],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     },
     {
      "particle_ref": "S1-P01-B2",
@@ -9777,7 +9970,9 @@
      "color_label": "",
      "morphology_label": "",
      "outline": [],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": true,
@@ -9869,6 +10064,7 @@
       "color_label_original": "",
       "morphology_label_original": "pellet",
       "outline_edited": false,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -9971,6 +10167,7 @@
       "color_label_original": "",
       "morphology_label_original": "pellet",
       "outline_edited": true,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -10073,6 +10270,7 @@
       "color_label_original": "",
       "morphology_label_original": "pellet",
       "outline_edited": true,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -10111,7 +10309,9 @@
       1104.5,
       1404.9
      ],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": true,
@@ -10203,6 +10403,7 @@
       "color_label_original": "",
       "morphology_label_original": "",
       "outline_edited": true,
+      "derived_from": "",
       "tar_like": "",
       "reviewed_by": "DS",
       "reviewer_role": "expert",
@@ -10237,7 +10438,9 @@
       3.0,
       4.0
      ],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": true,
@@ -10273,7 +10476,9 @@
        -10
       ]
      ],
-     "tags": {}
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
     }
    ],
    "context": true,
@@ -10283,6 +10488,4770 @@
      "type": "ValueError"
     }
    ]
+  }
+ ],
+ "lists": [
+  {
+   "decisions": [
+    {
+     "particle_ref": "S1-P01-B2",
+     "action": "split",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:00:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [],
+     "tags": {},
+     "outlines": [
+      [
+       [
+        195,
+        188
+       ],
+       [
+        194,
+        189
+       ],
+       [
+        193,
+        189
+       ],
+       [
+        192,
+        190
+       ],
+       [
+        191,
+        191
+       ],
+       [
+        190,
+        192
+       ],
+       [
+        189,
+        193
+       ],
+       [
+        188,
+        194
+       ],
+       [
+        188,
+        195
+       ],
+       [
+        188,
+        196
+       ],
+       [
+        188,
+        197
+       ],
+       [
+        187,
+        198
+       ],
+       [
+        187,
+        199
+       ],
+       [
+        187,
+        200
+       ],
+       [
+        188,
+        201
+       ],
+       [
+        188,
+        202
+       ],
+       [
+        188,
+        203
+       ],
+       [
+        189,
+        204
+       ],
+       [
+        189,
+        205
+       ],
+       [
+        190,
+        206
+       ],
+       [
+        191,
+        207
+       ],
+       [
+        192,
+        208
+       ],
+       [
+        193,
+        208
+       ],
+       [
+        194,
+        209
+       ],
+       [
+        195,
+        209
+       ],
+       [
+        196,
+        210
+       ],
+       [
+        197,
+        210
+       ],
+       [
+        197,
+        209
+       ],
+       [
+        197,
+        208
+       ],
+       [
+        197,
+        207
+       ],
+       [
+        197,
+        206
+       ],
+       [
+        197,
+        205
+       ],
+       [
+        197,
+        204
+       ],
+       [
+        197,
+        203
+       ],
+       [
+        197,
+        202
+       ],
+       [
+        197,
+        201
+       ],
+       [
+        197,
+        200
+       ],
+       [
+        197,
+        199
+       ],
+       [
+        197,
+        198
+       ],
+       [
+        197,
+        197
+       ],
+       [
+        197,
+        196
+       ],
+       [
+        197,
+        195
+       ],
+       [
+        197,
+        194
+       ],
+       [
+        197,
+        193
+       ],
+       [
+        197,
+        192
+       ],
+       [
+        197,
+        191
+       ],
+       [
+        197,
+        190
+       ],
+       [
+        197,
+        189
+       ],
+       [
+        197,
+        188
+       ],
+       [
+        196,
+        188
+       ]
+      ],
+      [
+       [
+        200,
+        188
+       ],
+       [
+        200,
+        189
+       ],
+       [
+        200,
+        190
+       ],
+       [
+        200,
+        191
+       ],
+       [
+        200,
+        192
+       ],
+       [
+        200,
+        193
+       ],
+       [
+        200,
+        194
+       ],
+       [
+        200,
+        195
+       ],
+       [
+        200,
+        196
+       ],
+       [
+        200,
+        197
+       ],
+       [
+        200,
+        198
+       ],
+       [
+        200,
+        199
+       ],
+       [
+        200,
+        200
+       ],
+       [
+        200,
+        201
+       ],
+       [
+        200,
+        202
+       ],
+       [
+        200,
+        203
+       ],
+       [
+        200,
+        204
+       ],
+       [
+        200,
+        205
+       ],
+       [
+        200,
+        206
+       ],
+       [
+        200,
+        207
+       ],
+       [
+        200,
+        208
+       ],
+       [
+        200,
+        209
+       ],
+       [
+        200,
+        210
+       ],
+       [
+        201,
+        210
+       ],
+       [
+        202,
+        209
+       ],
+       [
+        203,
+        209
+       ],
+       [
+        204,
+        208
+       ],
+       [
+        205,
+        208
+       ],
+       [
+        206,
+        207
+       ],
+       [
+        207,
+        206
+       ],
+       [
+        208,
+        205
+       ],
+       [
+        208,
+        204
+       ],
+       [
+        209,
+        203
+       ],
+       [
+        209,
+        202
+       ],
+       [
+        209,
+        201
+       ],
+       [
+        210,
+        200
+       ],
+       [
+        210,
+        199
+       ],
+       [
+        210,
+        198
+       ],
+       [
+        210,
+        197
+       ],
+       [
+        209,
+        196
+       ],
+       [
+        209,
+        195
+       ],
+       [
+        209,
+        194
+       ],
+       [
+        208,
+        193
+       ],
+       [
+        207,
+        192
+       ],
+       [
+        207,
+        191
+       ],
+       [
+        206,
+        190
+       ],
+       [
+        205,
+        190
+       ],
+       [
+        204,
+        189
+       ],
+       [
+        203,
+        189
+       ],
+       [
+        202,
+        188
+       ],
+       [
+        201,
+        188
+       ]
+      ]
+     ],
+     "merge_with": []
+    }
+   ],
+   "out": [
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2",
+     "particle_ref": "S1-P01-B2",
+     "crop_file": "crops/S1-P01-B2.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 198.6,
+     "centroid_y_px": 198.8,
+     "bbox_x_px": 187,
+     "bbox_y_px": 188,
+     "bbox_w_px": 24,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 18.05139278773483,
+     "centroid_y_mm": 18.075577629021808,
+     "length_mm": 2.2119136473811705,
+     "width_mm": 2.090909090909091,
+     "area_mm2": 3.479338842975207,
+     "perimeter_mm": 6.841348545085367,
+     "ced_mm": 2.104764073336753,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.279988400724446,
+     "length_mm_inner": 2.1281272564944773,
+     "width_mm_outer": 2.181818181818182,
+     "width_mm_inner": 2.0,
+     "size_uncertainty": 0.06865600038670895,
+     "convex_area_mm2": 3.673553719008264,
+     "convex_perimeter_mm": 6.846424026922746,
+     "aspect_ratio": 1.0170616850234522,
+     "circularity": 0.9341640621451958,
+     "solidity": 0.9471316085489314,
+     "roundness": 0.9832245327154776,
+     "major_mm": 2.122643543249743,
+     "minor_mm": 2.0870352059332546,
+     "feret_ratio": 1.0578717443996903,
+     "perimeter_subpixel_mm": 6.594914269809488,
+     "circularity_subpixel": 0.9991340542504147,
+     "solidity_subpixel": 0.9999998521794647,
+     "color_L": 44.9120312777679,
+     "color_a": 59.90634441087613,
+     "color_b": 39.25075528700906,
+     "color_L_sd": 1.771771586580175,
+     "color_a_sd": 2.1260125909717167,
+     "color_b_sd": 3.2639138883599776,
+     "color_hex": "#c92c2c",
+     "color_R": 201.2356495468278,
+     "color_G": 44.2809667673716,
+     "color_B": 44.2809667673716,
+     "color_H": 0.0,
+     "color_S": 198.87311178247734,
+     "color_V": 201.2356495468278,
+     "opacity": 0.8464566929133859,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "pellet",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9984325765710376,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 0.0015674234289624334,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": false,
+     "flag_bundle": "",
+     "review_reason": "",
+     "review_status": "rejected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:00:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2-1",
+     "particle_ref": "S1-P01-B2-1",
+     "crop_file": "",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 193.0,
+     "centroid_y_px": 198.9,
+     "bbox_x_px": 187,
+     "bbox_y_px": 188,
+     "bbox_w_px": 11,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 17.54936461388074,
+     "centroid_y_mm": 18.07820136852395,
+     "length_mm": 2.1086206372260365,
+     "width_mm": 1.0,
+     "area_mm2": 1.537190082644628,
+     "perimeter_mm": 5.1700052440989825,
+     "ced_mm": 1.399003645812924,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.2727272727272725,
+     "length_mm_inner": 2.0185093919249564,
+     "width_mm_outer": 1.909090909090909,
+     "width_mm_inner": 0.9090909090909091,
+     "size_uncertainty": 0.12056122202083196,
+     "convex_area_mm2": 1.6322314049586777,
+     "convex_perimeter_mm": 5.322123961015181,
+     "aspect_ratio": 1.9907767791376176,
+     "circularity": 0.7226957000015051,
+     "solidity": 0.9417721518987342,
+     "roundness": 0.5023164879556155,
+     "major_mm": 1.9739226456005248,
+     "minor_mm": 0.9915338908341125,
+     "feret_ratio": 2.1086206372260365,
+     "perimeter_subpixel_mm": 5.496709210776505,
+     "circularity_subpixel": 0.7921328477172951,
+     "solidity_subpixel": 0.9999998398266416,
+     "color_L": 44.969463195114116,
+     "color_a": 59.868852459016395,
+     "color_b": 39.13934426229508,
+     "color_L_sd": 1.716321321017357,
+     "color_a_sd": 2.0603629302773743,
+     "color_b_sd": 3.2170538751444364,
+     "color_hex": "#c92d2d",
+     "color_R": 201.327868852459,
+     "color_G": 44.59016393442623,
+     "color_B": 44.59016393442623,
+     "color_H": 0.0,
+     "color_S": 198.49180327868854,
+     "color_V": 201.327868852459,
+     "opacity": 0.84251968503937,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "fragment",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.5,
+     "morphology_runner_up": "fiber",
+     "morphology_runner_up_confidence": 0.02750445638708099,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": true,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "multi_blob;size_uncertain",
+     "review_status": "corrected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": true,
+     "derived_from": "S1-P01-B2",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:00:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2-2",
+     "particle_ref": "S1-P01-B2-2",
+     "crop_file": "",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 204.0,
+     "centroid_y_px": 198.8,
+     "bbox_x_px": 200,
+     "bbox_y_px": 188,
+     "bbox_w_px": 11,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 18.546897546897547,
+     "centroid_y_mm": 18.06926406926407,
+     "length_mm": 2.1086206372260365,
+     "width_mm": 1.0,
+     "area_mm2": 1.5619834710743803,
+     "perimeter_mm": 5.276511869122056,
+     "ced_mm": 1.4102408034072027,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.2727272727272725,
+     "length_mm_inner": 2.0185093919249564,
+     "width_mm_outer": 1.909090909090909,
+     "width_mm_inner": 0.9090909090909091,
+     "size_uncertainty": 0.12056122202083196,
+     "convex_area_mm2": 1.6611570247933882,
+     "convex_perimeter_mm": 5.342481884089383,
+     "aspect_ratio": 1.982466460791809,
+     "circularity": 0.7050054253394485,
+     "solidity": 0.9402985074626866,
+     "roundness": 0.5044221527967712,
+     "major_mm": 1.985620283551014,
+     "minor_mm": 1.0015908580657376,
+     "feret_ratio": 2.1086206372260365,
+     "perimeter_subpixel_mm": 5.519715633083479,
+     "circularity_subpixel": 0.7955619593108165,
+     "solidity_subpixel": 0.9999997250256101,
+     "color_L": 45.06039215686275,
+     "color_a": 59.72,
+     "color_b": 39.016,
+     "color_L_sd": 1.8668801986946975,
+     "color_a_sd": 2.2648620267027306,
+     "color_b_sd": 3.43856714344798,
+     "color_hex": "#c92d2d",
+     "color_R": 201.4,
+     "color_G": 45.064,
+     "color_B": 45.064,
+     "color_H": 0.0,
+     "color_S": 197.968,
+     "color_V": 201.4,
+     "opacity": 0.84251968503937,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "fragment",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.5,
+     "morphology_runner_up": "fiber",
+     "morphology_runner_up_confidence": 0.02750445638708099,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": true,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "multi_blob;size_uncertain",
+     "review_status": "corrected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": true,
+     "derived_from": "S1-P01-B2",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:00:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "F7",
+     "particle_ref": "S1-P01-F7",
+     "crop_file": "crops/S1-P01-F7.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 875.7,
+     "centroid_y_px": 725.8,
+     "bbox_x_px": 831,
+     "bbox_y_px": 714,
+     "bbox_w_px": 99,
+     "bbox_h_px": 24,
+     "centroid_x_mm": 79.61277968151582,
+     "centroid_y_mm": 65.9789356984479,
+     "length_mm": 9.164249618729302,
+     "width_mm": 1.0257402198289416,
+     "area_mm2": 7.454545454545454,
+     "perimeter_mm": 20.23350386317489,
+     "ced_mm": 3.080815161731231,
+     "fiber_length_mm": 8.690818343593891,
+     "size_length_source": "fiber_length",
+     "size_class": ">5",
+     "length_mm_outer": 9.206537382670664,
+     "length_mm_inner": 8.095504313052068,
+     "width_mm_outer": 1.069043114652627,
+     "width_mm_inner": 0.9174973491412897,
+     "size_uncertainty": 0.12123557474339622,
+     "convex_area_mm2": 8.541322314049587,
+     "convex_perimeter_mm": 19.328179706226695,
+     "aspect_ratio": 9.515426288963953,
+     "circularity": 0.2288172901222619,
+     "solidity": 0.872762457668118,
+     "roundness": 0.10509250659214356,
+     "major_mm": 9.503416595969146,
+     "minor_mm": 0.9987378712597736,
+     "feret_ratio": 8.934279305395263,
+     "perimeter_subpixel_mm": 19.33390436570047,
+     "circularity_subpixel": 0.2378133473928634,
+     "solidity_subpixel": 0.9525112739051838,
+     "color_L": 50.3184789067142,
+     "color_a": 2.793939393939394,
+     "color_b": -44.29848484848485,
+     "color_L_sd": 3.4283987803396614,
+     "color_a_sd": 2.1574310472410545,
+     "color_b_sd": 3.244622237162848,
+     "color_hex": "#327ac3",
+     "color_R": 49.71969696969697,
+     "color_G": 122.36060606060606,
+     "color_B": 195.14545454545456,
+     "color_H": 209.9381979971873,
+     "color_S": 190.3121212121212,
+     "color_V": 195.14545454545456,
+     "opacity": 0.8237704918032787,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "blue",
+     "color_confidence": 1.0,
+     "morphology_label": "fiber",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9999999999508977,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 4.910227779930665e-11,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": true,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "line;size_uncertain",
+     "review_status": "auto",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "",
+     "reviewer_role": "",
+     "reviewed_at": "",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "K9",
+     "particle_ref": "S1-P01-K9",
+     "crop_file": "crops/S1-P01-K9.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 1122.1,
+     "centroid_y_px": 1385.9,
+     "bbox_x_px": 1118,
+     "bbox_y_px": 1382,
+     "bbox_w_px": 9,
+     "bbox_h_px": 9,
+     "centroid_x_mm": 102.008658008658,
+     "centroid_y_mm": 125.991341991342,
+     "length_mm": 0.9090909090909091,
+     "width_mm": 0.8181818181818181,
+     "area_mm2": 0.5206611570247934,
+     "perimeter_mm": 2.580434210077294,
+     "ced_mm": 0.8142029074693427,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "0.5-1",
+     "length_mm_outer": 0.9359663764533637,
+     "length_mm_inner": 0.7820295697311478,
+     "width_mm_outer": 0.8181818181818181,
+     "width_mm_inner": 0.6363636363636364,
+     "size_uncertainty": 0.1693304873944374,
+     "convex_area_mm2": 0.578512396694215,
+     "convex_perimeter_mm": 2.749530467120084,
+     "aspect_ratio": 1.0493274518269524,
+     "circularity": 0.982606112288872,
+     "solidity": 0.9,
+     "roundness": 0.9529913643819479,
+     "major_mm": 0.834042470942608,
+     "minor_mm": 0.7948352723360871,
+     "feret_ratio": 1.1111111111111112,
+     "perimeter_subpixel_mm": 2.3844437954650908,
+     "circularity_subpixel": 0.9943904203156393,
+     "solidity_subpixel": 1.0,
+     "color_L": 73.92789373814043,
+     "color_a": -0.7741935483870968,
+     "color_b": 66.25806451612904,
+     "color_L_sd": 1.844417894530985,
+     "color_a_sd": 1.360969232885741,
+     "color_b_sd": 4.340118490544549,
+     "color_hex": "#d4b32e",
+     "color_R": 212.29032258064515,
+     "color_G": 178.93548387096774,
+     "color_B": 46.38709677419355,
+     "color_H": 47.81249999999999,
+     "color_S": 199.58064516129033,
+     "color_V": 212.29032258064515,
+     "opacity": 0.8174273858921162,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "yellow",
+     "color_confidence": 1.0,
+     "morphology_label": "pellet",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9935489282992781,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 0.0064510717007219,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "size_uncertain",
+     "review_status": "auto",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "",
+     "reviewer_role": "",
+     "reviewed_at": "",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    }
+   ]
+  },
+  {
+   "decisions": [
+    {
+     "particle_ref": "S1-P01-B2",
+     "action": "split",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:00:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [],
+     "tags": {},
+     "outlines": [
+      [
+       [
+        195,
+        188
+       ],
+       [
+        194,
+        189
+       ],
+       [
+        193,
+        189
+       ],
+       [
+        192,
+        190
+       ],
+       [
+        191,
+        191
+       ],
+       [
+        190,
+        192
+       ],
+       [
+        189,
+        193
+       ],
+       [
+        188,
+        194
+       ],
+       [
+        188,
+        195
+       ],
+       [
+        188,
+        196
+       ],
+       [
+        188,
+        197
+       ],
+       [
+        187,
+        198
+       ],
+       [
+        187,
+        199
+       ],
+       [
+        187,
+        200
+       ],
+       [
+        188,
+        201
+       ],
+       [
+        188,
+        202
+       ],
+       [
+        188,
+        203
+       ],
+       [
+        189,
+        204
+       ],
+       [
+        189,
+        205
+       ],
+       [
+        190,
+        206
+       ],
+       [
+        191,
+        207
+       ],
+       [
+        192,
+        208
+       ],
+       [
+        193,
+        208
+       ],
+       [
+        194,
+        209
+       ],
+       [
+        195,
+        209
+       ],
+       [
+        196,
+        210
+       ],
+       [
+        197,
+        210
+       ],
+       [
+        197,
+        209
+       ],
+       [
+        197,
+        208
+       ],
+       [
+        197,
+        207
+       ],
+       [
+        197,
+        206
+       ],
+       [
+        197,
+        205
+       ],
+       [
+        197,
+        204
+       ],
+       [
+        197,
+        203
+       ],
+       [
+        197,
+        202
+       ],
+       [
+        197,
+        201
+       ],
+       [
+        197,
+        200
+       ],
+       [
+        197,
+        199
+       ],
+       [
+        197,
+        198
+       ],
+       [
+        197,
+        197
+       ],
+       [
+        197,
+        196
+       ],
+       [
+        197,
+        195
+       ],
+       [
+        197,
+        194
+       ],
+       [
+        197,
+        193
+       ],
+       [
+        197,
+        192
+       ],
+       [
+        197,
+        191
+       ],
+       [
+        197,
+        190
+       ],
+       [
+        197,
+        189
+       ],
+       [
+        197,
+        188
+       ],
+       [
+        196,
+        188
+       ]
+      ],
+      [
+       [
+        200,
+        188
+       ],
+       [
+        200,
+        189
+       ],
+       [
+        200,
+        190
+       ],
+       [
+        200,
+        191
+       ],
+       [
+        200,
+        192
+       ],
+       [
+        200,
+        193
+       ],
+       [
+        200,
+        194
+       ],
+       [
+        200,
+        195
+       ],
+       [
+        200,
+        196
+       ],
+       [
+        200,
+        197
+       ],
+       [
+        200,
+        198
+       ],
+       [
+        200,
+        199
+       ],
+       [
+        200,
+        200
+       ],
+       [
+        200,
+        201
+       ],
+       [
+        200,
+        202
+       ],
+       [
+        200,
+        203
+       ],
+       [
+        200,
+        204
+       ],
+       [
+        200,
+        205
+       ],
+       [
+        200,
+        206
+       ],
+       [
+        200,
+        207
+       ],
+       [
+        200,
+        208
+       ],
+       [
+        200,
+        209
+       ],
+       [
+        200,
+        210
+       ],
+       [
+        201,
+        210
+       ],
+       [
+        202,
+        209
+       ],
+       [
+        203,
+        209
+       ],
+       [
+        204,
+        208
+       ],
+       [
+        205,
+        208
+       ],
+       [
+        206,
+        207
+       ],
+       [
+        207,
+        206
+       ],
+       [
+        208,
+        205
+       ],
+       [
+        208,
+        204
+       ],
+       [
+        209,
+        203
+       ],
+       [
+        209,
+        202
+       ],
+       [
+        209,
+        201
+       ],
+       [
+        210,
+        200
+       ],
+       [
+        210,
+        199
+       ],
+       [
+        210,
+        198
+       ],
+       [
+        210,
+        197
+       ],
+       [
+        209,
+        196
+       ],
+       [
+        209,
+        195
+       ],
+       [
+        209,
+        194
+       ],
+       [
+        208,
+        193
+       ],
+       [
+        207,
+        192
+       ],
+       [
+        207,
+        191
+       ],
+       [
+        206,
+        190
+       ],
+       [
+        205,
+        190
+       ],
+       [
+        204,
+        189
+       ],
+       [
+        203,
+        189
+       ],
+       [
+        202,
+        188
+       ],
+       [
+        201,
+        188
+       ]
+      ]
+     ],
+     "merge_with": []
+    },
+    {
+     "particle_ref": "S1-P01-B2-1",
+     "action": "split",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:01:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [],
+     "tags": {},
+     "outlines": [
+      [
+       [
+        195,
+        188
+       ],
+       [
+        194,
+        189
+       ],
+       [
+        193,
+        189
+       ],
+       [
+        192,
+        190
+       ],
+       [
+        191,
+        191
+       ],
+       [
+        190,
+        192
+       ],
+       [
+        189,
+        193
+       ],
+       [
+        188,
+        194
+       ],
+       [
+        188,
+        195
+       ],
+       [
+        188,
+        196
+       ],
+       [
+        188,
+        197
+       ],
+       [
+        187,
+        198
+       ],
+       [
+        187,
+        199
+       ],
+       [
+        187,
+        200
+       ],
+       [
+        188,
+        201
+       ],
+       [
+        188,
+        202
+       ],
+       [
+        188,
+        203
+       ],
+       [
+        189,
+        204
+       ],
+       [
+        189,
+        205
+       ],
+       [
+        190,
+        206
+       ],
+       [
+        191,
+        207
+       ],
+       [
+        192,
+        208
+       ],
+       [
+        193,
+        208
+       ],
+       [
+        194,
+        209
+       ],
+       [
+        195,
+        209
+       ],
+       [
+        196,
+        210
+       ],
+       [
+        197,
+        210
+       ],
+       [
+        197,
+        209
+       ],
+       [
+        197,
+        208
+       ],
+       [
+        197,
+        207
+       ],
+       [
+        197,
+        206
+       ],
+       [
+        197,
+        205
+       ],
+       [
+        197,
+        204
+       ],
+       [
+        197,
+        203
+       ],
+       [
+        197,
+        202
+       ],
+       [
+        197,
+        201
+       ],
+       [
+        197,
+        200
+       ],
+       [
+        197,
+        199
+       ],
+       [
+        197,
+        198
+       ],
+       [
+        197,
+        197
+       ],
+       [
+        197,
+        196
+       ],
+       [
+        197,
+        195
+       ],
+       [
+        197,
+        194
+       ],
+       [
+        197,
+        193
+       ],
+       [
+        197,
+        192
+       ],
+       [
+        197,
+        191
+       ],
+       [
+        197,
+        190
+       ],
+       [
+        197,
+        189
+       ],
+       [
+        197,
+        188
+       ],
+       [
+        196,
+        188
+       ]
+      ],
+      [
+       [
+        195,
+        188
+       ],
+       [
+        194,
+        189
+       ],
+       [
+        193,
+        189
+       ],
+       [
+        192,
+        190
+       ],
+       [
+        191,
+        191
+       ],
+       [
+        190,
+        192
+       ],
+       [
+        189,
+        193
+       ],
+       [
+        188,
+        194
+       ],
+       [
+        188,
+        195
+       ],
+       [
+        188,
+        196
+       ],
+       [
+        188,
+        197
+       ],
+       [
+        187,
+        198
+       ],
+       [
+        187,
+        199
+       ],
+       [
+        187,
+        200
+       ],
+       [
+        188,
+        201
+       ],
+       [
+        188,
+        202
+       ],
+       [
+        188,
+        203
+       ],
+       [
+        189,
+        204
+       ],
+       [
+        189,
+        205
+       ],
+       [
+        190,
+        206
+       ],
+       [
+        191,
+        207
+       ],
+       [
+        192,
+        208
+       ],
+       [
+        193,
+        208
+       ],
+       [
+        194,
+        209
+       ],
+       [
+        195,
+        209
+       ],
+       [
+        196,
+        210
+       ],
+       [
+        197,
+        210
+       ],
+       [
+        197,
+        209
+       ],
+       [
+        197,
+        208
+       ],
+       [
+        197,
+        207
+       ],
+       [
+        197,
+        206
+       ],
+       [
+        197,
+        205
+       ],
+       [
+        197,
+        204
+       ],
+       [
+        197,
+        203
+       ],
+       [
+        197,
+        202
+       ],
+       [
+        197,
+        201
+       ],
+       [
+        197,
+        200
+       ],
+       [
+        197,
+        199
+       ],
+       [
+        197,
+        198
+       ],
+       [
+        197,
+        197
+       ],
+       [
+        197,
+        196
+       ],
+       [
+        197,
+        195
+       ],
+       [
+        197,
+        194
+       ],
+       [
+        197,
+        193
+       ],
+       [
+        197,
+        192
+       ],
+       [
+        197,
+        191
+       ],
+       [
+        197,
+        190
+       ],
+       [
+        197,
+        189
+       ],
+       [
+        197,
+        188
+       ],
+       [
+        196,
+        188
+       ]
+      ]
+     ],
+     "merge_with": []
+    }
+   ],
+   "out": [
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2",
+     "particle_ref": "S1-P01-B2",
+     "crop_file": "crops/S1-P01-B2.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 198.6,
+     "centroid_y_px": 198.8,
+     "bbox_x_px": 187,
+     "bbox_y_px": 188,
+     "bbox_w_px": 24,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 18.05139278773483,
+     "centroid_y_mm": 18.075577629021808,
+     "length_mm": 2.2119136473811705,
+     "width_mm": 2.090909090909091,
+     "area_mm2": 3.479338842975207,
+     "perimeter_mm": 6.841348545085367,
+     "ced_mm": 2.104764073336753,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.279988400724446,
+     "length_mm_inner": 2.1281272564944773,
+     "width_mm_outer": 2.181818181818182,
+     "width_mm_inner": 2.0,
+     "size_uncertainty": 0.06865600038670895,
+     "convex_area_mm2": 3.673553719008264,
+     "convex_perimeter_mm": 6.846424026922746,
+     "aspect_ratio": 1.0170616850234522,
+     "circularity": 0.9341640621451958,
+     "solidity": 0.9471316085489314,
+     "roundness": 0.9832245327154776,
+     "major_mm": 2.122643543249743,
+     "minor_mm": 2.0870352059332546,
+     "feret_ratio": 1.0578717443996903,
+     "perimeter_subpixel_mm": 6.594914269809488,
+     "circularity_subpixel": 0.9991340542504147,
+     "solidity_subpixel": 0.9999998521794647,
+     "color_L": 44.9120312777679,
+     "color_a": 59.90634441087613,
+     "color_b": 39.25075528700906,
+     "color_L_sd": 1.771771586580175,
+     "color_a_sd": 2.1260125909717167,
+     "color_b_sd": 3.2639138883599776,
+     "color_hex": "#c92c2c",
+     "color_R": 201.2356495468278,
+     "color_G": 44.2809667673716,
+     "color_B": 44.2809667673716,
+     "color_H": 0.0,
+     "color_S": 198.87311178247734,
+     "color_V": 201.2356495468278,
+     "opacity": 0.8464566929133859,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "pellet",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9984325765710376,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 0.0015674234289624334,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": false,
+     "flag_bundle": "",
+     "review_reason": "",
+     "review_status": "rejected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:00:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2-1",
+     "particle_ref": "S1-P01-B2-1",
+     "crop_file": "",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 193.0,
+     "centroid_y_px": 198.9,
+     "bbox_x_px": 187,
+     "bbox_y_px": 188,
+     "bbox_w_px": 11,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 17.54936461388074,
+     "centroid_y_mm": 18.07820136852395,
+     "length_mm": 2.1086206372260365,
+     "width_mm": 1.0,
+     "area_mm2": 1.537190082644628,
+     "perimeter_mm": 5.1700052440989825,
+     "ced_mm": 1.399003645812924,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.2727272727272725,
+     "length_mm_inner": 2.0185093919249564,
+     "width_mm_outer": 1.909090909090909,
+     "width_mm_inner": 0.9090909090909091,
+     "size_uncertainty": 0.12056122202083196,
+     "convex_area_mm2": 1.6322314049586777,
+     "convex_perimeter_mm": 5.322123961015181,
+     "aspect_ratio": 1.9907767791376176,
+     "circularity": 0.7226957000015051,
+     "solidity": 0.9417721518987342,
+     "roundness": 0.5023164879556155,
+     "major_mm": 1.9739226456005248,
+     "minor_mm": 0.9915338908341125,
+     "feret_ratio": 2.1086206372260365,
+     "perimeter_subpixel_mm": 5.496709210776505,
+     "circularity_subpixel": 0.7921328477172951,
+     "solidity_subpixel": 0.9999998398266416,
+     "color_L": 44.969463195114116,
+     "color_a": 59.868852459016395,
+     "color_b": 39.13934426229508,
+     "color_L_sd": 1.716321321017357,
+     "color_a_sd": 2.0603629302773743,
+     "color_b_sd": 3.2170538751444364,
+     "color_hex": "#c92d2d",
+     "color_R": 201.327868852459,
+     "color_G": 44.59016393442623,
+     "color_B": 44.59016393442623,
+     "color_H": 0.0,
+     "color_S": 198.49180327868854,
+     "color_V": 201.327868852459,
+     "opacity": 0.84251968503937,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "fragment",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.5,
+     "morphology_runner_up": "fiber",
+     "morphology_runner_up_confidence": 0.02750445638708099,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": true,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "multi_blob;size_uncertain",
+     "review_status": "rejected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": true,
+     "derived_from": "S1-P01-B2",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:01:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2-3",
+     "particle_ref": "S1-P01-B2-3",
+     "crop_file": "",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 193.0,
+     "centroid_y_px": 198.9,
+     "bbox_x_px": 187,
+     "bbox_y_px": 188,
+     "bbox_w_px": 11,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 17.54936461388074,
+     "centroid_y_mm": 18.07820136852395,
+     "length_mm": 2.1086206372260365,
+     "width_mm": 1.0,
+     "area_mm2": 1.537190082644628,
+     "perimeter_mm": 5.1700052440989825,
+     "ced_mm": 1.399003645812924,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.2727272727272725,
+     "length_mm_inner": 2.0185093919249564,
+     "width_mm_outer": 1.909090909090909,
+     "width_mm_inner": 0.9090909090909091,
+     "size_uncertainty": 0.12056122202083196,
+     "convex_area_mm2": 1.6322314049586777,
+     "convex_perimeter_mm": 5.322123961015181,
+     "aspect_ratio": 1.9907767791376176,
+     "circularity": 0.7226957000015051,
+     "solidity": 0.9417721518987342,
+     "roundness": 0.5023164879556155,
+     "major_mm": 1.9739226456005248,
+     "minor_mm": 0.9915338908341125,
+     "feret_ratio": 2.1086206372260365,
+     "perimeter_subpixel_mm": 5.496709210776505,
+     "circularity_subpixel": 0.7921328477172951,
+     "solidity_subpixel": 0.9999998398266416,
+     "color_L": 44.969463195114116,
+     "color_a": 59.868852459016395,
+     "color_b": 39.13934426229508,
+     "color_L_sd": 1.716321321017357,
+     "color_a_sd": 2.0603629302773743,
+     "color_b_sd": 3.2170538751444364,
+     "color_hex": "#c92d2d",
+     "color_R": 201.327868852459,
+     "color_G": 44.59016393442623,
+     "color_B": 44.59016393442623,
+     "color_H": 0.0,
+     "color_S": 198.49180327868854,
+     "color_V": 201.327868852459,
+     "opacity": 0.84251968503937,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "fragment",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.5,
+     "morphology_runner_up": "fiber",
+     "morphology_runner_up_confidence": 0.02750445638708099,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": true,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "multi_blob;size_uncertain",
+     "review_status": "corrected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": true,
+     "derived_from": "S1-P01-B2-1",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:01:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2-4",
+     "particle_ref": "S1-P01-B2-4",
+     "crop_file": "",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 193.0,
+     "centroid_y_px": 198.9,
+     "bbox_x_px": 187,
+     "bbox_y_px": 188,
+     "bbox_w_px": 11,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 17.54936461388074,
+     "centroid_y_mm": 18.07820136852395,
+     "length_mm": 2.1086206372260365,
+     "width_mm": 1.0,
+     "area_mm2": 1.537190082644628,
+     "perimeter_mm": 5.1700052440989825,
+     "ced_mm": 1.399003645812924,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.2727272727272725,
+     "length_mm_inner": 2.0185093919249564,
+     "width_mm_outer": 1.909090909090909,
+     "width_mm_inner": 0.9090909090909091,
+     "size_uncertainty": 0.12056122202083196,
+     "convex_area_mm2": 1.6322314049586777,
+     "convex_perimeter_mm": 5.322123961015181,
+     "aspect_ratio": 1.9907767791376176,
+     "circularity": 0.7226957000015051,
+     "solidity": 0.9417721518987342,
+     "roundness": 0.5023164879556155,
+     "major_mm": 1.9739226456005248,
+     "minor_mm": 0.9915338908341125,
+     "feret_ratio": 2.1086206372260365,
+     "perimeter_subpixel_mm": 5.496709210776505,
+     "circularity_subpixel": 0.7921328477172951,
+     "solidity_subpixel": 0.9999998398266416,
+     "color_L": 44.969463195114116,
+     "color_a": 59.868852459016395,
+     "color_b": 39.13934426229508,
+     "color_L_sd": 1.716321321017357,
+     "color_a_sd": 2.0603629302773743,
+     "color_b_sd": 3.2170538751444364,
+     "color_hex": "#c92d2d",
+     "color_R": 201.327868852459,
+     "color_G": 44.59016393442623,
+     "color_B": 44.59016393442623,
+     "color_H": 0.0,
+     "color_S": 198.49180327868854,
+     "color_V": 201.327868852459,
+     "opacity": 0.84251968503937,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "fragment",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.5,
+     "morphology_runner_up": "fiber",
+     "morphology_runner_up_confidence": 0.02750445638708099,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": true,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "multi_blob;size_uncertain",
+     "review_status": "corrected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": true,
+     "derived_from": "S1-P01-B2-1",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:01:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2-2",
+     "particle_ref": "S1-P01-B2-2",
+     "crop_file": "",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 204.0,
+     "centroid_y_px": 198.8,
+     "bbox_x_px": 200,
+     "bbox_y_px": 188,
+     "bbox_w_px": 11,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 18.546897546897547,
+     "centroid_y_mm": 18.06926406926407,
+     "length_mm": 2.1086206372260365,
+     "width_mm": 1.0,
+     "area_mm2": 1.5619834710743803,
+     "perimeter_mm": 5.276511869122056,
+     "ced_mm": 1.4102408034072027,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.2727272727272725,
+     "length_mm_inner": 2.0185093919249564,
+     "width_mm_outer": 1.909090909090909,
+     "width_mm_inner": 0.9090909090909091,
+     "size_uncertainty": 0.12056122202083196,
+     "convex_area_mm2": 1.6611570247933882,
+     "convex_perimeter_mm": 5.342481884089383,
+     "aspect_ratio": 1.982466460791809,
+     "circularity": 0.7050054253394485,
+     "solidity": 0.9402985074626866,
+     "roundness": 0.5044221527967712,
+     "major_mm": 1.985620283551014,
+     "minor_mm": 1.0015908580657376,
+     "feret_ratio": 2.1086206372260365,
+     "perimeter_subpixel_mm": 5.519715633083479,
+     "circularity_subpixel": 0.7955619593108165,
+     "solidity_subpixel": 0.9999997250256101,
+     "color_L": 45.06039215686275,
+     "color_a": 59.72,
+     "color_b": 39.016,
+     "color_L_sd": 1.8668801986946975,
+     "color_a_sd": 2.2648620267027306,
+     "color_b_sd": 3.43856714344798,
+     "color_hex": "#c92d2d",
+     "color_R": 201.4,
+     "color_G": 45.064,
+     "color_B": 45.064,
+     "color_H": 0.0,
+     "color_S": 197.968,
+     "color_V": 201.4,
+     "opacity": 0.84251968503937,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "fragment",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.5,
+     "morphology_runner_up": "fiber",
+     "morphology_runner_up_confidence": 0.02750445638708099,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": true,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "multi_blob;size_uncertain",
+     "review_status": "corrected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": true,
+     "derived_from": "S1-P01-B2",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:00:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "F7",
+     "particle_ref": "S1-P01-F7",
+     "crop_file": "crops/S1-P01-F7.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 875.7,
+     "centroid_y_px": 725.8,
+     "bbox_x_px": 831,
+     "bbox_y_px": 714,
+     "bbox_w_px": 99,
+     "bbox_h_px": 24,
+     "centroid_x_mm": 79.61277968151582,
+     "centroid_y_mm": 65.9789356984479,
+     "length_mm": 9.164249618729302,
+     "width_mm": 1.0257402198289416,
+     "area_mm2": 7.454545454545454,
+     "perimeter_mm": 20.23350386317489,
+     "ced_mm": 3.080815161731231,
+     "fiber_length_mm": 8.690818343593891,
+     "size_length_source": "fiber_length",
+     "size_class": ">5",
+     "length_mm_outer": 9.206537382670664,
+     "length_mm_inner": 8.095504313052068,
+     "width_mm_outer": 1.069043114652627,
+     "width_mm_inner": 0.9174973491412897,
+     "size_uncertainty": 0.12123557474339622,
+     "convex_area_mm2": 8.541322314049587,
+     "convex_perimeter_mm": 19.328179706226695,
+     "aspect_ratio": 9.515426288963953,
+     "circularity": 0.2288172901222619,
+     "solidity": 0.872762457668118,
+     "roundness": 0.10509250659214356,
+     "major_mm": 9.503416595969146,
+     "minor_mm": 0.9987378712597736,
+     "feret_ratio": 8.934279305395263,
+     "perimeter_subpixel_mm": 19.33390436570047,
+     "circularity_subpixel": 0.2378133473928634,
+     "solidity_subpixel": 0.9525112739051838,
+     "color_L": 50.3184789067142,
+     "color_a": 2.793939393939394,
+     "color_b": -44.29848484848485,
+     "color_L_sd": 3.4283987803396614,
+     "color_a_sd": 2.1574310472410545,
+     "color_b_sd": 3.244622237162848,
+     "color_hex": "#327ac3",
+     "color_R": 49.71969696969697,
+     "color_G": 122.36060606060606,
+     "color_B": 195.14545454545456,
+     "color_H": 209.9381979971873,
+     "color_S": 190.3121212121212,
+     "color_V": 195.14545454545456,
+     "opacity": 0.8237704918032787,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "blue",
+     "color_confidence": 1.0,
+     "morphology_label": "fiber",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9999999999508977,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 4.910227779930665e-11,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": true,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "line;size_uncertain",
+     "review_status": "auto",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "",
+     "reviewer_role": "",
+     "reviewed_at": "",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "K9",
+     "particle_ref": "S1-P01-K9",
+     "crop_file": "crops/S1-P01-K9.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 1122.1,
+     "centroid_y_px": 1385.9,
+     "bbox_x_px": 1118,
+     "bbox_y_px": 1382,
+     "bbox_w_px": 9,
+     "bbox_h_px": 9,
+     "centroid_x_mm": 102.008658008658,
+     "centroid_y_mm": 125.991341991342,
+     "length_mm": 0.9090909090909091,
+     "width_mm": 0.8181818181818181,
+     "area_mm2": 0.5206611570247934,
+     "perimeter_mm": 2.580434210077294,
+     "ced_mm": 0.8142029074693427,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "0.5-1",
+     "length_mm_outer": 0.9359663764533637,
+     "length_mm_inner": 0.7820295697311478,
+     "width_mm_outer": 0.8181818181818181,
+     "width_mm_inner": 0.6363636363636364,
+     "size_uncertainty": 0.1693304873944374,
+     "convex_area_mm2": 0.578512396694215,
+     "convex_perimeter_mm": 2.749530467120084,
+     "aspect_ratio": 1.0493274518269524,
+     "circularity": 0.982606112288872,
+     "solidity": 0.9,
+     "roundness": 0.9529913643819479,
+     "major_mm": 0.834042470942608,
+     "minor_mm": 0.7948352723360871,
+     "feret_ratio": 1.1111111111111112,
+     "perimeter_subpixel_mm": 2.3844437954650908,
+     "circularity_subpixel": 0.9943904203156393,
+     "solidity_subpixel": 1.0,
+     "color_L": 73.92789373814043,
+     "color_a": -0.7741935483870968,
+     "color_b": 66.25806451612904,
+     "color_L_sd": 1.844417894530985,
+     "color_a_sd": 1.360969232885741,
+     "color_b_sd": 4.340118490544549,
+     "color_hex": "#d4b32e",
+     "color_R": 212.29032258064515,
+     "color_G": 178.93548387096774,
+     "color_B": 46.38709677419355,
+     "color_H": 47.81249999999999,
+     "color_S": 199.58064516129033,
+     "color_V": 212.29032258064515,
+     "opacity": 0.8174273858921162,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "yellow",
+     "color_confidence": 1.0,
+     "morphology_label": "pellet",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9935489282992781,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 0.0064510717007219,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "size_uncertain",
+     "review_status": "auto",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "",
+     "reviewer_role": "",
+     "reviewed_at": "",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    }
+   ]
+  },
+  {
+   "decisions": [
+    {
+     "particle_ref": "S1-P01-F7",
+     "action": "merge",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:00:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [
+      [
+       1126,
+       1387
+      ],
+      [
+       1125,
+       1389
+      ],
+      [
+       1123,
+       1390
+      ],
+      [
+       1121,
+       1390
+      ],
+      [
+       1119,
+       1389
+      ],
+      [
+       1118,
+       1387
+      ],
+      [
+       831,
+       722
+      ],
+      [
+       831,
+       717
+      ],
+      [
+       832,
+       715
+      ],
+      [
+       833,
+       714
+      ],
+      [
+       838,
+       714
+      ],
+      [
+       905,
+       726
+      ],
+      [
+       916,
+       728
+      ],
+      [
+       929,
+       733
+      ],
+      [
+       1126,
+       1384
+      ]
+     ],
+     "tags": {},
+     "outlines": [],
+     "merge_with": [
+      "S1-P01-K9"
+     ]
+    }
+   ],
+   "out": [
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2",
+     "particle_ref": "S1-P01-B2",
+     "crop_file": "crops/S1-P01-B2.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 198.6,
+     "centroid_y_px": 198.8,
+     "bbox_x_px": 187,
+     "bbox_y_px": 188,
+     "bbox_w_px": 24,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 18.05139278773483,
+     "centroid_y_mm": 18.075577629021808,
+     "length_mm": 2.2119136473811705,
+     "width_mm": 2.090909090909091,
+     "area_mm2": 3.479338842975207,
+     "perimeter_mm": 6.841348545085367,
+     "ced_mm": 2.104764073336753,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.279988400724446,
+     "length_mm_inner": 2.1281272564944773,
+     "width_mm_outer": 2.181818181818182,
+     "width_mm_inner": 2.0,
+     "size_uncertainty": 0.06865600038670895,
+     "convex_area_mm2": 3.673553719008264,
+     "convex_perimeter_mm": 6.846424026922746,
+     "aspect_ratio": 1.0170616850234522,
+     "circularity": 0.9341640621451958,
+     "solidity": 0.9471316085489314,
+     "roundness": 0.9832245327154776,
+     "major_mm": 2.122643543249743,
+     "minor_mm": 2.0870352059332546,
+     "feret_ratio": 1.0578717443996903,
+     "perimeter_subpixel_mm": 6.594914269809488,
+     "circularity_subpixel": 0.9991340542504147,
+     "solidity_subpixel": 0.9999998521794647,
+     "color_L": 44.9120312777679,
+     "color_a": 59.90634441087613,
+     "color_b": 39.25075528700906,
+     "color_L_sd": 1.771771586580175,
+     "color_a_sd": 2.1260125909717167,
+     "color_b_sd": 3.2639138883599776,
+     "color_hex": "#c92c2c",
+     "color_R": 201.2356495468278,
+     "color_G": 44.2809667673716,
+     "color_B": 44.2809667673716,
+     "color_H": 0.0,
+     "color_S": 198.87311178247734,
+     "color_V": 201.2356495468278,
+     "opacity": 0.8464566929133859,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "pellet",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9984325765710376,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 0.0015674234289624334,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": false,
+     "flag_bundle": "",
+     "review_reason": "",
+     "review_status": "auto",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "",
+     "reviewer_role": "",
+     "reviewed_at": "",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "F7",
+     "particle_ref": "S1-P01-F7",
+     "crop_file": "crops/S1-P01-F7.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 875.7,
+     "centroid_y_px": 725.8,
+     "bbox_x_px": 831,
+     "bbox_y_px": 714,
+     "bbox_w_px": 99,
+     "bbox_h_px": 24,
+     "centroid_x_mm": 79.61277968151582,
+     "centroid_y_mm": 65.9789356984479,
+     "length_mm": 9.164249618729302,
+     "width_mm": 1.0257402198289416,
+     "area_mm2": 7.454545454545454,
+     "perimeter_mm": 20.23350386317489,
+     "ced_mm": 3.080815161731231,
+     "fiber_length_mm": 8.690818343593891,
+     "size_length_source": "fiber_length",
+     "size_class": ">5",
+     "length_mm_outer": 9.206537382670664,
+     "length_mm_inner": 8.095504313052068,
+     "width_mm_outer": 1.069043114652627,
+     "width_mm_inner": 0.9174973491412897,
+     "size_uncertainty": 0.12123557474339622,
+     "convex_area_mm2": 8.541322314049587,
+     "convex_perimeter_mm": 19.328179706226695,
+     "aspect_ratio": 9.515426288963953,
+     "circularity": 0.2288172901222619,
+     "solidity": 0.872762457668118,
+     "roundness": 0.10509250659214356,
+     "major_mm": 9.503416595969146,
+     "minor_mm": 0.9987378712597736,
+     "feret_ratio": 8.934279305395263,
+     "perimeter_subpixel_mm": 19.33390436570047,
+     "circularity_subpixel": 0.2378133473928634,
+     "solidity_subpixel": 0.9525112739051838,
+     "color_L": 50.3184789067142,
+     "color_a": 2.793939393939394,
+     "color_b": -44.29848484848485,
+     "color_L_sd": 3.4283987803396614,
+     "color_a_sd": 2.1574310472410545,
+     "color_b_sd": 3.244622237162848,
+     "color_hex": "#327ac3",
+     "color_R": 49.71969696969697,
+     "color_G": 122.36060606060606,
+     "color_B": 195.14545454545456,
+     "color_H": 209.9381979971873,
+     "color_S": 190.3121212121212,
+     "color_V": 195.14545454545456,
+     "opacity": 0.8237704918032787,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "blue",
+     "color_confidence": 1.0,
+     "morphology_label": "fiber",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9999999999508977,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 4.910227779930665e-11,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": true,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "line;size_uncertain",
+     "review_status": "rejected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:00:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "F7-1",
+     "particle_ref": "S1-P01-F7-1",
+     "crop_file": "",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 966.8,
+     "centroid_y_px": 964.1,
+     "bbox_x_px": 831,
+     "bbox_y_px": 714,
+     "bbox_w_px": 296,
+     "bbox_h_px": 677,
+     "centroid_x_mm": 87.89278845533282,
+     "centroid_y_mm": 87.64415473777962,
+     "length_mm": 67.02614513927685,
+     "width_mm": 7.955768730801196,
+     "area_mm2": 291.0330578512397,
+     "perimeter_mm": 149.59014159067254,
+     "ced_mm": 19.249799949126604,
+     "fiber_length_mm": 65.06151293309176,
+     "size_length_source": "fiber_length",
+     "size_class": ">5",
+     "length_mm_outer": 68.29136653927532,
+     "length_mm_inner": 67.02614513927685,
+     "width_mm_outer": 9.840081660930235,
+     "width_mm_inner": 7.953581702240209,
+     "size_uncertainty": 0.018876535378387085,
+     "convex_area_mm2": 298.8057851239669,
+     "convex_perimeter_mm": 139.0852354439822,
+     "aspect_ratio": 9.880188063884606,
+     "circularity": 0.16343544126483936,
+     "solidity": 0.9739873601526738,
+     "roundness": 0.10121264833564603,
+     "major_mm": 60.507446591464806,
+     "minor_mm": 6.124118913549812,
+     "feret_ratio": 8.424848359377446,
+     "perimeter_subpixel_mm": 162.7363042174915,
+     "circularity_subpixel": 0.1424290877320549,
+     "solidity_subpixel": 0.9014181627714317,
+     "color_L": 86.09813173608939,
+     "color_a": 0.03011450725813723,
+     "color_b": -1.0751961049499594,
+     "color_L_sd": 23.21693488020778,
+     "color_a_sd": 0.595816501139659,
+     "color_b_sd": 7.178189086514735,
+     "color_hex": "#d7d9db",
+     "color_R": 215.39440387100652,
+     "color_G": 217.25389955820035,
+     "color_B": 218.9869864454663,
+     "color_H": 358.9609044613482,
+     "color_S": 5.21176329155772,
+     "color_V": 219.20319778799626,
+     "opacity": 0.04132231404958678,
+     "color_secondary": "grey",
+     "color_secondary_fraction": 0.08292008535449163,
+     "color_label": "clear",
+     "color_confidence": 0.9586776859504132,
+     "morphology_label": "fiber",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9999999996232327,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 3.7676728403823745e-10,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": true,
+     "flag_line": true,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": false,
+     "flag_bundle": "",
+     "review_reason": "low_contrast;line",
+     "review_status": "corrected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": true,
+     "derived_from": "S1-P01-F7;S1-P01-K9",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:00:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "K9",
+     "particle_ref": "S1-P01-K9",
+     "crop_file": "crops/S1-P01-K9.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 1122.1,
+     "centroid_y_px": 1385.9,
+     "bbox_x_px": 1118,
+     "bbox_y_px": 1382,
+     "bbox_w_px": 9,
+     "bbox_h_px": 9,
+     "centroid_x_mm": 102.008658008658,
+     "centroid_y_mm": 125.991341991342,
+     "length_mm": 0.9090909090909091,
+     "width_mm": 0.8181818181818181,
+     "area_mm2": 0.5206611570247934,
+     "perimeter_mm": 2.580434210077294,
+     "ced_mm": 0.8142029074693427,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "0.5-1",
+     "length_mm_outer": 0.9359663764533637,
+     "length_mm_inner": 0.7820295697311478,
+     "width_mm_outer": 0.8181818181818181,
+     "width_mm_inner": 0.6363636363636364,
+     "size_uncertainty": 0.1693304873944374,
+     "convex_area_mm2": 0.578512396694215,
+     "convex_perimeter_mm": 2.749530467120084,
+     "aspect_ratio": 1.0493274518269524,
+     "circularity": 0.982606112288872,
+     "solidity": 0.9,
+     "roundness": 0.9529913643819479,
+     "major_mm": 0.834042470942608,
+     "minor_mm": 0.7948352723360871,
+     "feret_ratio": 1.1111111111111112,
+     "perimeter_subpixel_mm": 2.3844437954650908,
+     "circularity_subpixel": 0.9943904203156393,
+     "solidity_subpixel": 1.0,
+     "color_L": 73.92789373814043,
+     "color_a": -0.7741935483870968,
+     "color_b": 66.25806451612904,
+     "color_L_sd": 1.844417894530985,
+     "color_a_sd": 1.360969232885741,
+     "color_b_sd": 4.340118490544549,
+     "color_hex": "#d4b32e",
+     "color_R": 212.29032258064515,
+     "color_G": 178.93548387096774,
+     "color_B": 46.38709677419355,
+     "color_H": 47.81249999999999,
+     "color_S": 199.58064516129033,
+     "color_V": 212.29032258064515,
+     "opacity": 0.8174273858921162,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "yellow",
+     "color_confidence": 1.0,
+     "morphology_label": "pellet",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9935489282992781,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 0.0064510717007219,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "size_uncertain",
+     "review_status": "rejected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:00:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    }
+   ]
+  },
+  {
+   "decisions": [
+    {
+     "particle_ref": "S1-P01-B2",
+     "action": "split",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:00:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [],
+     "tags": {},
+     "outlines": [
+      [
+       [
+        195,
+        188
+       ],
+       [
+        194,
+        189
+       ],
+       [
+        193,
+        189
+       ],
+       [
+        192,
+        190
+       ],
+       [
+        191,
+        191
+       ],
+       [
+        190,
+        192
+       ],
+       [
+        189,
+        193
+       ],
+       [
+        188,
+        194
+       ],
+       [
+        188,
+        195
+       ],
+       [
+        188,
+        196
+       ],
+       [
+        188,
+        197
+       ],
+       [
+        187,
+        198
+       ],
+       [
+        187,
+        199
+       ],
+       [
+        187,
+        200
+       ],
+       [
+        188,
+        201
+       ],
+       [
+        188,
+        202
+       ],
+       [
+        188,
+        203
+       ],
+       [
+        189,
+        204
+       ],
+       [
+        189,
+        205
+       ],
+       [
+        190,
+        206
+       ],
+       [
+        191,
+        207
+       ],
+       [
+        192,
+        208
+       ],
+       [
+        193,
+        208
+       ],
+       [
+        194,
+        209
+       ],
+       [
+        195,
+        209
+       ],
+       [
+        196,
+        210
+       ],
+       [
+        197,
+        210
+       ],
+       [
+        197,
+        209
+       ],
+       [
+        197,
+        208
+       ],
+       [
+        197,
+        207
+       ],
+       [
+        197,
+        206
+       ],
+       [
+        197,
+        205
+       ],
+       [
+        197,
+        204
+       ],
+       [
+        197,
+        203
+       ],
+       [
+        197,
+        202
+       ],
+       [
+        197,
+        201
+       ],
+       [
+        197,
+        200
+       ],
+       [
+        197,
+        199
+       ],
+       [
+        197,
+        198
+       ],
+       [
+        197,
+        197
+       ],
+       [
+        197,
+        196
+       ],
+       [
+        197,
+        195
+       ],
+       [
+        197,
+        194
+       ],
+       [
+        197,
+        193
+       ],
+       [
+        197,
+        192
+       ],
+       [
+        197,
+        191
+       ],
+       [
+        197,
+        190
+       ],
+       [
+        197,
+        189
+       ],
+       [
+        197,
+        188
+       ],
+       [
+        196,
+        188
+       ]
+      ],
+      [
+       [
+        200,
+        188
+       ],
+       [
+        200,
+        189
+       ],
+       [
+        200,
+        190
+       ],
+       [
+        200,
+        191
+       ],
+       [
+        200,
+        192
+       ],
+       [
+        200,
+        193
+       ],
+       [
+        200,
+        194
+       ],
+       [
+        200,
+        195
+       ],
+       [
+        200,
+        196
+       ],
+       [
+        200,
+        197
+       ],
+       [
+        200,
+        198
+       ],
+       [
+        200,
+        199
+       ],
+       [
+        200,
+        200
+       ],
+       [
+        200,
+        201
+       ],
+       [
+        200,
+        202
+       ],
+       [
+        200,
+        203
+       ],
+       [
+        200,
+        204
+       ],
+       [
+        200,
+        205
+       ],
+       [
+        200,
+        206
+       ],
+       [
+        200,
+        207
+       ],
+       [
+        200,
+        208
+       ],
+       [
+        200,
+        209
+       ],
+       [
+        200,
+        210
+       ],
+       [
+        201,
+        210
+       ],
+       [
+        202,
+        209
+       ],
+       [
+        203,
+        209
+       ],
+       [
+        204,
+        208
+       ],
+       [
+        205,
+        208
+       ],
+       [
+        206,
+        207
+       ],
+       [
+        207,
+        206
+       ],
+       [
+        208,
+        205
+       ],
+       [
+        208,
+        204
+       ],
+       [
+        209,
+        203
+       ],
+       [
+        209,
+        202
+       ],
+       [
+        209,
+        201
+       ],
+       [
+        210,
+        200
+       ],
+       [
+        210,
+        199
+       ],
+       [
+        210,
+        198
+       ],
+       [
+        210,
+        197
+       ],
+       [
+        209,
+        196
+       ],
+       [
+        209,
+        195
+       ],
+       [
+        209,
+        194
+       ],
+       [
+        208,
+        193
+       ],
+       [
+        207,
+        192
+       ],
+       [
+        207,
+        191
+       ],
+       [
+        206,
+        190
+       ],
+       [
+        205,
+        190
+       ],
+       [
+        204,
+        189
+       ],
+       [
+        203,
+        189
+       ],
+       [
+        202,
+        188
+       ],
+       [
+        201,
+        188
+       ]
+      ]
+     ],
+     "merge_with": []
+    },
+    {
+     "particle_ref": "S1-P01-B2-1",
+     "action": "merge",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:02:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [
+      [
+       195,
+       188
+      ],
+      [
+       194,
+       189
+      ],
+      [
+       193,
+       189
+      ],
+      [
+       192,
+       190
+      ],
+      [
+       191,
+       191
+      ],
+      [
+       190,
+       192
+      ],
+      [
+       189,
+       193
+      ],
+      [
+       188,
+       194
+      ],
+      [
+       188,
+       195
+      ],
+      [
+       188,
+       196
+      ],
+      [
+       188,
+       197
+      ],
+      [
+       187,
+       198
+      ],
+      [
+       187,
+       199
+      ],
+      [
+       187,
+       200
+      ],
+      [
+       188,
+       201
+      ],
+      [
+       188,
+       202
+      ],
+      [
+       188,
+       203
+      ],
+      [
+       189,
+       204
+      ],
+      [
+       189,
+       205
+      ],
+      [
+       190,
+       206
+      ],
+      [
+       191,
+       207
+      ],
+      [
+       192,
+       208
+      ],
+      [
+       193,
+       208
+      ],
+      [
+       194,
+       209
+      ],
+      [
+       195,
+       209
+      ],
+      [
+       196,
+       210
+      ],
+      [
+       197,
+       210
+      ],
+      [
+       198,
+       210
+      ],
+      [
+       199,
+       210
+      ],
+      [
+       200,
+       210
+      ],
+      [
+       201,
+       210
+      ],
+      [
+       202,
+       209
+      ],
+      [
+       203,
+       209
+      ],
+      [
+       204,
+       208
+      ],
+      [
+       205,
+       208
+      ],
+      [
+       206,
+       207
+      ],
+      [
+       207,
+       206
+      ],
+      [
+       208,
+       205
+      ],
+      [
+       208,
+       204
+      ],
+      [
+       209,
+       203
+      ],
+      [
+       209,
+       202
+      ],
+      [
+       209,
+       201
+      ],
+      [
+       210,
+       200
+      ],
+      [
+       210,
+       199
+      ],
+      [
+       210,
+       198
+      ],
+      [
+       210,
+       197
+      ],
+      [
+       209,
+       196
+      ],
+      [
+       209,
+       195
+      ],
+      [
+       209,
+       194
+      ],
+      [
+       208,
+       193
+      ],
+      [
+       207,
+       192
+      ],
+      [
+       207,
+       191
+      ],
+      [
+       206,
+       190
+      ],
+      [
+       205,
+       190
+      ],
+      [
+       204,
+       189
+      ],
+      [
+       203,
+       189
+      ],
+      [
+       202,
+       188
+      ],
+      [
+       201,
+       188
+      ],
+      [
+       200,
+       188
+      ],
+      [
+       199,
+       188
+      ],
+      [
+       198,
+       188
+      ],
+      [
+       197,
+       188
+      ],
+      [
+       196,
+       188
+      ]
+     ],
+     "tags": {},
+     "outlines": [],
+     "merge_with": [
+      "S1-P01-B2-2"
+     ]
+    }
+   ],
+   "out": [
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2",
+     "particle_ref": "S1-P01-B2",
+     "crop_file": "crops/S1-P01-B2.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 198.6,
+     "centroid_y_px": 198.8,
+     "bbox_x_px": 187,
+     "bbox_y_px": 188,
+     "bbox_w_px": 24,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 18.05139278773483,
+     "centroid_y_mm": 18.075577629021808,
+     "length_mm": 2.2119136473811705,
+     "width_mm": 2.090909090909091,
+     "area_mm2": 3.479338842975207,
+     "perimeter_mm": 6.841348545085367,
+     "ced_mm": 2.104764073336753,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.279988400724446,
+     "length_mm_inner": 2.1281272564944773,
+     "width_mm_outer": 2.181818181818182,
+     "width_mm_inner": 2.0,
+     "size_uncertainty": 0.06865600038670895,
+     "convex_area_mm2": 3.673553719008264,
+     "convex_perimeter_mm": 6.846424026922746,
+     "aspect_ratio": 1.0170616850234522,
+     "circularity": 0.9341640621451958,
+     "solidity": 0.9471316085489314,
+     "roundness": 0.9832245327154776,
+     "major_mm": 2.122643543249743,
+     "minor_mm": 2.0870352059332546,
+     "feret_ratio": 1.0578717443996903,
+     "perimeter_subpixel_mm": 6.594914269809488,
+     "circularity_subpixel": 0.9991340542504147,
+     "solidity_subpixel": 0.9999998521794647,
+     "color_L": 44.9120312777679,
+     "color_a": 59.90634441087613,
+     "color_b": 39.25075528700906,
+     "color_L_sd": 1.771771586580175,
+     "color_a_sd": 2.1260125909717167,
+     "color_b_sd": 3.2639138883599776,
+     "color_hex": "#c92c2c",
+     "color_R": 201.2356495468278,
+     "color_G": 44.2809667673716,
+     "color_B": 44.2809667673716,
+     "color_H": 0.0,
+     "color_S": 198.87311178247734,
+     "color_V": 201.2356495468278,
+     "opacity": 0.8464566929133859,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "pellet",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9984325765710376,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 0.0015674234289624334,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": false,
+     "flag_bundle": "",
+     "review_reason": "",
+     "review_status": "rejected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:00:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2-1",
+     "particle_ref": "S1-P01-B2-1",
+     "crop_file": "",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 193.0,
+     "centroid_y_px": 198.9,
+     "bbox_x_px": 187,
+     "bbox_y_px": 188,
+     "bbox_w_px": 11,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 17.54936461388074,
+     "centroid_y_mm": 18.07820136852395,
+     "length_mm": 2.1086206372260365,
+     "width_mm": 1.0,
+     "area_mm2": 1.537190082644628,
+     "perimeter_mm": 5.1700052440989825,
+     "ced_mm": 1.399003645812924,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.2727272727272725,
+     "length_mm_inner": 2.0185093919249564,
+     "width_mm_outer": 1.909090909090909,
+     "width_mm_inner": 0.9090909090909091,
+     "size_uncertainty": 0.12056122202083196,
+     "convex_area_mm2": 1.6322314049586777,
+     "convex_perimeter_mm": 5.322123961015181,
+     "aspect_ratio": 1.9907767791376176,
+     "circularity": 0.7226957000015051,
+     "solidity": 0.9417721518987342,
+     "roundness": 0.5023164879556155,
+     "major_mm": 1.9739226456005248,
+     "minor_mm": 0.9915338908341125,
+     "feret_ratio": 2.1086206372260365,
+     "perimeter_subpixel_mm": 5.496709210776505,
+     "circularity_subpixel": 0.7921328477172951,
+     "solidity_subpixel": 0.9999998398266416,
+     "color_L": 44.969463195114116,
+     "color_a": 59.868852459016395,
+     "color_b": 39.13934426229508,
+     "color_L_sd": 1.716321321017357,
+     "color_a_sd": 2.0603629302773743,
+     "color_b_sd": 3.2170538751444364,
+     "color_hex": "#c92d2d",
+     "color_R": 201.327868852459,
+     "color_G": 44.59016393442623,
+     "color_B": 44.59016393442623,
+     "color_H": 0.0,
+     "color_S": 198.49180327868854,
+     "color_V": 201.327868852459,
+     "opacity": 0.84251968503937,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "fragment",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.5,
+     "morphology_runner_up": "fiber",
+     "morphology_runner_up_confidence": 0.02750445638708099,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": true,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "multi_blob;size_uncertain",
+     "review_status": "rejected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": true,
+     "derived_from": "S1-P01-B2",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:02:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2-3",
+     "particle_ref": "S1-P01-B2-3",
+     "crop_file": "",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 198.6,
+     "centroid_y_px": 198.8,
+     "bbox_x_px": 187,
+     "bbox_y_px": 188,
+     "bbox_w_px": 24,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 18.05139278773483,
+     "centroid_y_mm": 18.075577629021808,
+     "length_mm": 2.2119136473811705,
+     "width_mm": 2.090909090909091,
+     "area_mm2": 3.479338842975207,
+     "perimeter_mm": 6.841348545085367,
+     "ced_mm": 2.104764073336753,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.279988400724446,
+     "length_mm_inner": 2.1281272564944773,
+     "width_mm_outer": 2.181818181818182,
+     "width_mm_inner": 2.0,
+     "size_uncertainty": 0.06865600038670895,
+     "convex_area_mm2": 3.673553719008264,
+     "convex_perimeter_mm": 6.846424026922746,
+     "aspect_ratio": 1.0170616850234522,
+     "circularity": 0.9341640621451958,
+     "solidity": 0.9471316085489314,
+     "roundness": 0.9832245327154776,
+     "major_mm": 2.122643543249743,
+     "minor_mm": 2.0870352059332546,
+     "feret_ratio": 1.0578717443996903,
+     "perimeter_subpixel_mm": 6.594914269809488,
+     "circularity_subpixel": 0.9991340542504147,
+     "solidity_subpixel": 0.9999998521794647,
+     "color_L": 44.9120312777679,
+     "color_a": 59.90634441087613,
+     "color_b": 39.25075528700906,
+     "color_L_sd": 1.771771586580175,
+     "color_a_sd": 2.1260125909717167,
+     "color_b_sd": 3.2639138883599776,
+     "color_hex": "#c92c2c",
+     "color_R": 201.2356495468278,
+     "color_G": 44.2809667673716,
+     "color_B": 44.2809667673716,
+     "color_H": 0.0,
+     "color_S": 198.87311178247734,
+     "color_V": 201.2356495468278,
+     "opacity": 0.8464566929133859,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "pellet",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9984325765710376,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 0.0015674234289624334,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": false,
+     "flag_bundle": "",
+     "review_reason": "",
+     "review_status": "corrected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": true,
+     "derived_from": "S1-P01-B2-1;S1-P01-B2-2",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:02:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "B2-2",
+     "particle_ref": "S1-P01-B2-2",
+     "crop_file": "",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 204.0,
+     "centroid_y_px": 198.8,
+     "bbox_x_px": 200,
+     "bbox_y_px": 188,
+     "bbox_w_px": 11,
+     "bbox_h_px": 23,
+     "centroid_x_mm": 18.546897546897547,
+     "centroid_y_mm": 18.06926406926407,
+     "length_mm": 2.1086206372260365,
+     "width_mm": 1.0,
+     "area_mm2": 1.5619834710743803,
+     "perimeter_mm": 5.276511869122056,
+     "ced_mm": 1.4102408034072027,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "2-5",
+     "length_mm_outer": 2.2727272727272725,
+     "length_mm_inner": 2.0185093919249564,
+     "width_mm_outer": 1.909090909090909,
+     "width_mm_inner": 0.9090909090909091,
+     "size_uncertainty": 0.12056122202083196,
+     "convex_area_mm2": 1.6611570247933882,
+     "convex_perimeter_mm": 5.342481884089383,
+     "aspect_ratio": 1.982466460791809,
+     "circularity": 0.7050054253394485,
+     "solidity": 0.9402985074626866,
+     "roundness": 0.5044221527967712,
+     "major_mm": 1.985620283551014,
+     "minor_mm": 1.0015908580657376,
+     "feret_ratio": 2.1086206372260365,
+     "perimeter_subpixel_mm": 5.519715633083479,
+     "circularity_subpixel": 0.7955619593108165,
+     "solidity_subpixel": 0.9999997250256101,
+     "color_L": 45.06039215686275,
+     "color_a": 59.72,
+     "color_b": 39.016,
+     "color_L_sd": 1.8668801986946975,
+     "color_a_sd": 2.2648620267027306,
+     "color_b_sd": 3.43856714344798,
+     "color_hex": "#c92d2d",
+     "color_R": 201.4,
+     "color_G": 45.064,
+     "color_B": 45.064,
+     "color_H": 0.0,
+     "color_S": 197.968,
+     "color_V": 201.4,
+     "opacity": 0.84251968503937,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "red",
+     "color_confidence": 1.0,
+     "morphology_label": "fragment",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.5,
+     "morphology_runner_up": "fiber",
+     "morphology_runner_up_confidence": 0.02750445638708099,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": true,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "multi_blob;size_uncertain",
+     "review_status": "rejected",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": true,
+     "derived_from": "S1-P01-B2",
+     "tar_like": "",
+     "reviewed_by": "DS",
+     "reviewer_role": "expert",
+     "reviewed_at": "2026-11-12T10:02:00Z",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "F7",
+     "particle_ref": "S1-P01-F7",
+     "crop_file": "crops/S1-P01-F7.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 875.7,
+     "centroid_y_px": 725.8,
+     "bbox_x_px": 831,
+     "bbox_y_px": 714,
+     "bbox_w_px": 99,
+     "bbox_h_px": 24,
+     "centroid_x_mm": 79.61277968151582,
+     "centroid_y_mm": 65.9789356984479,
+     "length_mm": 9.164249618729302,
+     "width_mm": 1.0257402198289416,
+     "area_mm2": 7.454545454545454,
+     "perimeter_mm": 20.23350386317489,
+     "ced_mm": 3.080815161731231,
+     "fiber_length_mm": 8.690818343593891,
+     "size_length_source": "fiber_length",
+     "size_class": ">5",
+     "length_mm_outer": 9.206537382670664,
+     "length_mm_inner": 8.095504313052068,
+     "width_mm_outer": 1.069043114652627,
+     "width_mm_inner": 0.9174973491412897,
+     "size_uncertainty": 0.12123557474339622,
+     "convex_area_mm2": 8.541322314049587,
+     "convex_perimeter_mm": 19.328179706226695,
+     "aspect_ratio": 9.515426288963953,
+     "circularity": 0.2288172901222619,
+     "solidity": 0.872762457668118,
+     "roundness": 0.10509250659214356,
+     "major_mm": 9.503416595969146,
+     "minor_mm": 0.9987378712597736,
+     "feret_ratio": 8.934279305395263,
+     "perimeter_subpixel_mm": 19.33390436570047,
+     "circularity_subpixel": 0.2378133473928634,
+     "solidity_subpixel": 0.9525112739051838,
+     "color_L": 50.3184789067142,
+     "color_a": 2.793939393939394,
+     "color_b": -44.29848484848485,
+     "color_L_sd": 3.4283987803396614,
+     "color_a_sd": 2.1574310472410545,
+     "color_b_sd": 3.244622237162848,
+     "color_hex": "#327ac3",
+     "color_R": 49.71969696969697,
+     "color_G": 122.36060606060606,
+     "color_B": 195.14545454545456,
+     "color_H": 209.9381979971873,
+     "color_S": 190.3121212121212,
+     "color_V": 195.14545454545456,
+     "opacity": 0.8237704918032787,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "blue",
+     "color_confidence": 1.0,
+     "morphology_label": "fiber",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9999999999508977,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 4.910227779930665e-11,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": true,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "line;size_uncertain",
+     "review_status": "auto",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "",
+     "reviewer_role": "",
+     "reviewed_at": "",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    },
+    {
+     "sample_id": "S1",
+     "picture_label": "S1-P01",
+     "image_id": "quality_white_grid-0547ada4",
+     "photo_file": "quality_white_grid.png",
+     "particle_id": "K9",
+     "particle_ref": "S1-P01-K9",
+     "crop_file": "crops/S1-P01-K9.png",
+     "date": "",
+     "operator": "DS",
+     "lab": "Moore",
+     "setup": "",
+     "site": "",
+     "centroid_x_px": 1122.1,
+     "centroid_y_px": 1385.9,
+     "bbox_x_px": 1118,
+     "bbox_y_px": 1382,
+     "bbox_w_px": 9,
+     "bbox_h_px": 9,
+     "centroid_x_mm": 102.008658008658,
+     "centroid_y_mm": 125.991341991342,
+     "length_mm": 0.9090909090909091,
+     "width_mm": 0.8181818181818181,
+     "area_mm2": 0.5206611570247934,
+     "perimeter_mm": 2.580434210077294,
+     "ced_mm": 0.8142029074693427,
+     "fiber_length_mm": "",
+     "size_length_source": "max_feret",
+     "size_class": "0.5-1",
+     "length_mm_outer": 0.9359663764533637,
+     "length_mm_inner": 0.7820295697311478,
+     "width_mm_outer": 0.8181818181818181,
+     "width_mm_inner": 0.6363636363636364,
+     "size_uncertainty": 0.1693304873944374,
+     "convex_area_mm2": 0.578512396694215,
+     "convex_perimeter_mm": 2.749530467120084,
+     "aspect_ratio": 1.0493274518269524,
+     "circularity": 0.982606112288872,
+     "solidity": 0.9,
+     "roundness": 0.9529913643819479,
+     "major_mm": 0.834042470942608,
+     "minor_mm": 0.7948352723360871,
+     "feret_ratio": 1.1111111111111112,
+     "perimeter_subpixel_mm": 2.3844437954650908,
+     "circularity_subpixel": 0.9943904203156393,
+     "solidity_subpixel": 1.0,
+     "color_L": 73.92789373814043,
+     "color_a": -0.7741935483870968,
+     "color_b": 66.25806451612904,
+     "color_L_sd": 1.844417894530985,
+     "color_a_sd": 1.360969232885741,
+     "color_b_sd": 4.340118490544549,
+     "color_hex": "#d4b32e",
+     "color_R": 212.29032258064515,
+     "color_G": 178.93548387096774,
+     "color_B": 46.38709677419355,
+     "color_H": 47.81249999999999,
+     "color_S": 199.58064516129033,
+     "color_V": 212.29032258064515,
+     "opacity": 0.8174273858921162,
+     "color_secondary": "",
+     "color_secondary_fraction": 0.0,
+     "color_label": "yellow",
+     "color_confidence": 1.0,
+     "morphology_label": "pellet",
+     "morphology_source": "rule",
+     "morphology_confidence": 0.9935489282992781,
+     "morphology_runner_up": "fragment",
+     "morphology_runner_up_confidence": 0.0064510717007219,
+     "flag_edge": false,
+     "flag_merged": false,
+     "flag_low_confidence": "",
+     "flag_scale": false,
+     "flag_near_cutoff": false,
+     "flag_min_width": false,
+     "flag_low_contrast": false,
+     "flag_line": false,
+     "flag_multi_blob": false,
+     "flag_width_unresolved": false,
+     "flag_size_uncertain": true,
+     "flag_bundle": "",
+     "review_reason": "size_uncertain",
+     "review_status": "auto",
+     "color_label_original": "",
+     "morphology_label_original": "",
+     "outline_edited": false,
+     "derived_from": "",
+     "tar_like": "",
+     "reviewed_by": "",
+     "reviewer_role": "",
+     "reviewed_at": "",
+     "polymer_confirmed": "",
+     "polymer_method": "",
+     "background_type": "white_grid",
+     "mm_per_px": 0.09090909090909091,
+     "scale_source": "markers",
+     "app_version": "0.1.0",
+     "color_rules_version": "0.1-provisional",
+     "model_version": "",
+     "processed_at": "2026-11-18T00:00:00+00:00"
+    }
+   ]
+  },
+  {
+   "decisions": [
+    {
+     "particle_ref": "S1-P01-B2",
+     "action": "split",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:00:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [],
+     "tags": {},
+     "outlines": [
+      [
+       [
+        195,
+        188
+       ],
+       [
+        194,
+        189
+       ],
+       [
+        193,
+        189
+       ],
+       [
+        192,
+        190
+       ],
+       [
+        191,
+        191
+       ],
+       [
+        190,
+        192
+       ],
+       [
+        189,
+        193
+       ],
+       [
+        188,
+        194
+       ],
+       [
+        188,
+        195
+       ],
+       [
+        188,
+        196
+       ],
+       [
+        188,
+        197
+       ],
+       [
+        187,
+        198
+       ],
+       [
+        187,
+        199
+       ],
+       [
+        187,
+        200
+       ],
+       [
+        188,
+        201
+       ],
+       [
+        188,
+        202
+       ],
+       [
+        188,
+        203
+       ],
+       [
+        189,
+        204
+       ],
+       [
+        189,
+        205
+       ],
+       [
+        190,
+        206
+       ],
+       [
+        191,
+        207
+       ],
+       [
+        192,
+        208
+       ],
+       [
+        193,
+        208
+       ],
+       [
+        194,
+        209
+       ],
+       [
+        195,
+        209
+       ],
+       [
+        196,
+        210
+       ],
+       [
+        197,
+        210
+       ],
+       [
+        197,
+        209
+       ],
+       [
+        197,
+        208
+       ],
+       [
+        197,
+        207
+       ],
+       [
+        197,
+        206
+       ],
+       [
+        197,
+        205
+       ],
+       [
+        197,
+        204
+       ],
+       [
+        197,
+        203
+       ],
+       [
+        197,
+        202
+       ],
+       [
+        197,
+        201
+       ],
+       [
+        197,
+        200
+       ],
+       [
+        197,
+        199
+       ],
+       [
+        197,
+        198
+       ],
+       [
+        197,
+        197
+       ],
+       [
+        197,
+        196
+       ],
+       [
+        197,
+        195
+       ],
+       [
+        197,
+        194
+       ],
+       [
+        197,
+        193
+       ],
+       [
+        197,
+        192
+       ],
+       [
+        197,
+        191
+       ],
+       [
+        197,
+        190
+       ],
+       [
+        197,
+        189
+       ],
+       [
+        197,
+        188
+       ],
+       [
+        196,
+        188
+       ]
+      ]
+     ],
+     "merge_with": []
+    }
+   ],
+   "error": "split needs an outline for each piece, at least two.",
+   "type": "ValueError"
+  },
+  {
+   "decisions": [
+    {
+     "particle_ref": "S1-P01-F7",
+     "action": "merge",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:00:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [
+      [
+       1126,
+       1387
+      ],
+      [
+       1125,
+       1389
+      ],
+      [
+       1123,
+       1390
+      ],
+      [
+       1121,
+       1390
+      ],
+      [
+       1119,
+       1389
+      ],
+      [
+       1118,
+       1387
+      ],
+      [
+       831,
+       722
+      ],
+      [
+       831,
+       717
+      ],
+      [
+       832,
+       715
+      ],
+      [
+       833,
+       714
+      ],
+      [
+       838,
+       714
+      ],
+      [
+       905,
+       726
+      ],
+      [
+       916,
+       728
+      ],
+      [
+       929,
+       733
+      ],
+      [
+       1126,
+       1384
+      ]
+     ],
+     "tags": {},
+     "outlines": [],
+     "merge_with": []
+    }
+   ],
+   "error": "merge needs at least one other particle (merge_with).",
+   "type": "ValueError"
+  },
+  {
+   "decisions": [
+    {
+     "particle_ref": "S1-P01-F7",
+     "action": "merge",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:00:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [
+      [
+       1126,
+       1387
+      ],
+      [
+       1125,
+       1389
+      ],
+      [
+       1123,
+       1390
+      ],
+      [
+       1121,
+       1390
+      ],
+      [
+       1119,
+       1389
+      ],
+      [
+       1118,
+       1387
+      ],
+      [
+       831,
+       722
+      ],
+      [
+       831,
+       717
+      ],
+      [
+       832,
+       715
+      ],
+      [
+       833,
+       714
+      ],
+      [
+       838,
+       714
+      ],
+      [
+       905,
+       726
+      ],
+      [
+       916,
+       728
+      ],
+      [
+       929,
+       733
+      ],
+      [
+       1126,
+       1384
+      ]
+     ],
+     "tags": {},
+     "outlines": [],
+     "merge_with": [
+      "S1-P01-K9",
+      "S1-P01-K9"
+     ]
+    }
+   ],
+   "error": "merge lists a particle twice.",
+   "type": "ValueError"
+  },
+  {
+   "decisions": [
+    {
+     "particle_ref": "S1-P01-F7",
+     "action": "merge",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:00:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [
+      [
+       1126,
+       1387
+      ],
+      [
+       1125,
+       1389
+      ],
+      [
+       1123,
+       1390
+      ],
+      [
+       1121,
+       1390
+      ],
+      [
+       1119,
+       1389
+      ],
+      [
+       1118,
+       1387
+      ],
+      [
+       831,
+       722
+      ],
+      [
+       831,
+       717
+      ],
+      [
+       832,
+       715
+      ],
+      [
+       833,
+       714
+      ],
+      [
+       838,
+       714
+      ],
+      [
+       905,
+       726
+      ],
+      [
+       916,
+       728
+      ],
+      [
+       929,
+       733
+      ],
+      [
+       1126,
+       1384
+      ]
+     ],
+     "tags": {},
+     "outlines": [],
+     "merge_with": [
+      "S1-P01-F7"
+     ]
+    }
+   ],
+   "error": "merge lists a particle twice.",
+   "type": "ValueError"
+  },
+  {
+   "decisions": [
+    {
+     "particle_ref": "S1-P01-F7",
+     "action": "merge",
+     "reviewer": "DS",
+     "role": "expert",
+     "at": "2026-11-12T10:00:00Z",
+     "color_label": "",
+     "morphology_label": "",
+     "outline": [],
+     "tags": {},
+     "outlines": [],
+     "merge_with": [
+      "S1-P01-K9"
+     ]
+    }
+   ],
+   "error": "merge needs the merged particle's outline.",
+   "type": "ValueError"
   }
  ]
 }

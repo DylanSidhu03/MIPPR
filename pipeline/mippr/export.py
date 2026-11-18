@@ -55,7 +55,7 @@ COLUMNS = [
     # Quality flags
     *FLAGS, "review_reason",
     # Review
-    "review_status", "color_label_original", "morphology_label_original", "outline_edited", "tar_like",
+    "review_status", "color_label_original", "morphology_label_original", "outline_edited", "derived_from", "tar_like",
     "reviewed_by", "reviewer_role", "reviewed_at",
     # Lab results
     "polymer_confirmed", "polymer_method",

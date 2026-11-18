@@ -158,11 +158,11 @@ Folder: [pipeline/mippr/review/](../pipeline/mippr/review/README.md) (rules for 
 - [x] Decide how 'not plastic' particles are handled and what the output says when the model is unsure. The app doesn't test plastic or polymer, and every export says so. Uncertain particles get `review_reason` flags. `polymer_confirmed` columns are left for the lab.
 - [x] Decide the review columns: `review_status`, `*_original` labels, `outline_edited`, reviewer, role and time; rejected rows stay in particles.csv and leave the summary
 - [x] Apply reviewer decisions (`review/corrections.py`): confirm, reject, relabel, edit outline (re-measured exactly as the pipeline would), tag; original labels kept
-- [ ] Build split and merge. Decided (November 18): split pieces of B4 become B4-1, B4-2, …; the original combined row stays in particles.csv marked rejected
+- [x] Split and merge (November 18): split pieces of B4 become B4-1, B4-2 (the next free numbers in the box); a merge takes B4 if free, else the next free number; the rows replaced stay in particles.csv, marked rejected, and each new row names them in `derived_from`. `review/corrections.py` / `corrections.js` (`split`, `merge`, through `apply_all`), parity-tested; on the review screen: Split (drag a cut line), Merge with… (click the other particle; the merged outline is the hull of both, redraw it if needed).
 - [x] Order the review list: flagged and low-confidence particles first, then unflagged, reviewed, rejected (`review_queue`). Flagged includes `flag_size_uncertain`, so sizes the app isn't sure of are checked first.
 - [ ] Set the `flag_low_confidence` threshold from validation data
 - [x] Build the review screen (`web/src/review/screen.js`): outlines on the photo coloured by status, click or keyboard to select, confirm / reject / relabel, tar-like and bundle tags, review order; the rules are `review/corrections.js`, the port of corrections.py (parity-tested)
-- [ ] Redraw an outline on the review screen (the rules and re-measuring already work: `edit_outline`)
+- [x] Redraw an outline on the review screen (draw round the particle; re-measured with `edit_outline`)
 - [ ] Count how many particles need review and how long it takes
 
 **In:** Rows and overlays from parts 2–5.  

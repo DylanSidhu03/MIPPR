@@ -1,5 +1,5 @@
 // Smoke test of the app in a real browser: upload two sheet photos and one photo without a sheet,
-// measure them, review a few particles with the keyboard, and check the downloaded CSVs.
+// measure them, review a few particles with the keyboard, split one and redraw another, and check the downloads.
 //
 //   node web/scripts/fetch_opencv.mjs   # once
 //   node web/scripts/smoke_ui.mjs       # needs Playwright with Chromium (not an npm dependency of the repo)
@@ -92,6 +92,34 @@ try {
   const b = cw / 12; // B2 is the box in row 2, column 2
   await page.mouse.click(box.x + (1.5 * b * box.width) / cw, box.y + (1.5 * b * box.height) / ch);
   assert.match(await page.textContent(".panel h3"), /^B2/);
+  const at = (bx, by) => [box.x + (bx * b * box.width) / cw, box.y + (by * b * box.height) / ch];
+
+  // Split B2 with a cut line across it: two new rows, B2-1 and B2-2.
+  await page.keyboard.press("s");
+  let [x, y] = at(1.5, 1.2);
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  [x, y] = at(1.5, 1.8);
+  await page.mouse.move(x, y, { steps: 5 });
+  await page.mouse.up();
+  assert.match(await page.textContent(".panel h3"), /^B2-1/);
+
+  // Merge the two pieces back: one particle, B2-3 (B2, B2-1 and B2-2 stay in the file as rejected).
+  await page.keyboard.press("g");
+  for (const bx of [1.42, 1.58]) await page.mouse.click(...at(bx, 1.5)); // one of the two is B2-1 itself
+  assert.match(await page.textContent(".panel h3"), /^B2-3/);
+
+  // Redraw K9's outline (row K, column 9) by drawing round it.
+  [x, y] = at(8.5, 10.5);
+  await page.mouse.click(x, y);
+  assert.match(await page.textContent(".panel h3"), /^K9/);
+  await page.keyboard.press("r");
+  const ring = Array.from({ length: 24 }, (_, k) => at(8.5 + 0.3 * Math.cos((k * Math.PI) / 12), 10.5 + 0.3 * Math.sin((k * Math.PI) / 12)));
+  await page.mouse.move(...ring[0]);
+  await page.mouse.down();
+  for (const p of ring.slice(1)) await page.mouse.move(...p);
+  await page.mouse.up();
+  assert.match(await page.textContent(".panel h3"), /^K9 .*corrected/);
 
   const download = async (name) => {
     const [d] = await Promise.all([page.waitForEvent("download"), page.click(`[data-download="${name}"]`)]);
@@ -102,14 +130,18 @@ try {
   const lines = (await download("particles.csv")).trim().split("\r\n");
   const head = lines[0].split(",");
   const rows = lines.slice(1).map((l) => Object.fromEntries(l.split(",").map((v, i) => [head[i], v])));
-  assert.equal(rows.length, 6);
-  const statuses = rows.filter((r) => r.picture_label === "S042-P02").map((r) => r.review_status).sort();
-  assert.deepEqual(statuses, ["auto", "confirmed", "rejected"]);
-  const rejected = rows.find((r) => r.review_status === "rejected");
+  assert.equal(rows.length, 9); // 6 particles, B2 split in two, then the pieces merged
+  const p2 = rows.filter((r) => r.picture_label === "S042-P02");
+  assert.deepEqual(p2.filter((r) => r.derived_from === "S042-P02-B2").map((r) => r.particle_id), ["B2-1", "B2-2"]);
+  assert.equal(p2.find((r) => r.particle_id === "B2-3").derived_from.split(";").sort().join(";"), "S042-P02-B2-1;S042-P02-B2-2");
+  assert.equal(p2.find((r) => r.particle_id === "B2").review_status, "rejected");
+  assert.equal(p2.find((r) => r.particle_id === "K9").outline_edited, "True");
+  assert.equal(p2.find((r) => r.particle_id === "K9").review_status, "corrected"); // confirmed earlier, then redrawn
+  const rejected = rows.find((r) => r.review_status === "rejected" && r.color_label_original);
   assert.equal(rejected.color_label, "grey");
   assert.ok(rejected.color_label_original && rejected.reviewed_by === "Tester" && rejected.reviewer_role === "expert");
   const summary = (await download("summary.csv")).trim().split("\r\n");
-  assert.equal(summary[1].split(",").slice(0, 3).join(","), "S042,2,5"); // the rejected particle leaves the summary
+  assert.equal(summary[1].split(",").slice(0, 3).join(","), "S042,2,5"); // rejected rows (F7; B2 and its pieces, replaced by B2-3) leave the summary
   // Crops, overlays and the HTML summary.
   const binary = async (name) => {
     const [d] = await Promise.all([page.waitForEvent("download"), page.click(`[data-download="${name}"]`)]);
@@ -129,13 +161,13 @@ try {
     return names;
   };
   const crops = entries(await binary("crops.zip"));
-  assert.deepEqual(crops.sort(), rows.map((r) => r.crop_file).sort());
+  assert.deepEqual(crops.sort(), rows.map((r) => r.crop_file).filter(Boolean).sort());
   assert.deepEqual(entries(await binary("overlays.zip")).sort(), ["S042-P01_overlay.png", "S042-P02_overlay.png"]);
   const html = (await binary("summary.html")).toString();
   assert.match(html, /Sample S042/);
   assert.equal((html.match(/<img src="data:image\/jpeg/g) || []).length, 2);
   assert.deepEqual(errors, []);
-  console.log("smoke test passed: measure, refuse a photo without a sheet, review with keys and clicks, download");
+  console.log("smoke test passed: measure, refuse a photo without a sheet, review with keys and clicks, split, merge, redraw, download");
 } finally {
   await browser.close();
   server.close();

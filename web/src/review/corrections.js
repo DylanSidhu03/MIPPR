@@ -47,7 +47,7 @@ export function decisionFromPython(d) {
   return {
     particleRef: d.particle_ref, action: d.action, reviewer: d.reviewer, role: d.role, at: d.at,
     colorLabel: d.color_label ?? "", morphologyLabel: d.morphology_label ?? "", outline: d.outline ?? [],
-    tags: d.tags ?? {},
+    tags: d.tags ?? {}, outlines: d.outlines ?? [], mergeWith: d.merge_with ?? [],
   };
 }
 
@@ -228,7 +228,7 @@ function reasonOf(row) {
  * - edit_outline: `decision.outline` is re-measured with `context` (context.js, for the row's photo) and
  *   outline_edited is set (status corrected)
  * - tag: `tar_like` / `flag_bundle` set to true or false; the status is not changed
- * - split, merge: not built yet (throws, with name NotImplementedError)
+ * - split, merge: change the list of rows, so they go through applyAll (or split / merge below)
  *
  * Every decision records reviewed_by, reviewer_role and reviewed_at (the latest decision wins).
  */
@@ -236,12 +236,7 @@ export function apply(row, decision, context = null) {
   const d = decision;
   check(row, d);
   if (d.action === "split" || d.action === "merge") {
-    const e = new Error(
-      `${d.action} is not built yet: it turns one row into two (or two into one), which needs rules for the `
-      + "new particle_ids and for the row that is merged away. remeasure() already measures any mask, so it "
-      + "can be built on that once those rules are decided.");
-    e.name = "NotImplementedError";
-    throw e;
+    throw new Error(`${d.action} changes the list of rows: use apply_all (or ${d.action}()).`);
   }
   let out = { ...row };
   if (d.action === "edit_outline") {
@@ -328,24 +323,115 @@ export function remeasure(row, outline, context) {
   return out;
 }
 
+// ── Split and merge (corrections.py; decided November 18, 2026) ────────────
+// Split: each piece is measured from its own outline and gets the next free number in its box (B4 -> B4-1,
+// B4-2). Merge: one row from the merged outline, with the box label if free, else the next free number. The
+// rows replaced stay, marked rejected; each new row names them in derived_from.
+
+const boxOf = (id) => String(id).split("-")[0];
+
+function freeIds(rows, pictureLabel, box, n, bareFirst = false) {
+  const used = new Set(rows.filter((r) => r.picture_label === pictureLabel).map((r) => r.particle_id));
+  const out = [];
+  if (bareFirst && !used.has(box)) out.push(box);
+  for (let k = 1; out.length < n; k++) if (!used.has(`${box}-${k}`)) out.push(`${box}-${k}`);
+  return out;
+}
+
+function newRow(base, outline, context, particleId, derivedFrom, d) {
+  if (context === null || context === undefined) {
+    throw new Error(`${d.action} needs the photo's MeasureContext to measure the new outlines.`);
+  }
+  return { ...remeasure(base, outline, context), particle_id: particleId,
+    particle_ref: `${base.picture_label}-${particleId}`, crop_file: "", derived_from: derivedFrom,
+    review_status: "corrected", reviewed_by: d.reviewer, reviewer_role: d.role, reviewed_at: d.at };
+}
+
+function setMultiBlob(rows, pictureLabel, box) {
+  const mine = rows.filter((r) => r.picture_label === pictureLabel && boxOf(r.particle_id) === box
+    && r.review_status !== "rejected");
+  for (const r of mine) {
+    r.flag_multi_blob = mine.length > 1;
+    r.review_reason = reasonOf(r);
+  }
+}
+
+const retire = (row, d) => ({ ...row, review_status: "rejected", reviewed_by: d.reviewer, reviewer_role: d.role,
+  reviewed_at: d.at });
+
+function indexOf(rows, ref) {
+  const i = rows.findIndex((r) => r.particle_ref === ref);
+  if (i < 0) throw new Error(`No particle ${repr(ref)} for this decision.`);
+  return i;
+}
+
+/** New rows: the decision's particle replaced by one row per outline in `decision.outlines`. */
+export function split(rows, decision, context) {
+  const d = decision;
+  const i = indexOf(rows, d.particleRef);
+  check(rows[i], d);
+  if ((d.outlines ?? []).length < 2) throw new Error("split needs an outline for each piece, at least two.");
+  const old = rows[i];
+  const box = boxOf(old.particle_id);
+  const ids = freeIds(rows, old.picture_label, box, d.outlines.length);
+  const pieces = d.outlines.map((o, k) => newRow(old, o, context, ids[k], old.particle_ref, d));
+  const out = [...rows.slice(0, i).map((r) => ({ ...r })), retire(old, d), ...pieces,
+    ...rows.slice(i + 1).map((r) => ({ ...r }))];
+  setMultiBlob(out, old.picture_label, box);
+  return out;
+}
+
 /**
- * All decisions applied in time order (ties keep their given order). Returns new rows in the same order.
- * `contexts` maps image_id to that photo's context (a Map or an object), needed for edit_outline.
+ * New rows: the decision's particle and `decision.mergeWith` replaced by one row, measured from
+ * `decision.outline` (the merged particle's outline, drawn or the union of theirs).
+ */
+export function merge(rows, decision, context) {
+  const d = decision;
+  const i = indexOf(rows, d.particleRef);
+  check(rows[i], d);
+  if (!(d.mergeWith ?? []).length) throw new Error("merge needs at least one other particle (merge_with).");
+  if (d.outline === null || d.outline === undefined || d.outline.length < 3) {
+    throw new Error("merge needs the merged particle's outline.");
+  }
+  const old = rows[i];
+  const others = d.mergeWith.map((ref) => indexOf(rows, ref));
+  if (others.includes(i) || new Set(others).size !== others.length) throw new Error("merge lists a particle twice.");
+  if (others.some((j) => rows[j].image_id !== old.image_id)) throw new Error("Only particles on the same photo can be merged.");
+  const box = boxOf(old.particle_id);
+  const refs = [old.particle_ref, ...others.map((j) => rows[j].particle_ref)];
+  const [pid] = freeIds(rows, old.picture_label, box, 1, true);
+  const fresh = newRow(old, d.outline, context, pid, refs.join(";"), d);
+  const gone = new Set([...others, i]);
+  const out = [];
+  rows.forEach((r, j) => {
+    out.push(gone.has(j) ? retire(r, d) : { ...r });
+    if (j === i) out.push(fresh);
+  });
+  for (const b of new Set([box, ...others.map((j) => boxOf(rows[j].particle_id))])) setMultiBlob(out, old.picture_label, b);
+  return out;
+}
+
+/**
+ * All decisions applied in time order (ties keep their given order). Returns new rows: in the same order, with
+ * split and merge rows inserted after the particle they replace. `contexts` maps image_id to that photo's
+ * context (a Map or an object), needed for edit_outline, split and merge.
  */
 export function applyAll(rows, decisions, contexts = null) {
-  const index = new Map();
-  rows.forEach((r, i) => {
-    if (index.has(r.particle_ref)) throw new Error(`Two rows share particle_ref ${repr(r.particle_ref)}.`);
-    index.set(r.particle_ref, i);
-  });
-  const out = rows.map((r) => ({ ...r }));
+  const seen = new Set();
+  for (const r of rows) {
+    if (seen.has(r.particle_ref)) throw new Error(`Two rows share particle_ref ${repr(r.particle_ref)}.`);
+    seen.add(r.particle_ref);
+  }
+  let out = rows.map((r) => ({ ...r }));
   const timed = decisions.map((d) => [parseTime(d.at), d]);
   timed.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
   const contextOf = (id) => (contexts instanceof Map ? contexts.get(id) : contexts?.[id]) ?? null;
   for (const [, d] of timed) {
-    if (!index.has(d.particleRef)) throw new Error(`No particle ${repr(d.particleRef)} for this decision.`);
-    const i = index.get(d.particleRef);
-    out[i] = apply(out[i], d, contextOf(out[i].image_id));
+    const i = indexOf(out, d.particleRef);
+    const ctx = contextOf(out[i].image_id);
+    if (d.action === "split") out = split(out, d, ctx);
+    else if (d.action === "merge") out = merge(out, d, ctx);
+    else out[i] = apply(out[i], d, ctx);
   }
   return out;
 }

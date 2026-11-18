@@ -213,9 +213,36 @@ def main():
     outlines.append(sequence(rows, k9, [d(k9, "edit_outline", outline=[1.0, 2.0, 3.0, 4.0])], ctx))
     outlines.append(sequence(rows, k9, [d(k9, "edit_outline", outline=[[-50, -50], [-10, -50], [-30, -10]])], ctx))
 
+    # Split and merge, through apply_all with the photo's context.
+    def lst(ds):
+        res = run(lambda: {"rows": apply_all(rows, ds, {rows[0]["image_id"]: ctx})})
+        return {"decisions": [dataclasses.asdict(x) for x in ds],
+                **(res if "error" in res else {"out": [row_json(r) for r in res["rows"]]})}
+    b2mask = labels == labels[int(round(by_ref[b2]["centroid_y_px"])), int(round(by_ref[b2]["centroid_x_px"]))]
+    xs = np.nonzero(b2mask.any(axis=0))[0]
+    cut = (xs.min() + xs.max()) // 2
+    left, right = b2mask.copy(), b2mask.copy()
+    left[:, cut:] = False
+    right[:, :cut + 2] = False
+    masks = {ref: labels == labels[int(round(by_ref[ref]["centroid_y_px"])), int(round(by_ref[ref]["centroid_x_px"]))]
+             for ref in (f7, k9)}
+    hull = cv2.convexHull(cv2.findNonZero((masks[f7] | masks[k9]).astype(np.uint8))).reshape(-1, 2).tolist()
+    split_d = d(b2, "split", outlines=[polygon(left), polygon(right)])
+    lists = [
+        lst([split_d]),
+        lst([split_d, d("S1-P01-B2-1", "split", "2026-11-12T10:01:00Z", outlines=[polygon(left), polygon(left)])]),
+        lst([d(f7, "merge", outline=hull, merge_with=[k9])]),
+        lst([split_d, d("S1-P01-B2-1", "merge", "2026-11-12T10:02:00Z", outline=polygon(b2mask), merge_with=["S1-P01-B2-2"])]),
+        lst([d(b2, "split", outlines=[polygon(left)])]),
+        lst([d(f7, "merge", outline=hull)]),
+        lst([d(f7, "merge", outline=hull, merge_with=[k9, k9])]),
+        lst([d(f7, "merge", outline=hull, merge_with=[f7])]),
+        lst([d(f7, "merge", merge_with=[k9])]),
+    ]
+
     out = {"file": PHOTO.name, **SAMPLE, "processed_at": PROCESSED_AT, "rows": [row_json(r) for r in rows],
            "sequences": sequences, "apply_all": apply_alls, "times": time_cases, "queues": queues,
-           "outlines": outlines}
+           "outlines": outlines, "lists": lists}
     (FIX / "review.json").write_text(json.dumps(out, indent=1))
     print(f"{len(sequences)} sequences, {len(apply_alls)} apply_all cases, {len(time_cases)} times, "
           f"{len(queues)} queues, {len(outlines)} outline cases -> {FIX / 'review.json'}")

@@ -37,7 +37,7 @@ export const COLUMNS = Object.freeze([
   "morphology_label", "morphology_source", "morphology_confidence", "morphology_runner_up",
   "morphology_runner_up_confidence",
   ...FLAGS, "review_reason",
-  "review_status", "color_label_original", "morphology_label_original", "outline_edited", "tar_like",
+  "review_status", "color_label_original", "morphology_label_original", "outline_edited", "derived_from", "tar_like",
   "reviewed_by", "reviewer_role", "reviewed_at",
   "polymer_confirmed", "polymer_method",
   "background_type", "mm_per_px", "scale_source",

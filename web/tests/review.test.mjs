@@ -104,6 +104,25 @@ function close(got, want, where) {
   }
 }
 
+test("split and merge match Python (new ids, rejected originals, derived_from, re-measured pieces)", { skip }, () => {
+  const context = photoContext(cv, readPngMat(cv, new URL(ref.file, fixtures).pathname));
+  try {
+    for (const c of ref.lists) {
+      const decisions = c.decisions.map(decisionFromPython);
+      const contexts = { [rows[0].image_id]: context };
+      if (c.error) {
+        assert.throws(() => applyAll(rows, decisions, contexts), { message: c.error });
+        continue;
+      }
+      const out = applyAll(rows, decisions, contexts);
+      assert.deepEqual(out.map((r) => r.particle_ref), c.out.map((r) => r.particle_ref));
+      out.forEach((r, i) => close(r, fromJson(c.out[i]), `${c.decisions.map((x) => x.action).join("+")} row ${i}`));
+    }
+  } finally {
+    context.delete();
+  }
+});
+
 test("edit_outline re-measures like Python", { skip }, () => {
   const img = readPngMat(cv, new URL(ref.file, fixtures));
   const context = photoContext(cv, img);

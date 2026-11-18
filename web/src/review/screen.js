@@ -1,7 +1,14 @@
 // Part 6: the review screen. The photo's flattened grid with every outline, a panel for the selected
 // particle, and the particle table in review order. Decisions go through corrections.js, the twin of
 // pipeline/mippr/review/corrections.py, so labels change, numbers don't, and the prediction is kept.
-import { REVIEW_COLORS, REVIEW_MORPHOLOGIES, apply, reviewQueue } from "./corrections.js";
+import { REVIEW_COLORS, REVIEW_MORPHOLOGIES, apply, merge, reviewQueue, split } from "./corrections.js";
+import { cutPieces, mergedOutline, pathOutline, polygonsMask } from "./edit.js";
+
+const HINTS = {
+  split: "Drag a line across the particle where it should be cut.",
+  merge: "Click the other particle that is part of this one.",
+  redraw: "Draw round the particle, holding the mouse button down; let go to finish.",
+};
 
 const isTrue = (v) => v === true || v === "True";
 const fmt = (v, d = 2) => (typeof v === "number" && Number.isFinite(v) ? v.toFixed(d) : v === "" || v == null ? "–" : String(v));
@@ -70,7 +77,8 @@ export class ReviewScreen {
    * getReviewer(): {reviewer, role}; onChange(): called after every decision.
    */
   constructor(container, photo, { getReviewer, onChange }) {
-    Object.assign(this, { container, photo, getReviewer, onChange, selected: null, message: "" });
+    Object.assign(this, { container, photo, getReviewer, onChange, selected: null, message: "", mode: null, path: null });
+    this.context = photo.context ?? null; // context.js: needed to measure edited outlines
     const { width, height, rgba } = photo.display;
     this.base = document.createElement("canvas");
     Object.assign(this.base, { width, height });
@@ -99,27 +107,151 @@ export class ReviewScreen {
     this.panel = this.container.querySelector(".panel");
     this.tbody = this.container.querySelector("tbody");
     this.canvas.addEventListener("click", (e) => this.clickAt(e));
+    this.canvas.addEventListener("pointerdown", (e) => this.pointerDown(e));
+    this.canvas.addEventListener("pointermove", (e) => this.pointerMove(e));
+    this.canvas.addEventListener("pointerup", (e) => this.pointerUp(e));
     this.tbody.addEventListener("click", (e) => {
       const tr = e.target.closest("tr[data-i]");
       if (tr) this.select(Number(tr.dataset.i));
     });
   }
 
-  clickAt(e) {
+  toGrid(e) {
     const r = this.canvas.getBoundingClientRect();
-    const pt = [((e.clientX - r.left) * this.canvas.width) / r.width, ((e.clientY - r.top) * this.canvas.height) / r.height];
+    return [((e.clientX - r.left) * this.canvas.width) / r.width, ((e.clientY - r.top) * this.canvas.height) / r.height];
+  }
+
+  clickAt(e) {
+    if (this.mode === "split" || this.mode === "redraw") return; // drawing, not selecting
+    const r = this.canvas.getBoundingClientRect();
+    const pt = this.toGrid(e);
     let best = null, bestD = (12 * this.canvas.width) / r.width; // within about 12 screen px of an outline
+    const reach = bestD;
     this.photo.outlines.forEach((polys, i) => {
+      // A rejected row's outline (e.g. a particle replaced by its split pieces) loses to a kept one under it.
+      const penalty = this.photo.rows[i].review_status === "rejected" ? reach / 2 : 0;
       for (const poly of polys) {
-        const d = inside(pt, poly) ? 0 : distToPoly(pt, poly);
+        const d = (inside(pt, poly) ? 0 : distToPoly(pt, poly)) + penalty;
         if (d < bestD) (best = i), (bestD = d);
       }
     });
-    if (best !== null) this.select(best);
+    if (best === null) return;
+    if (this.mode === "merge") this.finishMerge(best);
+    else this.select(best);
+  }
+
+  // ── Outline tools: split, merge, redraw ──────────────────────────────────
+
+  startMode(mode) {
+    if (this.selected === null) return;
+    if (!this.context) {
+      this.message = "The outline tools need the photo's measurements; measure the photo again to use them.";
+      return this.renderPanel();
+    }
+    this.mode = this.mode === mode ? null : mode;
+    this.message = this.mode ? HINTS[mode] : "";
+    this.render();
+  }
+
+  cancelMode() {
+    this.mode = this.path = null;
+    this.message = "";
+    this.render();
+  }
+
+  pointerDown(e) {
+    if (this.mode !== "split" && this.mode !== "redraw") return;
+    this.path = [this.toGrid(e)];
+    this.canvas.setPointerCapture?.(e.pointerId);
+    e.preventDefault();
+  }
+
+  pointerMove(e) {
+    if (!this.path) return;
+    this.path.push(this.toGrid(e));
+    this.draw();
+    const ctx = this.canvas.getContext("2d");
+    ctx.strokeStyle = "#d6336c";
+    ctx.lineWidth = Math.max(2, this.canvas.width / 450);
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    const pts = this.mode === "split" ? [this.path[0], this.path[this.path.length - 1]] : this.path;
+    pts.forEach(([x, y], k) => (k ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+    ctx.stroke();
+  }
+
+  pointerUp(e) {
+    if (!this.path) return;
+    this.path.push(this.toGrid(e));
+    const path = this.path;
+    this.path = null;
+    if (this.mode === "split") this.finishSplit(path[0], path[path.length - 1]);
+    else this.finishRedraw(path);
+  }
+
+  maskOf(i) {
+    const { width, height } = this.photo.display;
+    return polygonsMask(this.context.cv, this.photo.outlines[i], width, height);
+  }
+
+  finishSplit(p0, p1) {
+    const { width, height } = this.photo.display;
+    const pieces = cutPieces(this.context.cv, this.maskOf(this.selected), width, height, p0, p1);
+    if (pieces.length < 2) {
+      this.message = "That line doesn't cut the particle in two. Drag it right across the particle.";
+      return this.render();
+    }
+    this.listDecision({ action: "split", outlines: pieces }, pieces.map((p) => [p]));
+  }
+
+  finishMerge(other) {
+    if (other === this.selected) return;
+    const { width, height } = this.photo.display;
+    const outline = mergedOutline(this.context.cv, [this.maskOf(this.selected), this.maskOf(other)], width, height);
+    this.listDecision({ action: "merge", outline, mergeWith: [this.photo.rows[other].particle_ref] }, [[outline]]);
+  }
+
+  finishRedraw(path) {
+    const outline = pathOutline(path);
+    if (!outline) {
+      this.message = "Draw round the particle, holding the mouse button down.";
+      return this.render();
+    }
+    const i = this.selected;
+    this.mode = null;
+    if (this.decide({ action: "edit_outline", outline })) {
+      this.photo.outlines[i] = [outline];
+      this.render();
+    }
+  }
+
+  /** A split or merge: new rows from corrections.js, and their outlines (`newOutlines`, in order). */
+  listDecision(partial, newOutlines) {
+    const row = this.photo.rows[this.selected];
+    const { reviewer, role } = this.getReviewer();
+    const d = { particleRef: row.particle_ref, reviewer, role, at: new Date().toISOString(), ...partial };
+    let rows;
+    try {
+      rows = (partial.action === "split" ? split : merge)(this.photo.rows, d, this.context);
+    } catch (e) {
+      this.message = e.message === "A decision needs a reviewer." ? "Enter your name above first." : e.message;
+      return this.renderPanel();
+    }
+    const byRef = new Map(this.photo.rows.map((r, i) => [r.particle_ref, this.photo.outlines[i]]));
+    const fresh = [...newOutlines];
+    this.photo.outlines = rows.map((r) => byRef.get(r.particle_ref) ?? fresh.shift());
+    this.photo.rows = rows;
+    (this.photo.decisions ??= []).push({ particleRef: row.particle_ref, reviewer, role, ...partial });
+    this.mode = null;
+    this.message = "";
+    this.selected = rows.findIndex((r) => !byRef.has(r.particle_ref));
+    this.onChange?.();
+    this.render();
   }
 
   select(i) {
     this.selected = i;
+    this.mode = null;
     this.message = "";
     this.render();
   }
@@ -155,6 +287,11 @@ export class ReviewScreen {
         <button data-act="reject">Reject <kbd>X</kbd></button>
         <button data-act="prev">◀ <kbd>P</kbd></button>
         <button data-act="next">▶ <kbd>N</kbd></button>
+      </div>
+      <div class="actions">
+        <button data-act="split"${this.mode === "split" ? ' aria-pressed="true"' : ""}>Split <kbd>S</kbd></button>
+        <button data-act="merge"${this.mode === "merge" ? ' aria-pressed="true"' : ""}>Merge with… <kbd>G</kbd></button>
+        <button data-act="redraw"${this.mode === "redraw" ? ' aria-pressed="true"' : ""}>Redraw outline <kbd>R</kbd></button>
       </div>
       <div class="actions">
         <label>Colour <select data-relabel="color">${options(REVIEW_COLORS, r.color_label)}</select></label>
@@ -199,25 +336,26 @@ export class ReviewScreen {
   }
 
   act(name) {
+    if (name === "split" || name === "merge" || name === "redraw") return this.startMode(name);
     if (name === "next") return this.step(1);
     if (name === "prev") return this.step(-1);
     this.decide({ action: name });
   }
 
   decide(partial) {
-    if (this.selected === null) return;
+    if (this.selected === null) return false;
     const row = this.photo.rows[this.selected];
     const { reviewer, role } = this.getReviewer();
     try {
       this.photo.rows[this.selected] = apply(row, {
         particleRef: row.particle_ref, reviewer, role, at: new Date().toISOString(), ...partial,
-      });
+      }, this.context);
       (this.photo.decisions ??= []).push({ particleRef: row.particle_ref, reviewer, role, ...partial });
       this.message = "";
     } catch (e) {
       this.message = e.message === "A decision needs a reviewer." ? "Enter your name above first." : e.message;
       this.renderPanel();
-      return;
+      return false;
     }
     this.onChange?.();
     if (partial.action === "confirm" || partial.action === "reject") {
@@ -225,6 +363,7 @@ export class ReviewScreen {
       this.selected = next ?? this.selected;
     }
     this.render();
+    return true;
   }
 
   /** Keyboard shortcuts; returns true when the key was used. */
@@ -240,6 +379,10 @@ export class ReviewScreen {
     else if (k === "m") this.panel.querySelector('[data-relabel="morphology"]')?.focus();
     else if (k === "t" && r) this.decide({ action: "tag", tags: { tar_like: !isTrue(r.tar_like) } });
     else if (k === "b" && r) this.decide({ action: "tag", tags: { flag_bundle: !isTrue(r.flag_bundle) } });
+    else if (k === "s") this.startMode("split");
+    else if (k === "g") this.startMode("merge");
+    else if (k === "r") this.startMode("redraw");
+    else if (k === "escape" && this.mode) this.cancelMode();
     else return false;
     return true;
   }

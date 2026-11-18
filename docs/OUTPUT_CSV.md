@@ -155,6 +155,7 @@ On the lab's fragment_area sample (24 particles) these match ImageJ's own result
 | `review_status` | Review | `auto` (not reviewed), `confirmed`, `corrected` or `rejected`. Rejected rows stay in `particles.csv`, where they serve as negative examples for training, but are left out of `summary.csv`. | v1 |
 | `color_label_original`, `morphology_label_original` | Review | The prediction before a correction; empty if unchanged. The label columns hold the corrected value. | v2 / v3 |
 | `outline_edited` | Review | True if the reviewer redrew, split or merged the outline. Measurements then come from the edited outline. | v1 |
+| `derived_from` | Review | On a row made by a split or merge, the `particle_ref`(s) it replaces, separated by semicolons. Split pieces of B4 are numbered B4-1, B4-2 (the next free numbers in the box); a merge takes the box label (B4) if free, else the next free number. The rows replaced stay in the file, marked rejected. | v1 |
 | `tar_like` | Review | Optional tag a reviewer ticks for tar-like particles (the lab notes ~900). The app does not detect tar. | v1 |
 | `reviewed_by`, `reviewer_role`, `reviewed_at` | Review | Who reviewed, `expert` or `community`, and when. Expert-confirmed rows can be weighted more in training and used for the gold test set. | v1 |
 
@@ -249,6 +250,7 @@ Column names stay the same across releases. Columns not yet available are left e
 - **November 18, 2026:** ImageJ is the main guideline for every measurement. `perimeter_mm`, `circularity` and `aspect_ratio` are now ImageJ's (Perim., Circ., AR from the fitted ellipse); `roundness`, `major_mm`, `minor_mm` were added. The other methods are kept as `feret_ratio` (used by the rules), `perimeter_subpixel_mm` and `circularity_subpixel`, replacing `perimeter_imagej_mm` and `circularity_imagej`. Mean RGB and HSV were added back as `color_R` … `color_V`.
 - **November 18, 2026:** `scale_source = paper_edges`: when all four paper edges are in the photo, the app measures how the printer scaled the sheet and corrects the scale if it is off by more than 1% (a `printer_scaled` photo problem says so).
 - **November 18, 2026:** `photo_file` and `crop_file` (the full photo and each particle's crop, as the user asked), `solidity_subpixel` (used by the pellet rule), and the crops, overlay and HTML summary downloads.
+- **November 18, 2026:** `derived_from`, for split and merge.
 - **November 12, 2026 (size check):** `length_mm_outer`, `length_mm_inner`, `width_mm_outer`, `width_mm_inner`, `size_uncertainty` and `flag_size_uncertain` added, so a size that depends strongly on where the edge is drawn is flagged for review.
 - **No "likely plastic" column:** it stays out of scope, unless the lab asks for it.
 
