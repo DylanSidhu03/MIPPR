@@ -94,7 +94,7 @@ Folder: [pipeline/mippr/measurement/](../pipeline/mippr/measurement/README.md).
 - [x] Leave width empty with `flag_width_unresolved` when a particle is under about 2 px wide
 - [x] Measure how much each size depends on where the edge is drawn (`measurement/uncertainty.py`): length and width with the edge at 40% and 60% of the particle's contrast, `size_uncertainty`, and `flag_size_uncertain` above a provisional 0.10
 - [ ] Set the `flag_size_uncertain` threshold in testing (part 7), separately for fibers if their fading ends need it
-- [ ] Decide how max Feret is measured: over pixel corners (ImageJ's convention, now) it reads about 1.25 px long even on a perfect disc; at a whole-sheet photo's 10 px/mm that is +0.12 mm, about 6% on a 2 mm particle and 25% near the 0.5 mm cutoff. Option: a sub-pixel Feret from the outline as the headline, with the ImageJ value kept alongside (as for perimeter).
+- [ ] Decide how max Feret is measured: over pixel corners (ImageJ's convention, now) it reads about 1.25 px long even on a perfect disc; at a whole-sheet photo's 10 px/mm that is +0.12 mm, about 6% on a 2 mm particle and 25% near the 0.5 mm cutoff. Option: a sub-pixel Feret from the outline as the headline, with the ImageJ value kept alongside (as for perimeter). On synthetic shapes the sub-pixel length is more consistent (spread 0.58 vs 0.99 px) but reads slightly short; decide on the labelled sheet photos with calipers.
 - [ ] Later decision: which perimeter method gives the headline circularity (sub-pixel or ImageJ-compatible; spec section 5)
 - [ ] Check opacity on real photos of clear films, against the opposite background
 
