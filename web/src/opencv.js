@@ -31,8 +31,14 @@ export function whenReady(mod) {
 
 let loading = null;
 
-/** Load OpenCV.js once in the browser with a classic script tag (the file is UMD, not an ES module). */
-export function loadOpenCV({ src = OPENCV.url, integrity = OPENCV.integrity } = {}) {
+/** The copy served with the site (decided November 18, 2026: no CDN), as an absolute URL. */
+export const OPENCV_LOCAL_URL = new URL(`../${OPENCV.vendorPath}`, import.meta.url).href;
+
+/**
+ * Load OpenCV.js once in the browser with a classic script tag (the file is UMD, not an ES module). By default
+ * the copy served with the site; pass `src: OPENCV.url, integrity: OPENCV.integrity` for the pinned CDN copy.
+ */
+export function loadOpenCV({ src = OPENCV_LOCAL_URL, integrity = null } = {}) {
   loading ??= new Promise((resolve, reject) => {
     const s = document.createElement("script");
     s.src = src;

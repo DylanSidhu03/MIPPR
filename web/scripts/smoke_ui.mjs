@@ -55,7 +55,7 @@ function blankPng(path, w = 400, h = 300) {
 
 const { chromium } = createRequire(import.meta.url)("playwright");
 const server = await serve();
-const base = `http://127.0.0.1:${server.address().port}/web/?opencv=local`;
+const base = `http://127.0.0.1:${server.address().port}/web/${process.env.SMOKE_QUERY ?? ""}`; // SMOKE_QUERY="?worker=off": on the page
 const tmp = mkdtempSync(join(tmpdir(), "mippr-smoke-"));
 blankPng(join(tmp, "not_a_sheet.png"));
 const browser = await chromium.launch();
@@ -64,6 +64,7 @@ try {
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+  if (!process.env.SMOKE_QUERY) page.on("console", (m) => m.type() === "warning" && /Processing on the page/.test(m.text()) && errors.push(m.text()));
   await page.goto(base);
   await page.waitForFunction(() => !document.querySelector("#run").disabled, null, { timeout: 120000 });
   await page.fill("input[name=sampleId]", "S042");
@@ -93,9 +94,16 @@ try {
   await page.mouse.click(box.x + (1.5 * b * box.width) / cw, box.y + (1.5 * b * box.height) / ch);
   assert.match(await page.textContent(".panel h3"), /^B2/);
   const at = (bx, by) => [box.x + (bx * b * box.width) / cw, box.y + (by * b * box.height) / ch];
+  // The photos were measured in the background worker, so the first outline tool loads the photo's context on
+  // the page; wait for the tool's hint.
+  const tool = async (key, hint) => {
+    await page.keyboard.press(key);
+    await page.waitForFunction((h) => document.querySelector(".panel .error")?.textContent.startsWith(h), hint,
+      { timeout: 120000 });
+  };
 
   // Split B2 with a cut line across it: two new rows, B2-1 and B2-2.
-  await page.keyboard.press("s");
+  await tool("s", "Drag a line");
   let [x, y] = at(1.5, 1.2);
   await page.mouse.move(x, y);
   await page.mouse.down();
@@ -105,7 +113,7 @@ try {
   assert.match(await page.textContent(".panel h3"), /^B2-1/);
 
   // Merge the two pieces back: one particle, B2-3 (B2, B2-1 and B2-2 stay in the file as rejected).
-  await page.keyboard.press("g");
+  await tool("g", "Click the other");
   for (const bx of [1.42, 1.58]) await page.mouse.click(...at(bx, 1.5)); // one of the two is B2-1 itself
   assert.match(await page.textContent(".panel h3"), /^B2-3/);
 
@@ -113,7 +121,7 @@ try {
   [x, y] = at(8.5, 10.5);
   await page.mouse.click(x, y);
   assert.match(await page.textContent(".panel h3"), /^K9/);
-  await page.keyboard.press("r");
+  await tool("r", "Draw round");
   const ring = Array.from({ length: 24 }, (_, k) => at(8.5 + 0.3 * Math.cos((k * Math.PI) / 12), 10.5 + 0.3 * Math.sin((k * Math.PI) / 12)));
   await page.mouse.move(...ring[0]);
   await page.mouse.down();

@@ -49,3 +49,7 @@ jobs:
         run: npm install --no-save --no-package-lock playwright@1.63.0 && npx playwright install --with-deps chromium
       - name: The app in a real browser (measure, refuse a photo without a sheet, review, download)
         run: node web/scripts/smoke_ui.mjs
+      - name: The same, processing on the page instead of the background worker
+        run: node web/scripts/smoke_ui.mjs
+        env:
+          SMOKE_QUERY: "?worker=off"

@@ -43,18 +43,18 @@ The website people use: print a background, upload photos, get results, review t
 
 **The one known difference.** On the same photo, OpenCV.js 4.10's flattening differs from Python's OpenCV 5 by up to one grey level on a few pixels, which can flip a pixel right at a particle's edge. So, end to end, text, labels and flags are identical, but numbers can differ slightly: for 2–9 mm particles, area within one pixel (≤ 0.3%) and length exact; a 0.6 mm particle (about 60 px in area) moved 6% in area. Rule confidences, from a steep curve, moved up to about 0.04. Each module on identical inputs matches exactly; this comes only from the flattening's resampling, and could be removed by writing the remap in JS like `subpix.js`'s warp, if exact agreement is wanted.
 
-**The app (`index.html`, `style.css`, `src/app.js`)**: print a background; type the sample details and choose photos; measure (in the browser, a message per photo, refused photos say why); check the results on the review screen (`src/review/screen.js`: the flattened grid with outlines coloured by status, click or keys to select, confirm, reject, relabel, tar-like and bundle tags, in review order, with the rules of `src/review/corrections.js`); download particles.csv, summary.csv, run.json and NOTE.txt. The reviewer's name and role are remembered in the browser. `?opencv=local` loads OpenCV.js from `vendor/` instead of the CDN.
+**The app (`index.html`, `style.css`, `src/app.js`)**: print a background; type the sample details and choose photos; measure (in the browser, a message per photo, refused photos say why); check the results on the review screen (`src/review/screen.js`: the flattened grid with outlines coloured by status, click or keys to select, confirm, reject, relabel, tar-like and bundle tags, in review order, with the rules of `src/review/corrections.js`); download particles.csv, summary.csv, run.json, NOTE.txt, the crops, the overlays and an HTML summary. The reviewer's name and role are remembered in the browser. Photos are measured in a background worker (`src/worker.js`) so the page stays responsive; the outline tools load OpenCV.js on the page the first time they are used. `?worker=off` measures on the page instead (also the fallback when a worker can't start).
 
 `node web/scripts/smoke_ui.mjs` runs the app in Chromium (Playwright): measures two sheet photos, refuses one without a sheet, reviews with keys and a click, and checks the downloaded CSVs. CI runs it too.
 
-Still stubs: `storage/supabase.js` (part 9) and `morphology/model.js` (v3). Not built yet: redrawing an outline on the screen (the rules and re-measuring work), the overlay image download, and a Web Worker for large batches.
+Still stubs: `storage/supabase.js` (part 9) and `morphology/model.js` (v3). 
 
 Shared helpers: `grids.js` (plain pixel grids and the OpenCV.js morphology and contour calls), and `segmentation/edges.js`, whose `edgeLevel` and `fillHolesGrid` the measurement modules use too (merged November 18; the parity tests are unchanged).
 
 ## Technical choices
 
 - **Plain ES modules, no build step** (approved), so Cloudflare Pages serves the folder as is.
-- **OpenCV.js 4.10.0**, the official `docs.opencv.org/4.10.0/opencv.js` build as redistributed in the npm package `@techstark/opencv-js@4.10.0-release.1` (the package says it is the docs.opencv.org file plus a one-line UMD patch; docs.opencv.org was not reachable from the dev container to compare hashes). The browser loads it from jsDelivr with a subresource-integrity hash; the version, URLs and hashes are in `src/opencv.js`. It is a UMD script, so it is loaded with a script tag, not `import`.
+- **OpenCV.js 4.10.0**, the official `docs.opencv.org/4.10.0/opencv.js` build as redistributed in the npm package `@techstark/opencv-js@4.10.0-release.1` (the package says it is the docs.opencv.org file plus a one-line UMD patch; docs.opencv.org was not reachable from the dev container to compare hashes). It is served with the site from `vendor/` (decided November 18, 2026; `web/scripts/fetch_opencv.mjs` fetches it and checks its sha256); the pinned jsDelivr URL and its subresource-integrity hash are kept in `src/opencv.js`. It is a UMD script, so it is loaded with a script tag, not `import`.
 - **Parity tests** against the Python reference, with fixtures made by the Python code and committed.
 
 ### ArUco in OpenCV.js
@@ -91,7 +91,7 @@ Serve the repo root (`python -m http.server`) and open `/web/` to try the page; 
 - [x] Port parts 1–5 module by module, each passing the parity tests, and join them (`pipeline.js`), checked end to end against Python on all three backgrounds
 - [x] Draw the overlay (outlines and box labels) on a canvas for the results and review screens
 - [x] Batch processing in the browser on the user's machine, with a clear message for each failed photo (quality check, part 1)
-- [ ] Run the processing in a Web Worker so the page stays responsive
+- [x] Run the processing in a Web Worker so the page stays responsive (`src/worker.js`)
 - [x] Photo guidance: print at actual size, whole sheet and all four markers in frame, even light, no flash. A photo without the markers is refused with that message (the app only takes the three printed backgrounds).
 - [x] Export particles.csv, summary.csv, run.json, NOTE.txt
 - [x] Downloads: overlay images and particle crops (zip, `export/zip.js`), and `summary.html` (`export/report.js`)

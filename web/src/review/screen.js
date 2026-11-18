@@ -142,8 +142,18 @@ export class ReviewScreen {
 
   // ── Outline tools: split, merge, redraw ──────────────────────────────────
 
-  startMode(mode) {
+  async startMode(mode) {
     if (this.selected === null) return;
+    if (!this.context && this.photo.makeContext) {
+      this.message = "Preparing the outline tools…";
+      this.renderPanel();
+      try {
+        this.context = this.photo.context = await this.photo.makeContext();
+      } catch (e) {
+        this.message = `The outline tools could not start: ${e.message}`;
+        return this.renderPanel();
+      }
+    }
     if (!this.context) {
       this.message = "The outline tools need the photo's measurements; measure the photo again to use them.";
       return this.renderPanel();

@@ -248,7 +248,7 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
   - End to end on all three backgrounds: text, labels and flags identical to Python; numbers within about a pixel, because OpenCV.js 4.10's resampling differs from OpenCV 5's by up to one grey level (web/README.md).
 - [x] Draw the overlay (outlines and box labels) on a canvas
 - [x] Run batches in the browser on the user's machine (several photos per run, no processing server); a photo without a sheet is refused with the reason and the rest carry on
-- [ ] Move the processing into a Web Worker so the page stays responsive on large batches
+- [x] Move the processing into a Web Worker so the page stays responsive on large batches (`web/src/worker.js`; falls back to the page; both paths in the CI smoke test)
 - [x] Build the upload and progress screens, and a results table with overlays
 - [x] Photo guidance on the site: print at actual size, whole sheet in frame with all four markers, even light, no flash; and the message shown when a photo has no sheet
 - [x] Download particles.csv, summary.csv, run.json (with the review decisions) and NOTE.txt

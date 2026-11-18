@@ -1,6 +1,7 @@
 // Part 8: the app. Print a background -> measure photos (in the browser) -> check the results -> download.
 // Processing runs on the user's machine; Cloudflare Pages only serves these files.
-import { OPENCV, loadOpenCV } from "./opencv.js";
+import { OPENCV_LOCAL_URL, loadOpenCV } from "./opencv.js";
+import { photoContext } from "./review/context.js";
 import { APP_VERSION, imageIdFor, runGrid } from "./pipeline.js";
 import { NOTE, particlesCsv, summaryCsv } from "./export/csv.js";
 import { summaryHtml } from "./export/report.js";
@@ -21,8 +22,58 @@ export async function processPhoto(cv, imageData, file, { sampleId, photo, metad
   const bgr = new cv.Mat();
   try {
     cv.cvtColor(rgba, bgr, cv.COLOR_RGBA2BGR);
-    return runGrid(cv, bgr, { sampleId, photo, imageId, photoFile: file.name, metadata, lineMm, forDisplay: true,
+    const res = runGrid(cv, bgr, { sampleId, photo, imageId, photoFile: file.name, metadata, lineMm, forDisplay: true,
       keepContext: true });
+    return { ...res, problems: res.problems.map((q) => q.asDict()) };
+  } finally {
+    rgba.delete();
+    bgr.delete();
+  }
+}
+
+/**
+ * The photo processor: a background worker (worker.js) when the browser allows it, else the page itself.
+ * `process(file, options)` resolves with runGrid's result; `onPage` says which is in use.
+ */
+async function startProcessor() {
+  try {
+    const worker = new Worker(new URL("./worker.js", import.meta.url));
+    const pending = new Map();
+    let next = 0;
+    await new Promise((resolve, reject) => {
+      worker.onmessage = ({ data }) => (data.type === "ready" ? resolve() : reject(new Error(data.message)));
+      worker.onerror = (e) => reject(new Error(e.message || "The background worker failed to start."));
+      worker.postMessage({ type: "init", opencv: OPENCV_LOCAL_URL });
+    });
+    worker.onmessage = ({ data }) => {
+      const p = pending.get(data.id);
+      pending.delete(data.id);
+      if (data.type === "done") p.resolve(data.result);
+      else p.reject(new Error(data.message));
+    };
+    return {
+      onPage: false,
+      process: (file, options) => new Promise((resolve, reject) => {
+        const id = next++;
+        pending.set(id, { resolve, reject });
+        worker.postMessage({ type: "process", id, file, options });
+      }),
+    };
+  } catch (e) {
+    console.warn(`Processing on the page (no background worker: ${e.message})`);
+    const cv = await loadOpenCV();
+    return { onPage: true, process: async (file, options) => processPhoto(cv, await readImage(file), file, options) };
+  }
+}
+
+/** The photo's measuring context, built on the page from the photo itself, for the outline tools. */
+async function contextFor(file, lineMm) {
+  const cv = await loadOpenCV();
+  const rgba = cv.matFromImageData(await readImage(file));
+  const bgr = new cv.Mat();
+  try {
+    cv.cvtColor(rgba, bgr, cv.COLOR_RGBA2BGR);
+    return photoContext(cv, bgr, { lineMm });
   } finally {
     rgba.delete();
     bgr.delete();
@@ -104,11 +155,12 @@ async function main() {
   remember("#reviewer");
   remember("#role");
 
-  let cv;
+  let processor;
   try {
-    // The pinned CDN copy, checked by its hash; ?opencv=local (or a CDN failure) uses web/vendor/.
-    cv = params.get("opencv") === "local" ? await loadOpenCV({ src: OPENCV.vendorPath, integrity: null })
-      : await loadOpenCV().catch(() => loadOpenCV({ src: OPENCV.vendorPath, integrity: null }));
+    // OpenCV.js is served with the site (web/vendor/); ?worker=off processes on the page.
+    processor = params.get("worker") === "off"
+      ? { onPage: true, process: async (file, options) => processPhoto(await loadOpenCV(), await readImage(file), file, options) }
+      : await startProcessor();
     run.disabled = false;
     run.textContent = "Measure";
   } catch (e) {
@@ -142,9 +194,10 @@ async function main() {
       const item = status.appendChild(li(`${file.name}: measuring…`));
       await nextFrame();
       try {
-        const img = await readImage(file);
-        const res = await processPhoto(cv, img, file, { sampleId: f.get("sampleId"), photo, metadata, lineMm });
-        state.photos.push({ name: file.name, ...res, rows: res.rows.slice(), decisions: [] });
+        const res = await processor.process(file, { sampleId: f.get("sampleId"), photo, metadata, lineMm });
+        // The outline tools need the photo's measuring context: kept from an on-page run, else built on demand.
+        state.photos.push({ name: file.name, ...res, rows: res.rows.slice(), decisions: [],
+          makeContext: () => contextFor(file, lineMm) });
         const warn = res.problems.map((p) => p.message).join(" ");
         item.textContent = `${file.name}: ${res.rows.length} particles, ${res.rows.filter((r) => r.review_reason).length} flagged for checking` +
           ` (${res.run.background_type.replace("_", " ")})${warn ? `. ${warn}` : ""}`;
@@ -191,7 +244,7 @@ async function main() {
           download(name, zip(files), "application/zip");
         } else {
           const photos = [];
-          for (const p of state.photos) photos.push({ ...p, problems: p.problems.map((q) => q.asDict()), overlay: await overlayDataUrl(p) });
+          for (const p of state.photos) photos.push({ ...p, overlay: await overlayDataUrl(p) });
           download(name, summaryHtml(photos, { appVersion: APP_VERSION }), "text/html");
         }
       } finally {
