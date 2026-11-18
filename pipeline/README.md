@@ -51,6 +51,12 @@ A batch writes each photo's outputs to `out/photos/<photo>/`, plus one combined
 `batch_report.csv` listing every photo as processed or refused (with the reason and
 its quality problems). A photo without a printed sheet is refused; the rest carry on.
 
+**Speed** (November 18, 2026): 500 synthetic whole-sheet photos (3000 px wide, about 70
+particles each, 34,870 in all) took 31 minutes on one core of the dev container, 3.7 s
+per photo, and wrote 2.6 GB, mostly the overlays (about 5 MB each; crops about 0.3 MB per
+photo). Measuring each particle in a window round it, instead of the whole image, made
+the run 3× faster (13.3 s per photo before).
+
 ### Printable backgrounds ([`backgrounds/`](../backgrounds/README.md))
 
 There are three backgrounds:
