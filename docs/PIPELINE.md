@@ -233,11 +233,10 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
 - [ ] Time it on 500 images and fix the slowest step
 - [ ] Sketch the screens: print background, upload, sample details, run, review, export
 - [x] Offer the printable backgrounds on the website (download table in `web/index.html`)
-- [ ] Port parts 1–5 to the browser module by module (`web/src/`), each passing parity tests against the Python pipeline
-  - Done: the official OpenCV.js 4.10.0 build has ArUco (`cv.aruco_ArucoDetector`); its marker corners match Python's to 0 px.
-  - Done: sheet layout, marker detection and rectification (`web/src/capture/sheet.js`), parity-tested against Python.
-  - Next: grid-crossing refinement (`rectify_grid`); the checkerboard needs a JS `cornerSubPix`, which 4.10.0 lacks.
-  - Write a marching-squares step for the sub-pixel perimeter and a skeleton step for fiber length, which OpenCV.js lacks.
+- [x] Port parts 1–5 to the browser module by module (`web/src/`), each passing parity tests against the Python pipeline, and join them (`web/src/pipeline.js`)
+  - Markers, crossings, flattening, white balance and the quality check; segmentation; measurement (with JS marching squares and skeleton); colour and shape rules; rows and CSV.
+  - End to end on all three backgrounds: text, labels and flags identical to Python; numbers within about a pixel, because OpenCV.js 4.10's resampling differs from OpenCV 5's by up to one grey level (web/README.md).
+- [ ] Draw the overlay (outlines and box labels) on a canvas
 - [ ] Run batches in the browser on the user's machine (no processing server)
 - [ ] Build the upload and progress screens, and a results table with overlays
 - [ ] Photo guidance on the site: print at actual size, whole sheet in frame with all four markers, even light, no flash; and the message shown when a photo has no sheet

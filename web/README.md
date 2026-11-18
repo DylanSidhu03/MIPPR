@@ -27,11 +27,24 @@ The website people use: print a background, upload photos, get results, review t
 | `src/export/` | 8 CSV and summary | `export.py` |
 | `src/app.js`, `index.html` | 8 Screens and flow | `cli.py` |
 
-Built so far (part 1, the marker stage):
-- `src/capture/sheet.js`: the sheet layout (papers, box grid and labels, marker IDs and corners, 100 mm line, patches, background types), `detectMarkers`, `findSheet` (layout from the marker IDs, px per mm, homography) and `rectifySheet`. Pure ES module: no DOM, and OpenCV.js is passed in as `cv`.
-- `src/opencv.js`: the pinned OpenCV.js build and `loadOpenCV()`.
+## What's built
 
-Everything else in `src/` is still a stub (each function throws "not implemented"), including `rectifyGrid` (the grid-crossing refinement) and `whiteBalance`.
+**Parts 1–5 run in the browser, end to end** (`src/pipeline.js` `runGrid`, the twin of Python's `cli.run_grid`; `src/app.js` `processPhoto` takes a canvas image). Every module takes OpenCV.js as `cv`, with no DOM, so it runs in Node for tests.
+
+| Module | Does | Parity with Python |
+|---|---|---|
+| `capture/sheet.js`, `subpix.js` | Layout, markers, homography, grid-crossing refinement, flattening, white balance | crossings within 0.002 px on five synthetic photos; flattened grid within 1 grey level |
+| `capture/quality.js` | Photo quality check (same codes, messages, limits) | identical codes on 36 degraded photos |
+| `segmentation/edges.js`, `grid.js` | Per-box background, line bridging, hysteresis, half-maximum edges | labels pixel for pixel on all three backgrounds |
+| `measurement/*.js` | Sizes, Feret (ImageJ convention, in one function), sub-pixel perimeter, colour statistics, fiber length, opacity, size range | floating-point precision on every field |
+| `color/rules.js`, `morphology/rules.js`, `export/csv.js` | Colour and shape rules, rows, summary, CSV | rows exact; CSV byte for byte |
+| `pipeline.js` | The whole photo → rows run | text and flags identical; numbers within about a pixel (below) |
+
+**The one known difference.** On the same photo, OpenCV.js 4.10's flattening differs from Python's OpenCV 5 by up to one grey level on a few pixels, which can flip a pixel right at a particle's edge. So, end to end, text, labels and flags are identical, but numbers can differ slightly: for 2–9 mm particles, area within one pixel (≤ 0.3%) and length exact; a 0.6 mm particle (about 60 px in area) moved 6% in area. Rule confidences, from a steep curve, moved up to about 0.04. Each module on identical inputs matches exactly; this comes only from the flattening's resampling, and could be removed by writing the remap in JS like `subpix.js`'s warp, if exact agreement is wanted.
+
+Still stubs: `review/screen.js`, `storage/supabase.js`, `morphology/model.js`, and the screens in `app.js`. Not yet ported: the overlay drawing (the screen will draw outlines on a canvas).
+
+Small tidy-up left: `measurement/_edges.js` repeats `edgeLevel` and `fillHoles` from `segmentation/edges.js` (they take plain arrays rather than Mats); merge them after checking the float32 median rounding is the same.
 
 ## Technical choices
 
@@ -68,7 +81,8 @@ Serve the repo root (`python -m http.server`) and open `/web/` to try the page; 
 
 - [ ] Sketch the screens: print background, upload, sample details, run with progress, review, export
 - [x] Serve the printable PDFs from `backgrounds/` (links on `index.html`)
-- [ ] Port parts 1–5 module by module (part 1 marker stage done: layout, marker detection, homography, sheet rectification), each passing the parity tests. The marching-squares outline and the skeleton step need their own code (not in OpenCV.js).
+- [x] Port parts 1–5 module by module, each passing the parity tests, and join them (`pipeline.js`), checked end to end against Python on all three backgrounds
+- [ ] Draw the overlay (outlines and box labels) on a canvas for the results and review screens
 - [ ] Batch processing in the browser on the user's machine, with a clear message for each failed photo (quality check, part 1)
 - [ ] Photo guidance: print at actual size, whole sheet and all four markers in frame, even light, no flash. A photo without the markers is refused with that message (the app only takes the three printed backgrounds).
 - [ ] Export the files above; a PDF or HTML summary

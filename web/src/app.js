@@ -1,16 +1,26 @@
-// Part 8: the app shell. Planned.
+// Part 8: the app shell. Processing works; the screens are planned.
 // Screens: print a background -> upload photos -> run (in the browser) -> review -> export.
 // Processing runs on the user's machine; Cloudflare Pages only serves these files.
-import { findSheet, rectifyGrid, whiteBalance } from "./capture/sheet.js";
-import { checkQuality } from "./capture/quality.js";
-import { segmentGrid } from "./segmentation/grid.js";
-import { measure } from "./measurement/geometry.js";
-import { colorClasses } from "./color/rules.js";
-import { morphologyRules } from "./morphology/rules.js";
-import { renderReview } from "./review/screen.js";
+import { imageIdFor, runGrid } from "./pipeline.js";
 import { particlesCsv, summaryCsv } from "./export/csv.js";
 
-/** Run one photo through parts 1-5 and return particle rows (planned). */
-export async function processPhoto(imageData, metadata) {
-  throw new Error("Part 8: processPhoto is not implemented yet");
+export { particlesCsv, summaryCsv };
+
+/**
+ * Run one photo through parts 1-5 in the browser.
+ * `imageData` is a canvas ImageData (RGBA); `file` the uploaded File (for its name and hash).
+ * Returns {rows, problems, quality, run} (see pipeline.js runGrid), or throws with a message
+ * for the user when the photo has no printed MIPPR sheet.
+ */
+export async function processPhoto(cv, imageData, file, { sampleId, photo, metadata, lineMm } = {}) {
+  const imageId = await imageIdFor(file.name, await file.arrayBuffer());
+  const rgba = cv.matFromImageData(imageData);
+  const bgr = new cv.Mat();
+  try {
+    cv.cvtColor(rgba, bgr, cv.COLOR_RGBA2BGR);
+    return runGrid(cv, bgr, { sampleId, photo, imageId, metadata, lineMm });
+  } finally {
+    rgba.delete();
+    bgr.delete();
+  }
 }

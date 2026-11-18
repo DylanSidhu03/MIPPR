@@ -91,6 +91,17 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 - **Tar:** an optional reviewer tag `tar_like`; no automatic detection.
 - **Validation:** match the lab's plate photos to their spreadsheet rows and compare per class; the pass mark is set after.
 
+### The browser pipeline (November 18, 2026)
+
+- Parts 1–5 are ported to `web/src/` and joined in `pipeline.js` (`runGrid`), checked against Python module by module and end to end. Details and numbers in [web/README.md](../web/README.md).
+- **Module parity:** given identical inputs, every module matches Python exactly or to floating-point precision. Reaching that took JS versions of things OpenCV.js 4.10 lacks or does differently: `cornerSubPix`, `boxPoints`, a perspective warp that samples like OpenCV 5 (4.10 places samples to 1/32 px, which moved grid crossings by up to 0.4 px), skimage's marching squares and Zhang–Suen skeleton, SciPy's shortest-path tie order, a float32 chamfer distance transform, Python's float printing and numpy's rounding, and glibc's `exp` and `hypot` (so values exactly at a threshold fall on the same side).
+- **End to end:** text, labels and flags identical; numbers within about a pixel. The flattening's remap in OpenCV.js 4.10 differs from OpenCV 5's by up to one grey level, which can flip an edge pixel: ≤ 0.3% in area for 2–9 mm particles, 6% for a 0.6 mm one, up to 0.04 in rule confidences. Removable by writing the remap in JS, if exact agreement is wanted.
+- **The test runner skipped files:** `web/tests/index.js` started each test file without waiting, so `node --test web/tests/` ran only 35 of 106 tests. Removed; CI runs `node --test "web/tests/*.test.mjs"`.
+- **Findings about the Python reference, from the port:**
+  - The pip OpenCV's `distanceTransform` uses Intel IPP; builds without it give fiber lengths about 1e-6 different. Too small to matter, noted for reproducibility.
+  - On the checkerboard, `cornerSubPix` often doesn't converge on 2–7 corners per photo (they slide along an edge next to a box label), so their final position depends on the OpenCV build. The smooth fit keeps the grid within about 0.05 px in most cases; on one 5.8 px/mm A4 photo it moved outer crossings up to 2.3 px. Worth a look when real checkerboard photos exist.
+  - On the white grid below about 6 px/mm, the last crossing-search pass finds nothing (its window is no wider than the masked line), so the grid silently falls back to the marker-only homography. The quality check already refuses photos under 10 px/mm, so it doesn't arise in use; JS keeps the same behaviour.
+
 ### The box-by-box check (November 18, 2026)
 
 - `validation/sheet_check.py` takes photos of labelled particles on the sheets, the well-to-box list and the lab's spreadsheets (and calipers where measured), runs the normal pipeline, and reports per background and class: size error, colour and morphology agreement with the confusions, missed and extra detections, and for each flag (and each `size_uncertainty` threshold) how many wrong sizes it catches and how many right ones it flags. Calipers are the size reference where present. The lab's photo guide and templates are in `validation/`.
