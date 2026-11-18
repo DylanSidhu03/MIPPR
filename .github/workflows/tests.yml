@@ -21,6 +21,9 @@ jobs:
       - name: Validation tools (ruler reader, the lab's old checkerboard)
         working-directory: validation
         run: python -m pytest -q
+      - name: Training scaffold (dataset, evaluation, gate; the torch test is skipped without torch)
+        working-directory: training
+        run: python -m pytest -q
       - name: Plan, issues and tracker in sync
         run: python scripts/sync_plan.py --check
 

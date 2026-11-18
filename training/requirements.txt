@@ -1,0 +1,9 @@
+# Part 10 training (not needed by the pipeline, the app or CI). Versions used for the smoke run on November 18, 2026.
+# On a computer without an NVIDIA GPU, the CPU-only torch is much smaller:
+#   pip install torch==2.15.0 torchvision==0.29.2 --index-url https://download.pytorch.org/whl/cpu
+# Colab and Kaggle already have torch and torchvision; install the rest.
+-r ../pipeline/requirements.txt
+torch==2.15.0
+torchvision==0.29.2
+onnx==1.23.2
+onnxruntime==1.32.0

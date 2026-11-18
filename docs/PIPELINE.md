@@ -140,6 +140,7 @@ Folder: [pipeline/mippr/morphology/](../pipeline/mippr/morphology/README.md) (ru
 - [ ] Tar-like: reviewer tag or class? Not decided yet (a tag for now)
 - [x] Cut particle crops with the background blanked (`pipeline/mippr/crops.py`, `web/src/crops.js`): full resolution, square, padded, background transparent; saved as `crops/<particle_ref>.png` and named in `crop_file`, with the photo in `photo_file`. `morphology/model.py` `model_input` puts a crop on grey at the model's size.
 - [ ] Train an image model on crops + shape values (v3) for fragment, rubbery fragment and foam. Compare a classifier chain with one multi-task model.
+  - Scaffold built November 18 ([training/](../training/README.md)): one shared model, crop on grey + shape values + background type one-hot, augmentation as decided, class weights, early stopping, confidence and runner-up, `model_version`. Runs end to end on synthetic particles; waits for real labels. Browser side: `web/src/morphology/model.js` (ONNX Runtime Web, same inputs; not wired in yet). The chain vs multi-task comparison is a hook (`--head`), not built.
 - [ ] Decide when the model may overrule a rule (decided that it may; set the confidence from validation data)
 - [ ] Add 2–3 example photos per morphology class to the spec
 
@@ -297,8 +298,11 @@ Folder: [database/](../database/README.md) (draft schema) and `web/src/storage/`
 Folder: [training/](../training/README.md). Periodic and manual, not continuous online learning.
 
 - [ ] Build a fixed, expert-labelled gold test set that is never used for training
-- [ ] Set up the retraining routine: snapshot, build the dataset, train, evaluate, gate, publish (`training/` stubs)
+  - The code side is ready: a gold list (particle refs or whole samples) is held out by `build_dataset.py` and checked for leaks by `gate.py`. The particles themselves are still to be chosen and labelled.
+- [x] Set up the retraining routine: snapshot, build the dataset, train, evaluate, gate, publish (`training/`)
+  - Built November 18: `build_dataset.py` (reviewed rows and box-label sheets, rejected rows out, split by sample, samples keep their split across rebuilds, gold held out), `train.py`, `evaluate.py`, `export_onnx.py` (with a torch vs onnxruntime check), `gate.py`. Still manual: exporting a database snapshot to run folders (part 9) and publishing.
 - [ ] Version every model and record its gold-set scores (`model_versions`), so past results stay reproducible
+  - `gate.py` writes the version record with the `model_versions` fields and keeps a JSON list of every version; saving it to Supabase waits for part 9.
 - [ ] At each retraining, check the flag thresholds against reviewer corrections (which flagged particles were really wrong, and which wrong ones weren't flagged); change a threshold only by a new, versioned release, never automatically
 - [ ] Decide where training runs: a lab GPU machine or free notebooks (open question 8; to be discussed later)
 - [ ] Set a plan for who answers issues and retrains the model after the practicum (open question 7)

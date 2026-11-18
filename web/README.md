@@ -47,7 +47,7 @@ The website people use: print a background, upload photos, get results, review t
 
 `node web/scripts/smoke_ui.mjs` runs the app in Chromium (Playwright): measures two sheet photos, refuses one without a sheet, reviews with keys and a click, and checks the downloaded CSVs. CI runs it too.
 
-Still stubs: `storage/supabase.js` (part 9) and `morphology/model.js` (v3). 
+Still a stub: `storage/supabase.js` (part 9). `morphology/model.js` builds the v3 model's inputs and runs an exported model with ONNX Runtime Web (`loadModel`, `predict`), but no model exists yet and it isn't wired into the app; when it is, ONNX Runtime Web goes in `vendor/onnxruntime-web/` (served with the site, like OpenCV.js). 
 
 Shared helpers: `grids.js` (plain pixel grids and the OpenCV.js morphology and contour calls), and `segmentation/edges.js`, whose `edgeLevel` and `fillHolesGrid` the measurement modules use too (merged November 18; the parity tests are unchanged).
 
