@@ -2,17 +2,17 @@
 
 No model is involved, so the same mask always gives the same numbers.
 
-Geometry follows ImageJ's conventions so results can be compared with the
-lab's current workflow: area is the pixel count, and Feret diameters are taken
-over the outer edges of the boundary pixels (so a single pixel has Feret
-sqrt(2) px and MinFeret 1 px, as in ImageJ).
+ImageJ is the main guideline for every measurement (decided November 18, 2026),
+so results compare with the lab's workflow: area is the pixel count; Feret
+diameters are taken over the outer edges of the boundary pixels (a single pixel
+has Feret sqrt(2) px and MinFeret 1 px); perimeter is ImageJ's traced
+perimeter, and circularity, aspect ratio (fitted ellipse), roundness and
+solidity are ImageJ's shape descriptors.
 
-Perimeter is the exception. The main `perimeter_um` and `circularity` use a
-sub-pixel outline, which validation/perimeter_study.py found to be the most
-accurate and the least affected by rotation. ImageJ-compatible values are
-kept alongside as `perimeter_imagej_um` and `circularity_imagej`. Which one
-is reported as the headline number is a provisional decision
-(docs/CLASSIFICATION_SPEC.md).
+Other methods that are useful to know are kept alongside: the sub-pixel
+perimeter and circularity (`perimeter_subpixel_um`, `circularity_subpixel`;
+validation/perimeter_study.py found them the most accurate and least affected
+by rotation) and the Feret length:width (`feret_ratio`, used by the rules).
 """
 import math
 
@@ -154,6 +154,46 @@ def _crack_vertices(mask):
     return np.array(keep) - 1
 
 
+def ellipse_imagej(mask):
+    """(major, minor) axis lengths in px of ImageJ's fitted ellipse (ij/process/EllipseFitter.java).
+
+    The ellipse has the particle's second moments (each pixel a unit square, hence the
+    1/12 terms) and the same area as the particle. ImageJ's AR is major / minor.
+    """
+    ys, xs = np.nonzero(mask)
+    n = len(xs)
+    x, y = xs.astype(np.float64), ys.astype(np.float64)
+    xm, ym = x.mean(), y.mean()
+    u20 = float(((x - xm) ** 2).mean()) + 0.08333333
+    u02 = float(((y - ym) ** 2).mean()) + 0.08333333
+    u11 = float(((x - xm) * (y - ym)).mean())
+    m4 = max(4.0 * abs(u02 * u20 - u11 * u11), 0.000001)
+    a11, a12, a22 = u02 / m4, u11 / m4, u20 / m4
+    tmp = a11 - a22
+    if tmp == 0.0:
+        tmp = 0.000001
+    theta = 0.5 * math.atan(2.0 * a12 / tmp)
+    if theta < 0.0:
+        theta += math.pi / 2
+    if a12 > 0.0:
+        theta += math.pi / 2
+    elif a12 == 0.0:
+        if a22 > a11:
+            theta = 0.0
+            a11, a22 = a22, a11
+        elif a11 != a22:
+            theta = math.pi / 2
+    tmp = math.sin(theta)
+    if tmp == 0.0:
+        tmp = 0.000001
+    z = a12 * math.cos(theta) / tmp
+    major = math.sqrt(1.0 / abs(a22 + z))
+    minor = math.sqrt(1.0 / abs(a11 - z))
+    scale = math.sqrt(n / (math.pi * major * minor))  # equal areas
+    major, minor = major * scale * 2.0, minor * scale * 2.0
+    return (major, minor) if major >= minor else (minor, major)
+
+
 def feret(hull):
     """(max Feret, min Feret, max Feret angle in degrees) of a convex polygon, in px."""
     d = hull[:, None, :] - hull[None, :, :]
@@ -234,6 +274,7 @@ def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margi
         level = edge_level(mask, diff, edge_fraction) if diff is not None else None
         perim, outline_area = _polygon_length_area(subpixel_outline(mask, diff, level))
         perim_ij = perimeter_imagej(mask)
+        major, minor = ellipse_imagej(mask)
         convex_area = cv2.contourArea(hull.astype(np.float32))
         convex_perim = cv2.arcLength(hull.astype(np.float32), True)
         ys, xs = np.nonzero(mask)
@@ -248,8 +289,8 @@ def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margi
             "y_um": cy * u,
             "area_um2": area_px * u2,
             "area_px": area_px,
-            "perimeter_um": perim * u,
-            "perimeter_imagej_um": perim_ij * u,
+            "perimeter_um": perim_ij * u,  # ImageJ's traced perimeter
+            "perimeter_subpixel_um": perim * u,
             "convex_area_um2": convex_area * u2,
             "convex_perimeter_um": convex_perim * u,
             "feret_max_um": f_max * u,
@@ -260,9 +301,13 @@ def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margi
             "bbox_height_um": (y1 - y0 + 1) * u,
             "min_rect_length_um": max(rw, rh) * u,
             "min_rect_width_um": min(rw, rh) * u,
-            "aspect_ratio": f_max / f_min if f_min > 0 else float("nan"),
-            "circularity": min(1.0, 4 * math.pi * outline_area / perim ** 2) if perim > 0 else float("nan"),
-            "circularity_imagej": min(1.0, 4 * math.pi * area_px / perim_ij ** 2) if perim_ij > 0 else float("nan"),
+            "major_um": major * u,  # ImageJ's fitted ellipse
+            "minor_um": minor * u,
+            "aspect_ratio": major / minor if minor > 0 else float("nan"),  # ImageJ AR
+            "roundness": 4 * area_px / (math.pi * major ** 2) if major > 0 else float("nan"),  # ImageJ Round
+            "feret_ratio": f_max / f_min if f_min > 0 else float("nan"),  # length:width, used by the rules
+            "circularity": min(1.0, 4 * math.pi * area_px / perim_ij ** 2) if perim_ij > 0 else float("nan"),  # ImageJ Circ.
+            "circularity_subpixel": min(1.0, 4 * math.pi * outline_area / perim ** 2) if perim > 0 else float("nan"),
             "solidity": min(1.0, area_px / convex_area) if convex_area > 0 else float("nan"),
         }
         cimg = img_bgr if color_img is None else color_img

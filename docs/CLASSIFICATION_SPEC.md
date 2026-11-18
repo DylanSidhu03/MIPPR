@@ -19,7 +19,7 @@ The printed background makes most of this deterministic: the app knows the scale
 | Find each particle | the **outline** (mask) and its box (`particle_id`) | **Threshold**: difference from the box's own known background colour, hysteresis threshold, half-maximum edge. Printed lines and label corners are masked. |
 | Measure | length, width, area, perimeter, convex values, CED, fiber length | **Geometry** from the outline × scale |
 | Size uncertainty | `size_uncertainty`, length and width at the outer and inner edge | **Geometry**: the outline redrawn with the edge at 40% and 60% of the particle's contrast; how much the length changes |
-| Shape ratios | aspect ratio, circularity, solidity | **Derived** from the measurements |
+| Shape ratios | aspect ratio, circularity, solidity, roundness (ImageJ's shape descriptors), Feret length:width | **Derived** from the measurements |
 | Opacity | how much of the background shows through | **Measured**: particle contrast against the known background of its box |
 | Colour values | Lab mean and spread, hex, second colour and its share | **Measured** inside the outline after white balance |
 | Size class, size flags | `size_class`, `flag_near_cutoff`, `flag_min_width`, `flag_width_unresolved` | **Fixed thresholds** |
@@ -59,7 +59,7 @@ The classes are **fragment, rubbery_fragment, fiber, film, foam, pellet**, plus 
 | Class | Rule for a person | Measured hint (starting values, tune on labelled data) |
 |---|---|---|
 | **Fiber** | Long and thin, with a roughly even width along its length | **Rule (v2):** length : width **≥ 3 : 1** (decided), using `fiber_length_mm` and the skeleton width for curved fibers. A fiber whose width can't be resolved counts as a fiber. Bundles get `flag_bundle`. |
-| **Pellet** (bead, sphere) | Round or regular, smooth, looks manufactured | **Rule (v2):** circularity > 0.85, solidity > 0.95, aspect ratio < 1.3 (starting values) |
+| **Pellet** (bead, sphere) | Round or regular, smooth, looks manufactured | **Rule (v2):** circularity > 0.85 (ImageJ's), solidity > 0.95, Feret length:width < 1.3 (starting values) |
 | **Fragment** | Hard, irregular, broken or angular edges | Default for opaque pieces that aren't fibers or pellets (v2); confirmed by the model (v3) |
 | **Rubbery fragment** | Soft, rubbery-looking piece, usually black (the lab's second most common class, 1,178 of ~4,600) | Texture; **model only** (v3), trained on the lab's labelled particles re-photographed on the sheets. Until then such particles are labelled fragment. |
 | **Film** | Thin, flexible sheet, often see-through | **Rule (v2):** low `opacity` (starting value < 0.5) and not a fiber; opaque films are left to the model (v3) |
@@ -109,19 +109,18 @@ A reviewer sets `review_status` (`auto`, `confirmed`, `corrected`, `rejected`). 
 - **Every export** includes this statement: *"Visual classification only. Whether a particle is plastic, and its polymer type, were not tested."*
 - Spectroscopy columns `polymer_confirmed` and `polymer_method` are in the output. The app leaves them blank, and the lab fills them in.
 
-## 5. Perimeter and circularity (provisional)
+## 5. Perimeter and circularity
 
 Circularity = 4π × area / perimeter². Perimeter can be measured several ways, and the choice changes circularity by up to 0.1. `validation/perimeter_study.py` tested five methods on shapes with known perimeters, drawn the way a camera sees them:
 
 | Method | Perimeter error, worst case | Change with rotation | vs the lab's old ImageJ numbers |
 |---|---|---|---|
-| **Sub-pixel outline** (`perimeter_mm`, `circularity`) | −9% | under 1.2% | circularity ~0.08–0.10 higher |
-| **ImageJ method** (`perimeter_imagej_mm`, `circularity_imagej`) | −13% | 7–9% | matches (same calculation) |
+| **ImageJ method** (`perimeter_mm`, `circularity`) | −13% | 7–9% | matches (same calculation) |
+| **Sub-pixel outline** (`perimeter_subpixel_mm`, `circularity_subpixel`) | −9% | under 1.2% | circularity ~0.08–0.10 higher |
 | Pixel-centre contour (old prototype) | −20% | 7–9% | — |
 | Pixel-edge length, scikit-image weighted | +33 to +38% | 20–37% | — |
 
-- **Current choice:** report **both**. The sub-pixel values are the headline columns because they are the most accurate. The ImageJ values keep old data comparable.
-- **Decide later:** which one the app's summaries use. The decision should follow validation against hand measurements and whatever the lab's published methods need.
+- **Decided (user, November 18, 2026): ImageJ is the main guideline for every measurement.** The ImageJ perimeter and circularity are the main columns, so results compare with the lab's workflow; the sub-pixel values are kept alongside because they are the most accurate. The same holds for aspect ratio (ImageJ's fitted-ellipse AR), with the Feret length:width kept as `feret_ratio` for the rules, and for length (ImageJ's Feret over pixel corners).
 
 ## 6. Output
 
@@ -142,7 +141,6 @@ The no-plastic statement goes in `NOTE.txt`, not in the CSV, so the CSV opens cl
 
 - Example photos per morphology class (from the stage 2 pilot)
 - Color swatches and HSV/Lab ranges (once the color reference is settled in issue #2)
-- Headline perimeter method (section 5)
 - Validation tolerance against hand measurements (project open question 6). **Method:** compare length, width, shape and colour per class on labelled particles photographed on the printed sheets (the lab's labelled particles re-photographed, labels carried over by well), and set the pass mark after seeing the agreement. The match against the lab's older "Rows A–H" photos (November 11–12) is a first check of the measurement code, not the pass mark: their scale settings vary by session.
 - How the lab measures length and width, and why width is larger than length in SF_02/SF_03 ([LAB_DATA.md](LAB_DATA.md))
 - Rule thresholds for fiber, pellet and film, tuned on labelled particles photographed on the sheets

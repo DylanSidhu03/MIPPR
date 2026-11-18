@@ -53,7 +53,7 @@ def main():
     # particles.csv (docs/OUTPUT_CSV.md) is in mm; the comparison below works in um.
     mp = mp.assign(x_um=mp.centroid_x_mm * 1e3, y_um=mp.centroid_y_mm * 1e3,
                    area_um2=mp.area_mm2 * 1e6, feret_max_um=mp.length_mm * 1e3, feret_min_um=mp.width_mm * 1e3,
-                   perimeter_um=mp.perimeter_mm * 1e3, perimeter_imagej_um=mp.perimeter_imagej_mm * 1e3)
+                   perimeter_um=mp.perimeter_mm * 1e3, perimeter_subpixel_um=mp.perimeter_subpixel_mm * 1e3)
     ox, oy = crop_offset(cv2.imread(str(root / "template.jpg")))
     board = find_board(cv2.imread(str(root / "particle.jpg")), a.px_per_square)
     pts = np.stack([ij.X / IMAGEJ_UM_PER_PX + ox, ij.Y / IMAGEJ_UM_PER_PX + oy], axis=1)
@@ -75,8 +75,9 @@ def main():
             "ij_feret_mm": r.Feret / 1e3, "mp_feret_mm": m.feret_max_um / 1e3,
             "ij_minferet_mm": r.MinFeret / 1e3, "mp_minferet_mm": m.feret_min_um / 1e3,
             "ij_perim_mm": r["Perim."] / 1e3, "mp_perim_mm": m.perimeter_um / 1e3,
-            "mp_perim_ij_mm": m.perimeter_imagej_um / 1e3,
-            "ij_circ": r["Circ."], "mp_circ": m.circularity, "mp_circ_ij": m.circularity_imagej,
+            "mp_perim_sub_mm": m.perimeter_subpixel_um / 1e3,
+            "ij_circ": r["Circ."], "mp_circ": m.circularity, "mp_circ_sub": m.circularity_subpixel,
+            "ij_ar": r.AR, "mp_ar": m.aspect_ratio, "ij_round": r.Round, "mp_round": m.roundness,
             "ij_solidity": r.Solidity, "mp_solidity": m.solidity,
         })
     t = pd.DataFrame(rows)
@@ -92,8 +93,9 @@ def main():
     print(f"\nmatched one-to-one: {len(good)}   ImageJ-only (specks or misses): {unmatched_ij}"
           f"   MIPPR-only: {unmatched_mp}")
     for name, ij_name in (("area_mm2", "area_mm2"), ("feret_mm", "feret_mm"), ("minferet_mm", "minferet_mm"),
-                          ("perim_mm", "perim_mm"), ("perim_ij_mm", "perim_mm"),
-                          ("circ", "circ"), ("circ_ij", "circ"), ("solidity", "solidity")):
+                          ("perim_mm", "perim_mm"), ("perim_sub_mm", "perim_mm"),
+                          ("circ", "circ"), ("circ_sub", "circ"), ("ar", "ar"), ("round", "round"),
+                          ("solidity", "solidity")):
         rel = good[f"mp_{name}"] / good[f"ij_{ij_name}"] - 1
         print(f"{name:12s} MIPPR vs ImageJ: median {rel.median():+.1%}, "
               f"middle 80% {rel.quantile(.1):+.1%} to {rel.quantile(.9):+.1%}")

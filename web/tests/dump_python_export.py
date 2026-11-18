@@ -199,21 +199,21 @@ def edge_cases(base):
         m(4, box="B4", x_um=4000.0, y_um=900.6),
         m(5, box="B4", x_um=3000.0, y_um=899.6),
         m(6, box="", x_um=10.0, y_um=10.0), m(7, box=None, x_um=5.0, y_um=10.0),  # no box: numbered 1, 2
-        m(8, box="C1", aspect_ratio=NAN, circularity=NAN, solidity=NAN, opacity=None,
+        m(8, box="C1", feret_ratio=NAN, circularity=NAN, solidity=NAN, opacity=None,
           drop=("color_label", "color_confidence", "color_secondary", "color_secondary_fraction")),
         m(9, box="C2", fiber_uniform=True, fiber_length_um=5200.0, fiber_width_um=300.0, feret_max_um=3000.0,
-          feret_min_um=600.0, aspect_ratio=5.0),  # bent fiber: sized along the fiber
+          feret_min_um=600.0, feret_ratio=5.0),  # bent fiber: sized along the fiber
         m(10, box="C3", fiber_uniform=True, fiber_length_um=3100.0, fiber_width_um=300.0, feret_max_um=3000.0,
-          feret_min_um=1000.0, aspect_ratio=3.0),  # straight: Feret decides
+          feret_min_um=1000.0, feret_ratio=3.0),  # straight: Feret decides
         m(11, box="C4", feret_max_um=500.0, feret_min_um=480.0, _contrast=50.0, _touches_edge=True,
           _touches_line=True, length_um_outer=600.0, length_um_inner=400.0),
-        m(12, box="C5", feret_max_um=0.0, feret_min_um=0.0, aspect_ratio=NAN, area_um2=1.234e-3,
+        m(12, box="C5", feret_max_um=0.0, feret_min_um=0.0, feret_ratio=NAN, area_um2=1.234e-3,
           perimeter_um=1e22, _contrast=NAN),
-        m(13, box="C6", aspect_ratio=500.0, circularity=0.01, solidity=0.2, R_mean=-3.0, G_mean=255.5,
+        m(13, box="C6", feret_ratio=500.0, circularity=0.01, solidity=0.2, R_mean=-3.0, G_mean=255.5,
           B_mean=127.5, ced_um=1e-7, convex_area_um2=123456789.0, x_um=0.1 + 0.2, y_um=1 / 3),
         m(14, box="C7", feret_max_um=5000.0, fiber_length_um=4000.0, fiber_uniform=True, fiber_width_um=100.0,
-          aspect_ratio=50.0, color_label="clear", color_confidence=0.75, opacity=0.25),
-        m(15, box="C8", feret_max_um=4999.999999, feret_min_um=2000.0, aspect_ratio=2.5,
+          feret_ratio=50.0, color_label="clear", color_confidence=0.75, opacity=0.25),
+        m(15, box="C8", feret_max_um=4999.999999, feret_min_um=2000.0, feret_ratio=2.5,
           drop=("_contrast",)),
     ]
 

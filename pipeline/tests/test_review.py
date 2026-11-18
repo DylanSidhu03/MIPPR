@@ -18,9 +18,10 @@ from mippr.segmentation.grid import GridSegmentParams, background_image, box_of,
 
 def _m(**kw):
     m = {"particle": 1, "box": "A1", "x_um": 1000.0, "y_um": 1000.0, "area_um2": 3e6, "perimeter_um": 7000.0,
-         "perimeter_imagej_um": 7100.0, "convex_area_um2": 3.1e6, "convex_perimeter_um": 6900.0,
+         "perimeter_subpixel_um": 7100.0, "convex_area_um2": 3.1e6, "convex_perimeter_um": 6900.0,
          "feret_max_um": 2000.0, "feret_min_um": 1500.0, "ced_um": 1950.0, "aspect_ratio": 1.33,
-         "circularity": 0.8, "circularity_imagej": 0.75, "solidity": 0.97, "fiber_length_um": 2000.0,
+         "circularity": 0.8, "circularity_subpixel": 0.75, "feret_ratio": 1.33, "roundness": 0.75,
+         "major_um": 2100.0, "minor_um": 1600.0, "feret_angle_deg": 10.0, "H_mean": 5.0, "S_mean": 200.0, "V_mean": 200.0, "solidity": 0.97, "fiber_length_um": 2000.0,
          "fiber_width_um": 1500.0, "fiber_uniform": False, "opacity": 0.9, "color_label": "red",
          "color_confidence": 0.9, "color_secondary": "", "color_secondary_fraction": 0.0,
          "L_mean": 40.0, "a_mean": 50.0, "b_mean": 30.0, "L_sd": 1.0, "a_sd": 1.0, "b_sd": 1.0,

@@ -34,10 +34,11 @@ Folder: [pipeline/mippr/capture/](../pipeline/mippr/capture/README.md) and `back
 - [x] Choose the sheet design: "Standard" for all three backgrounds (12 mm boxes, 0.5 mm lines, each box's label printed in its corner), chosen November 5 from three options
 - [ ] Test the Standard design with the largest particles and long fibers on real photos (open question 1a)
 - [ ] Test the checkerboard against the two lined grids on real photos, especially particles across a black/white edge (open question 1)
-- [ ] Choose paper (matte paper or cardstock), and check whether printer black varies enough between printers to matter (open question 1b)
+- [x] Choose paper: matte paper (decided November 18, 2026)
+- [ ] Make the printer not matter (user, November 18): segmentation already measures each box's own colour in the photo and white balance uses the paper white, so printer black doesn't matter. Remaining: catch a printer that scaled the sheet without relying on the user measuring the 100 mm line, and keep printer-made grey and coloured patches out of anything that changes results
 - [x] Put a scale reference in every frame: corner markers at a known printed size, plus a printed 100 mm line to check printer scaling.
   - Four corner markers alone can't correct lens distortion. The grid's own line crossings do: about 0.1 px in synthetic tests.
-- [ ] Put a color reference in every frame. The white and grey patches are on the sheets; decide whether hue classes also need colored patches.
+- [ ] Put a color reference in every frame. The white and grey patches are on the sheets. A version of each sheet with coloured patches was requested (user, November 18): make it, in the repo and Drive.
 - [x] Keep the grid in the center, clear of the markers, with row/column labels and the patches in the margin
 - [x] Correct perspective and lens distortion on the printed grids: markers first, then the grid's line crossings (or checkerboard corners). About 0.1 px in synthetic tests; not yet tested on real photos.
 - [x] Read the scale from the corner markers, with the 100 mm check line correction (`--line-mm`, sets `flag_scale`)
@@ -94,8 +95,9 @@ Folder: [pipeline/mippr/measurement/](../pipeline/mippr/measurement/README.md).
 - [x] Leave width empty with `flag_width_unresolved` when a particle is under about 2 px wide
 - [x] Measure how much each size depends on where the edge is drawn (`measurement/uncertainty.py`): length and width with the edge at 40% and 60% of the particle's contrast, `size_uncertainty`, and `flag_size_uncertain` above a provisional 0.10
 - [ ] Set the `flag_size_uncertain` threshold in testing (part 7), separately for fibers if their fading ends need it
-- [ ] Decide how max Feret is measured: over pixel corners (ImageJ's convention, now) it reads about 1.25 px long even on a perfect disc; at a whole-sheet photo's 10 px/mm that is +0.12 mm, about 6% on a 2 mm particle and 25% near the 0.5 mm cutoff. Option: a sub-pixel Feret from the outline as the headline, with the ImageJ value kept alongside (as for perimeter). On synthetic shapes the sub-pixel length is more consistent (spread 0.58 vs 0.99 px) but reads slightly short; decide on the labelled sheet photos with calipers.
-- [ ] Later decision: which perimeter method gives the headline circularity (sub-pixel or ImageJ-compatible; spec section 5)
+- [x] Decided (user, November 18, 2026): **ImageJ is the main guideline for every measurement**, with other useful methods kept as extra columns. Length stays ImageJ's Feret over pixel corners; perimeter, circularity and aspect ratio (fitted ellipse) are now ImageJ's, plus roundness and major/minor axes; the sub-pixel perimeter and circularity and the Feret length:width are kept alongside. On the fragment_area sample: AR −0.1%, Round +0.2%, Circ. +3.0% against ImageJ's own results.
+- [x] ~~Decide how max Feret is measured~~ (ImageJ's, above): over pixel corners (ImageJ's convention, now) it reads about 1.25 px long even on a perfect disc; at a whole-sheet photo's 10 px/mm that is +0.12 mm, about 6% on a 2 mm particle and 25% near the 0.5 mm cutoff. Option: a sub-pixel Feret from the outline as the headline, with the ImageJ value kept alongside (as for perimeter). On synthetic shapes the sub-pixel length is more consistent (spread 0.58 vs 0.99 px) but reads slightly short; decide on the labelled sheet photos with calipers.
+- [x] Which perimeter method gives the headline circularity: ImageJ's (above)
 - [ ] Check opacity on real photos of clear films, against the opposite background
 
 **In:** Labels, difference map, image and scale from parts 1–2.  
@@ -131,7 +133,10 @@ Folder: [pipeline/mippr/morphology/](../pipeline/mippr/morphology/README.md) (ru
 
 - [x] List morphology classes with a written visual rule for each: fragment, rubbery fragment, fiber, film, foam, pellet, other. A fiber is length:width ≥ 3:1. Rubbery fragment was added on November 11 from the lab's records.
 - [x] Classify fiber, pellet and film by rules (v2): length:width ≥ 3 (centre-line ratio for particles that bend), round and solid for pellet, low opacity for film. The thresholds are provisional.
-- [ ] Tune the rule thresholds on labelled particles photographed on the sheets. The lab records some ≥ 3:1 particles as fragments, so the fiber rule may need a thinness condition.
+- [ ] Tune the rule thresholds on labelled particles photographed on the sheets. Pellet: small round particles measure solidity 0.87–0.94 at 10 px/mm, under the 0.95 starting value.
+- [ ] Fibers: on hold (advisor, November 18). The advisor will send fiber photos; the lab usually removes fibers by other methods. Whether a fiber is a thin thread or anything ≥ 3:1, and whether the Gyre sheet's "Line" / "Line Bundle" are fiber / fiber bundle, wait until then.
+- [ ] Rubbery fragment (advisor, November 18): wanted as its own class if the model can tell it apart; if not, the app says fragment and the reviewer marks whether it is rubbery. Decided by how it performs (v3).
+- [ ] Tar-like: reviewer tag or class? Not decided yet (a tag for now)
 - [ ] Cut particle crops with the background blanked (`crop_particle`), for training and inference
 - [ ] Train an image model on crops + shape values (v3) for fragment, rubbery fragment and foam. Compare a classifier chain with one multi-task model.
 - [ ] Decide when the model may overrule a rule (decided that it may; set the confidence from validation data)
@@ -152,7 +157,7 @@ Folder: [pipeline/mippr/review/](../pipeline/mippr/review/README.md) (rules for 
 - [x] Decide how 'not plastic' particles are handled and what the output says when the model is unsure. The app doesn't test plastic or polymer, and every export says so. Uncertain particles get `review_reason` flags. `polymer_confirmed` columns are left for the lab.
 - [x] Decide the review columns: `review_status`, `*_original` labels, `outline_edited`, reviewer, role and time; rejected rows stay in particles.csv and leave the summary
 - [x] Apply reviewer decisions (`review/corrections.py`): confirm, reject, relabel, edit outline (re-measured exactly as the pipeline would), tag; original labels kept
-- [ ] Split and merge: decide the new particle IDs and what happens to the merged-away row
+- [ ] Build split and merge. Decided (November 18): split pieces of B4 become B4-1, B4-2, …; the original combined row stays in particles.csv marked rejected
 - [x] Order the review list: flagged and low-confidence particles first, then unflagged, reviewed, rejected (`review_queue`). Flagged includes `flag_size_uncertain`, so sizes the app isn't sure of are checked first.
 - [ ] Set the `flag_low_confidence` threshold from validation data
 - [x] Build the review screen (`web/src/review/screen.js`): outlines on the photo coloured by status, click or keyboard to select, confirm / reject / relabel, tar-like and bundle tags, review order; the rules are `review/corrections.js`, the port of corrections.py (parity-tested)
@@ -180,14 +185,15 @@ The app only takes photos on the three printed backgrounds, so the labelled set,
 - [x] Find out whether a labeled set already exists from past hand-classification (open question 4). It does: about 4,600 particles with shape and colour, and about 4,000 with hand-measured length and width, in the Drive ParticleCount spreadsheets ([LAB_DATA.md](LAB_DATA.md)).
 - [x] Match the lab's "Rows A–H" photos to their spreadsheet rows by sample and well (`validation/lab_photo_check.py`; 20 photos so far)
 - [x] Compare automated sizes with the lab's ImageJ results on the fragment_area sample. Median differences across 24 particles: area +0.5%, Feret −0.2%, min Feret +0.1%.
-- [ ] Settle the scale gap with the lab: the app's sizes are 8–12% larger than the sheet on five EX_01 photos but within 2% on three others. Measure one particle from EX_01_S07 with calipers.
+- [x] ~~Settle the scale gap with the lab~~: left as is (user, November 18). The new sheet photos replace the older photos for validation.
 - [ ] Ask the lab how length and width are measured, and why width is larger than length in SF_02/SF_03
 - [x] Run the photo check on more samples and collect the matches into one table: 20 photos, 1,210 particles paired, 8 photos reliable ([report](../validation/reports/lab_photos.md)). The size gap varies by photo (+12% to −2%), so it comes from the lab's scale settings, not the app. SF_04 has no sheet in Drive.
 - [x] Build the box-by-box check (`validation/sheet_check.py`), the lab's photo guide (`validation/PHOTO_PROTOCOL.md`) and the well-to-box, calipers and label templates; tested end to end on synthetic sheet photos
-- [ ] Re-photograph the lab's labelled particles on the printed sheets (all three backgrounds), with a well-to-box list, so their hand labels and sizes carry over
+- [x] Permission: the lab's ParticleCount spreadsheets and photos may be used and published (advisor, November 18)
+- [ ] Re-photograph the lab's labelled particles on the printed sheets (all three backgrounds), with a well-to-box list, so their hand labels and sizes carry over. The advisor will print the backgrounds, take the photos and make a CSV of each particle's morphology and colour (about two weeks from November 18).
 - [ ] Compare box by box: length and width against the lab's sizes, colour and morphology against the lab's labels; report agreement per class and the confusion between classes
 - [ ] Count detection from the well-to-box list: boxes with a particle the app missed, and extra detections in boxes listed empty
-- [ ] Measure 30–50 of those particles with calipers, to decide which is right where the app and the lab's sizes disagree (the lab's older sizes vary by session)
+- [ ] Measure 30–50 of those particles with calipers (not yet agreed with the advisor), to decide which is right where the app and the lab's sizes disagree (the lab's older sizes vary by session)
 - [ ] Set each flag's threshold from the results: `flag_size_uncertain` (which `size_uncertainty` goes with a wrong size), `flag_low_contrast`, `flag_merged`, and `flag_low_confidence` once confidences exist. Record how many wrong results each flag catches and how many it misses.
 - [ ] Shoot a pilot batch of 50 to 100 particles on the printed sheets, covering every class
 - [ ] Set up a per-box label sheet (sample, photo, box, colour, morphology, labeller), with the class lists from the spec; no outline annotation tool is needed
@@ -196,7 +202,7 @@ The app only takes photos on the three printed backgrounds, so the labelled set,
 - [ ] Measure agreement between labelers (Cohen's kappa for classes)
 - [ ] Resolve disagreements and update the class spec from what you learn
 - [ ] Split into train, validation and test sets by sample, not by image
-- [ ] Agree how close to hand measurements counts as validated (open question 6), after seeing the agreement per class
+- [ ] Agree how close to hand measurements counts as validated (open question 6). Direction (November 18): the lab agrees the standard; sizes should be close, but applying the rules consistently matters more than always matching the hand measurement. The colour threshold and the multicolour / second-colour rules are set later.
 - [ ] Run the pipeline once on the held-out test set and do not tune on it
 - [ ] Report size error in mm, class confusion matrices for colour and morphology, detection counts, and what each flag catches
 - [ ] Compare model-versus-human agreement with human-versus-human agreement
@@ -208,6 +214,8 @@ The app only takes photos on the three printed backgrounds, so the labelled set,
 **Watch for:** Don't tune on the test set. A method proven only on the pilot setup isn't a standard method.
 
 ## Decision point: build the web app?
+
+**Deliverable (advisor, November 18):** the full web app, in about six months (around May 2027). The batch tool and documentation matter too, for papers afterwards.
 
 Go only if validation met its targets, the batch tool runs for someone other than you, and there is a hosting and maintenance plan. Otherwise release the command-line tool and documentation as the finished project.
 
@@ -244,12 +252,13 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
 - [x] Photo guidance on the site: print at actual size, whole sheet in frame with all four markers, even light, no flash; and the message shown when a photo has no sheet
 - [x] Download particles.csv, summary.csv, run.json (with the review decisions) and NOTE.txt
 - [ ] Download the overlay image, and a PDF or HTML summary
-- [ ] Host on Cloudflare Pages from the GitHub repo, with upload size limits
+- [ ] Host on Cloudflare Pages from the GitHub repo, with upload size limits. Decided (November 18): stays on the user's GitHub and Cloudflare accounts; OpenCV.js is served with the site, not from a CDN.
+- [x] Keep the browser and Python versions within about a pixel; an exact match is not needed now (November 18)
 - [x] Run the tests on every push (GitHub Actions: pipeline, ruler reader, browser parity tests, plan in sync)
-- [ ] Choose a license and add contribution notes
+- [ ] Add the licences (decided November 18: MIT for code, CC BY 4.0 for contributed photos and labels) and contribution notes
 - [ ] Write the methods page: class definitions, calibration, accuracy and known limits
 - [ ] Tag version 1.0 with a changelog
-- [ ] Pilot with two or three outside users and collect what confused them
+- [ ] Pilot with two or three outside users and collect what confused them (no pilot group identified yet, November 18)
 - [ ] Draft a short paper or report and share the repository with the lab group
 
 **In:** The pipeline (parts 1–6), validation results.  
@@ -264,13 +273,13 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
 
 Folder: [database/](../database/README.md) (draft schema) and `web/src/storage/` (client).
 
-- [ ] Decide what is stored: full photos, crops only, or only measurement rows (Drive open question 9b)
+- [ ] Decide what is stored: full photos, crops only, or only measurement rows (Drive open question 9b). Open, to discuss later. The user's idea: connect the user's Google Drive as the storage, and keep both the full photo and each particle's crop, referenced as columns in the CSV.
 - [ ] Set up Supabase: tables for samples, images, particles, labels and model versions, with Row Level Security on every table and no service-role key in client code. A draft is in `database/migrations/0001_draft_schema.sql`.
 - [ ] Add reviewer sign-in with Supabase Auth (expert or community role)
 - [ ] Save confirmed and corrected labels to Supabase from the review screen
 - [ ] Export a versioned database snapshot for each retraining and for publishing
 - [ ] Check Supabase free-tier limits and how to keep the project from pausing (open question 9c); set a data retention policy
-- [ ] Agree the data license and consent terms for contributed photos and labels (open question 9)
+- [ ] Agree the consent terms for contributed photos and labels (open question 9). The licence is decided: CC BY 4.0
 - [ ] Publish the labeled dataset or a sample, with a data card (e.g. on Zenodo for a citable DOI per version)
 
 **In:** Rows from part 8, decisions from part 6.  
@@ -289,7 +298,7 @@ Folder: [training/](../training/README.md). Periodic and manual, not continuous 
 - [ ] Set up the retraining routine: snapshot, build the dataset, train, evaluate, gate, publish (`training/` stubs)
 - [ ] Version every model and record its gold-set scores (`model_versions`), so past results stay reproducible
 - [ ] At each retraining, check the flag thresholds against reviewer corrections (which flagged particles were really wrong, and which wrong ones weren't flagged); change a threshold only by a new, versioned release, never automatically
-- [ ] Decide where training runs: a lab GPU machine or free notebooks (open question 8)
+- [ ] Decide where training runs: a lab GPU machine or free notebooks (open question 8; to be discussed later)
 - [ ] Set a plan for who answers issues and retrains the model after the practicum (open question 7)
 - [ ] Publish models (GitHub releases, Hugging Face or Zenodo)
 

@@ -29,9 +29,10 @@ export const COLUMNS = Object.freeze([
   "size_class",
   "length_mm_outer", "length_mm_inner", "width_mm_outer", "width_mm_inner", "size_uncertainty",
   "convex_area_mm2", "convex_perimeter_mm",
-  "aspect_ratio", "circularity", "solidity",
-  "perimeter_imagej_mm", "circularity_imagej",
+  "aspect_ratio", "circularity", "solidity", "roundness", "major_mm", "minor_mm",
+  "feret_ratio", "perimeter_subpixel_mm", "circularity_subpixel",
   "color_L", "color_a", "color_b", "color_L_sd", "color_a_sd", "color_b_sd", "color_hex",
+  "color_R", "color_G", "color_B", "color_H", "color_S", "color_V",
   "opacity", "color_secondary", "color_secondary_fraction", "color_label", "color_confidence",
   "morphology_label", "morphology_source", "morphology_confidence", "morphology_runner_up",
   "morphology_runner_up_confidence",
@@ -154,7 +155,7 @@ export function reviewReason(f) {
  * (Feret) length:width, or the along-the-fiber one for a particle that bends, so a curved fiber still counts.
  */
 export function morphology(m) {
-  let ar = m.aspect_ratio;
+  let ar = m.feret_ratio;
   if (get(m, "fiber_uniform") && get(m, "fiber_width_um") && m.fiber_length_um >= CURVED_RATIO * m.feret_max_um) {
     ar = pyMax(ar, m.fiber_length_um / m.fiber_width_um);
   }
@@ -236,9 +237,12 @@ export function buildRows(measurements, { sampleId, pictureLabel, imageId, metad
       ...sizeRange(m),
       convex_area_mm2: m.convex_area_um2 / 1e6, convex_perimeter_mm: m.convex_perimeter_um / 1000,
       aspect_ratio: m.aspect_ratio, circularity: m.circularity, solidity: m.solidity,
-      perimeter_imagej_mm: m.perimeter_imagej_um / 1000, circularity_imagej: m.circularity_imagej,
+      roundness: m.roundness, major_mm: m.major_um / 1000, minor_mm: m.minor_um / 1000,
+      feret_ratio: m.feret_ratio, perimeter_subpixel_mm: m.perimeter_subpixel_um / 1000,
+      circularity_subpixel: m.circularity_subpixel,
       color_L: m.L_mean, color_a: m.a_mean, color_b: m.b_mean,
       color_L_sd: m.L_sd, color_a_sd: m.a_sd, color_b_sd: m.b_sd, color_hex: hex(m),
+      ...Object.fromEntries([..."RGBHSV"].map((c) => [`color_${c}`, m[`${c}_mean`]])),
       opacity: isNone(get(m, "opacity")) ? "" : m.opacity,
       color_secondary: get(m, "color_secondary", ""),
       color_secondary_fraction: get(m, "color_secondary_fraction", ""),

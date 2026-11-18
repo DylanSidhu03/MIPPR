@@ -18,7 +18,7 @@ Details live in [CLASSIFICATION_SPEC.md](CLASSIFICATION_SPEC.md), [OUTPUT_CSV.md
 - **Color:** 13 classes (clear, white, black, grey, blue, green, red, yellow, orange, brown, pink, purple, multicolor). Clear and white are kept separate by a rule; multicolor means a second color covers ≥ 20%. A color reference goes in every frame.
 - **Plastic:** the app does not judge it. Every export says so in `NOTE.txt`, and the `polymer_confirmed` / `polymer_method` columns are left for the lab.
 
-### Perimeter method (October 27, 2026, provisional)
+### Perimeter method (October 27, 2026; replaced November 18, see below)
 
 - The sub-pixel outline is the headline perimeter and circularity. It was most accurate on shapes with known perimeters: worst error 9% versus 13–20%, and under 1.2% change with rotation (`validation/reports/perimeter_study.txt`).
 - ImageJ-compatible columns are kept alongside, because sub-pixel circularity reads about 0.08–0.10 higher than ImageJ.
@@ -90,6 +90,31 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 - **Colour:** nearest class with a confidence, no automatic "unknown"; the second colour and its share are always recorded.
 - **Tar:** an optional reviewer tag `tar_like`; no automatic detection.
 - **Validation:** match the lab's plate photos to their spreadsheet rows and compare per class; the pass mark is set after.
+
+### Answers to the open questions (user and advisor, November 18, 2026)
+
+- **ImageJ is the main guideline for every measurement** (size, shape, colour and morphology), with anything else useful kept as extra columns:
+  - Length and width: ImageJ's Feret and MinFeret over pixel corners (unchanged; the sub-pixel length question is closed).
+  - `perimeter_mm`, `circularity`, `aspect_ratio` are now ImageJ's Perim., Circ. and AR (fitted ellipse, ported from `ij/process/EllipseFitter.java`). Added `roundness`, `major_mm`, `minor_mm`.
+  - Kept alongside: `perimeter_subpixel_mm`, `circularity_subpixel`, and `feret_ratio` (length:width), which the morphology rules use, so the fiber rule is unchanged. Mean RGB and HSV are back as `color_R` … `color_V`. Feret angle stays out: it is undefined for near-square particles, and a one-pixel difference flips it.
+  - On the fragment_area sample, against ImageJ's own results: AR −0.1%, Round +0.2%, Circ. +3.0%, Solidity +1.0% (medians).
+  - Colour and morphology have no ImageJ equivalent; their guideline is the lab's labels.
+- **OpenCV.js** is served with the site, not from a CDN.
+- **Rubbery fragment:** its own class if the v3 model can tell it apart; otherwise fragment, with the reviewer marking rubbery. Decided by how it performs.
+- **Fibers on hold:** the advisor will send fiber photos, and the lab usually removes fibers by other methods. Do not change fiber logic for now.
+- **Tar-like:** not decided (stays a reviewer tag).
+- **Split IDs:** B4-1, B4-2, …; the original combined row stays, marked rejected.
+- **Browser vs Python:** within about a pixel is enough; no exact port of the warp now.
+- **Licences:** MIT for code, CC BY 4.0 for contributed photos and labels.
+- **Storage (9b):** open. The user's idea: connect the user's Google Drive as storage, keeping the full photo and each crop referenced in the CSV.
+- **Paper:** matte. **Printer:** should not matter; see the printer item in part 1 of the plan.
+- **Lab photos:** the advisor will print the backgrounds, photograph particles and make a CSV of morphology and colour, in about two weeks. Calipers not yet agreed.
+- **Validation:** the lab agrees the standard; consistent rules matter more than always matching hand measurements. Colour threshold and multicolour rules later.
+- **Lab data:** may be used and published. **Older size gap:** left as is.
+- **Coloured patches:** add a coloured-patch version of each sheet (repo and Drive).
+- **Hosting:** stays on the user's GitHub and Cloudflare accounts.
+- **Deliverable:** the full web app in about six months; the batch tool and documentation matter for papers.
+- **Still open:** upkeep after the practicum and where training runs (later), pilot users (unknown).
 
 ### The browser pipeline (November 18, 2026)
 

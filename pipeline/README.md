@@ -104,12 +104,14 @@ The output folder gets:
    to half the particle's own contrast, so bright and faint particles get the
    same treatment (`segmentation/edges.py`).
 5. **Measure and classify** (spec v0.3; `measurement/`, `color/`, `morphology/`). Measurement
-   is deterministic geometry with ImageJ conventions (area as a pixel count, Feret
-   diameters over pixel edges): area, convex area and perimeter, a sub-pixel
-   perimeter (the most accurate in `validation/perimeter_study.py`) plus an
-   ImageJ-compatible one, length and width (max and min Feret), circular
-   equivalent diameter, aspect ratio, circularity, solidity, and mean and SD of
-   CIE Lab. As well as these:
+   is deterministic geometry, with ImageJ as the main guideline for every value
+   (decided November 18, 2026): area as a pixel count, length and width (Feret and
+   MinFeret over pixel edges), ImageJ's traced perimeter, and its shape descriptors
+   (circularity, aspect ratio from the fitted ellipse, roundness, solidity). Also
+   kept: convex area and perimeter, circular equivalent diameter, a sub-pixel
+   perimeter and circularity (the most accurate in `validation/perimeter_study.py`),
+   the Feret length:width the rules use, and the mean and SD of CIE Lab plus mean
+   RGB and HSV. As well as these:
    - **length along the fiber** (`fiber_length_mm`): the skeleton's longest path,
      smoothed, with its ends trimmed where it runs into corners and the true end
      length added back. It is within about 1–3% on curved and straight test shapes.

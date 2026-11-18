@@ -38,7 +38,8 @@ for (const c of ref) {
     assert.deepEqual(rows.map((r) => r.particle_ref), c.rows.map((r) => r.particle_ref));
     // The flattened grid differs from Python's by at most 1 grey level on a few pixels (OpenCV.js 4.10 vs
     // OpenCV 5's remap), which can flip an edge pixel at the threshold. So text and flags must be identical,
-    // and numbers agree within a pixel or so: colour within 1.5 Lab units (3 levels for the hex code), other
+    // and numbers agree within a pixel or so: colour within 1.5 Lab units (6 levels for the hex code and the
+    // RGB/HSV means, 6 degrees for hue), other
     // values within 7% (a 0.6 mm particle is only about 60 px in area; larger ones agree within 0.3%).
     // Rule confidences come from a steep curve over the shape values, so they get 0.1 (absolute).
     const worst = {};
@@ -58,7 +59,8 @@ for (const c of ref) {
           const d = Math.abs(got - want);
           const absolute = k.startsWith("color_") || k.endsWith("confidence");
           worst[k] = Math.max(worst[k] ?? 0, absolute ? d : d / Math.max(1e-9, Math.abs(want)));
-          const limit = k.endsWith("confidence") ? 0.1 : k.startsWith("color_") ? 1.5 : 0.07 * Math.abs(want) + 1e-9;
+          const limit = k.endsWith("confidence") ? 0.1 : /^color_[RGBHSV]$/.test(k) ? 6
+            : k.startsWith("color_") ? 1.5 : 0.07 * Math.abs(want) + 1e-9;
           assert.ok(d <= limit, where);
         } else assert.equal(got, want ?? "", where);
       }

@@ -28,6 +28,8 @@ const EXACT = ["abs", 1e-9];
 const TOLERANCE = {
   perimeter_um: ["rel", 1e-6],
   circularity: ["rel", 1e-6],
+  perimeter_subpixel_um: ["rel", 1e-6],
+  circularity_subpixel: ["rel", 1e-6],
   fiber_length_um: ["rel", 1e-9], // asked for: 1%
   fiber_width_um: ["rel", 1e-9],
   opacity: ["abs", 1e-6],

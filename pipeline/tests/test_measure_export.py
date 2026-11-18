@@ -27,7 +27,8 @@ def _m(**kw):
     base = dict(particle=1, box="A1", x_um=0.0, y_um=0.0, feret_max_um=2000.0, feret_min_um=1500.0,
                 area_um2=3e6, perimeter_um=7000.0, ced_um=1950.0, convex_area_um2=3.1e6,
                 convex_perimeter_um=6900.0, aspect_ratio=1.33, circularity=0.8, solidity=0.95,
-                perimeter_imagej_um=7100.0, circularity_imagej=0.78,
+                perimeter_subpixel_um=7100.0, circularity_subpixel=0.78, feret_ratio=1.33, roundness=0.75,
+                major_um=2100.0, minor_um=1600.0, feret_angle_deg=10.0, H_mean=5.0, S_mean=200.0, V_mean=200.0,
                 R_mean=200.0, G_mean=40.0, B_mean=40.0, L_mean=45.0, a_mean=60.0, b_mean=40.0,
                 L_sd=3.0, a_sd=2.0, b_sd=2.0,
                 _contrast=200.0, _touches_edge=False, _touches_line=False, _px={"cx": 10.0, "cy": 20.0, "x": 5, "y": 15, "w": 10, "h": 10})

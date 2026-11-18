@@ -69,7 +69,7 @@ Columns appear in this order. Empty means "not available in this release" or "no
 | `length_mm` | Measured | Longest distance across the outline (max Feret) × scale. **The main size.** | v1 |
 | `width_mm` | Measured | Narrowest distance across the outline (min Feret) × scale. Key for fibers and for the sieve check. Empty, with `flag_width_unresolved`, when the width is under about 2 pixels (most fibers are ~24 µm wide). | v1 |
 | `area_mm2` | Measured | Pixels inside the outline × scale² | v1 |
-| `perimeter_mm` | Measured | Length of the sub-pixel outline × scale (see 4.5) | v1 |
+| `perimeter_mm` | Measured | Perimeter as ImageJ computes it for traced particles × scale (ImageJ's `Perim.`) | v1 |
 | `ced_mm` | Derived | Diameter of a circle with the same area | v1 |
 | `fiber_length_mm` | Measured | Length along the fiber's centre line (skeleton) × scale, so curved fibers are not under-measured. Filled for particles classed as fiber; empty otherwise. | v2 |
 | `size_length_source` | Derived | Which length `size_class` and summaries use: `fiber_length` for fibers, `max_feret` for everything else | v2 |
@@ -78,24 +78,27 @@ Columns appear in this order. Empty means "not available in this release" or "no
 | `size_uncertainty` | Derived | (`length_mm_outer` − `length_mm_inner`) ÷ `length_mm`: how much the size depends on where the edge is drawn. Near 0 for a sharp particle; large for a faint, clear, blurred or very small one. It is a warning sign, not an error bar: the testing phase measures how often particles above a given value are really wrong (section 9). | v1 |
 | `convex_area_mm2`, `convex_perimeter_mm` | Measured | Area and perimeter of the convex outline. Saturna reports both; solidity uses the convex area. | v1 |
 
-Length and width follow ImageJ's convention: they are measured over the outer edges of the boundary pixels. Every size column depends on `mm_per_px`. If the scale is wrong, all of them are wrong by the same factor, which is why the printed 100 mm check line exists.
+**ImageJ is the main guideline for every measurement** (decided November 18, 2026): the main columns are computed as ImageJ's Analyze Particles computes them, so results compare with the lab's workflow, and other useful methods are kept alongside (4.5). Length and width are ImageJ's Feret and MinFeret, measured over the outer edges of the boundary pixels. Every size column depends on `mm_per_px`. If the scale is wrong, all of them are wrong by the same factor, which is why the printed 100 mm check line exists.
 
 ### 4.4 Shape (no units)
 
 | Column | Type | How it is produced | From |
 |---|---|---|---|
-| `aspect_ratio` | Derived | `length_mm` ÷ `width_mm`. A value of 3 or more counts as a fiber in the spec. | v1 |
-| `circularity` | Derived | 4π × area ÷ perimeter² from the sub-pixel outline (1.0 = circle) | v1 |
-| `solidity` | Derived | area ÷ convex area. Low values suggest irregular fragments or two merged particles. | v1 |
+| `aspect_ratio` | Derived | ImageJ's `AR`: major ÷ minor axis of the fitted ellipse | v1 |
+| `circularity` | Derived | ImageJ's `Circ.`: 4π × area ÷ `perimeter_mm`² (1.0 = circle) | v1 |
+| `solidity` | Derived | ImageJ's `Solidity`: area ÷ convex area. Low values suggest irregular fragments or two merged particles. | v1 |
+| `roundness` | Derived | ImageJ's `Round`: 4 × area ÷ (π × major axis²) | v1 |
+| `major_mm`, `minor_mm` | Measured | ImageJ's `Major` and `Minor`: axes of the ellipse with the particle's area and second moments | v1 |
 
-### 4.5 ImageJ-compatible
+On the lab's fragment_area sample (24 particles) these match ImageJ's own results: median AR −0.1%, Round +0.2%, Circ. +3.0%, Solidity +1.0% (`validation/results/fragment_area_sample/compare_imagej.txt`).
+
+### 4.5 Other methods, kept alongside ImageJ's
 
 | Column | Type | How it is produced | From |
 |---|---|---|---|
-| `perimeter_imagej_mm` | Measured | Perimeter as ImageJ computes it for traced particles | v1 |
-| `circularity_imagej` | Derived | Circularity from that perimeter | v1 |
-
-These keep old ImageJ results comparable. On real particles the sub-pixel `circularity` reads about 0.08–0.10 higher than ImageJ's. Which one is the headline number is still a **provisional decision** (spec section 5).
+| `feret_ratio` | Derived | `length_mm` ÷ `width_mm` (Feret length:width). The rules use it: 3 or more counts as a fiber in the spec. | v1 |
+| `perimeter_subpixel_mm` | Measured | Length of the sub-pixel outline × scale: the most accurate and least rotation-dependent method in `validation/perimeter_study.py` | v1 |
+| `circularity_subpixel` | Derived | Circularity from that perimeter; on real particles about 0.08–0.10 higher than ImageJ's | v1 |
 
 ### 4.6 Color
 
@@ -104,6 +107,8 @@ These keep old ImageJ results comparable. On real particles the sub-pixel `circu
 | `color_L`, `color_a`, `color_b` | Measured | Mean CIE Lab inside the outline, with one edge pixel removed, after white balance | v1 |
 | `color_L_sd`, `color_a_sd`, `color_b_sd` | Measured | Spread of the same values; high spread suggests a multicolor particle | v1 |
 | `color_hex` | Derived | Mean color as a hex code, for a quick look in a spreadsheet | v1 |
+| `color_R`, `color_G`, `color_B` | Measured | Mean red, green and blue (0–255) inside the outline, after white balance | v1 |
+| `color_H`, `color_S`, `color_V` | Measured | Mean hue (0–360°, averaged on the circle), saturation and value (0–255) | v1 |
 | `opacity` | Measured | 0 (fully see-through) to 1 (opaque): how much of the box's known background contrast is blocked inside the outline. Separates clear from white and helps find films. | v1 |
 | `color_secondary` | Measured | The second most common colour class inside the outline, if any, so multicolour detail is kept even when the main label is a single colour | v2 |
 | `color_secondary_fraction` | Measured | Share of the particle's area in `color_secondary` (0–1). At 0.20 or more the label is `multicolor`. | v2 |
@@ -236,6 +241,7 @@ Column names stay the same across releases. Columns not yet available are left e
   - `background_type` values are `white_grid`, `black_grid` and `checkerboard`
   - on grids, the merged flag uses solidity only
 - **November 12, 2026:** photos are always on one of the three printed sheets. The lab's old checkerboard is no longer an app input (it is kept in `validation/legacy/` to compare with the lab's ImageJ results), so `scale_source = checkerboard` and the area rule for `flag_merged` are gone.
+- **November 18, 2026:** ImageJ is the main guideline for every measurement. `perimeter_mm`, `circularity` and `aspect_ratio` are now ImageJ's (Perim., Circ., AR from the fitted ellipse); `roundness`, `major_mm`, `minor_mm` were added. The other methods are kept as `feret_ratio` (used by the rules), `perimeter_subpixel_mm` and `circularity_subpixel`, replacing `perimeter_imagej_mm` and `circularity_imagej`. Mean RGB and HSV were added back as `color_R` … `color_V`.
 - **November 12, 2026 (size check):** `length_mm_outer`, `length_mm_inner`, `width_mm_outer`, `width_mm_inner`, `size_uncertainty` and `flag_size_uncertain` added, so a size that depends strongly on where the edge is drawn is flagged for review.
 - **No "likely plastic" column:** it stays out of scope, unless the lab asks for it.
 
@@ -255,6 +261,5 @@ Column names stay the same across releases. Columns not yet available are left e
 ## 9. Still to be decided
 
 - The confidence threshold for `flag_low_confidence` (from v2/v3 validation data).
-- Which perimeter method is the headline circularity (sub-pixel or ImageJ-compatible).
 - The provisional thresholds: merged solidity 0.75, low contrast 100, size uncertainty 0.10. Each is set the same way: run the app on labelled particles photographed on the sheets, see which values go with wrong sizes or labels, and pick the threshold from that (docs/PIPELINE.md, part 7). Fibers may need their own size-uncertainty threshold, since their thin ends fade.
 - The rule thresholds for fiber, pellet and film, and how `opacity` is computed on each background, tuned on labelled particles.

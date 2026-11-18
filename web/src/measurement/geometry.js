@@ -279,6 +279,43 @@ export function perimeterImageJ(mask) {
   return sumdx + sumdy - nCorners * (2 - Math.SQRT2);
 }
 
+/**
+ * (major, minor) axis lengths in px of ImageJ's fitted ellipse (ij/process/EllipseFitter.java): the ellipse
+ * with the particle's second moments (each pixel a unit square, hence the 1/12 terms) and its area.
+ */
+export function ellipseImageJ(mask) {
+  const { width: w, data } = mask;
+  let n = 0, sx = 0, sy = 0;
+  for (let i = 0; i < data.length; i++) if (data[i]) (n++, (sx += i % w), (sy += Math.floor(i / w)));
+  const xm = sx / n, ym = sy / n;
+  let sxx = 0, syy = 0, sxy = 0;
+  for (let i = 0; i < data.length; i++) {
+    if (!data[i]) continue;
+    const dx = (i % w) - xm, dy = Math.floor(i / w) - ym;
+    sxx += dx * dx, syy += dy * dy, sxy += dx * dy;
+  }
+  const u20 = sxx / n + 0.08333333, u02 = syy / n + 0.08333333, u11 = sxy / n;
+  const m4 = Math.max(4.0 * Math.abs(u02 * u20 - u11 * u11), 0.000001);
+  let a11 = u02 / m4, a22 = u20 / m4;
+  const a12 = u11 / m4;
+  let tmp = a11 - a22;
+  if (tmp === 0) tmp = 0.000001;
+  let theta = 0.5 * Math.atan((2.0 * a12) / tmp);
+  if (theta < 0) theta += Math.PI / 2;
+  if (a12 > 0) theta += Math.PI / 2;
+  else if (a12 === 0) {
+    if (a22 > a11) (theta = 0), ([a11, a22] = [a22, a11]);
+    else if (a11 !== a22) theta = Math.PI / 2;
+  }
+  tmp = Math.sin(theta);
+  if (tmp === 0) tmp = 0.000001;
+  const z = (a12 * Math.cos(theta)) / tmp;
+  let major = Math.sqrt(1.0 / Math.abs(a22 + z)), minor = Math.sqrt(1.0 / Math.abs(a11 - z));
+  const scale = Math.sqrt(n / (Math.PI * major * minor)); // equal areas
+  major *= scale * 2.0, minor *= scale * 2.0;
+  return major >= minor ? [major, minor] : [minor, major];
+}
+
 function meanSd(vals) {
   let s = 0;
   for (const v of vals) s += v;
@@ -374,6 +411,7 @@ export function measure(cv, labels, img, umPerPx, diff = null, edgeFraction = 0.
     const level = d ? edgeLevel(cv, mask, d, edgeFraction) : null;
     const [perim, outlineArea] = polygonLengthArea(subpixelOutline(cv, mask, d, level, 4, ox, oy));
     const perimIJ = perimeterImageJ(mask);
+    const [major, minor] = ellipseImageJ(mask);
     const convexArea = cv.contourArea(hullMat);
     const convexPerim = cv.arcLength(hullMat, true);
     const rect = cv.minAreaRect(hullMat);
@@ -388,8 +426,8 @@ export function measure(cv, labels, img, umPerPx, diff = null, edgeFraction = 0.
       y_um: cy * u,
       area_um2: areaPx * u2,
       area_px: areaPx,
-      perimeter_um: perim * u,
-      perimeter_imagej_um: perimIJ * u,
+      perimeter_um: perimIJ * u, // ImageJ's traced perimeter
+      perimeter_subpixel_um: perim * u,
       convex_area_um2: convexArea * u2,
       convex_perimeter_um: convexPerim * u,
       feret_max_um: fMax * u,
@@ -400,9 +438,13 @@ export function measure(cv, labels, img, umPerPx, diff = null, edgeFraction = 0.
       bbox_height_um: (y1 - y0 + 1) * u,
       min_rect_length_um: Math.max(rw, rh) * u,
       min_rect_width_um: Math.min(rw, rh) * u,
-      aspect_ratio: fMin > 0 ? fMax / fMin : NaN,
-      circularity: perim > 0 ? Math.min(1, (4 * Math.PI * outlineArea) / perim ** 2) : NaN,
-      circularity_imagej: perimIJ > 0 ? Math.min(1, (4 * Math.PI * areaPx) / perimIJ ** 2) : NaN,
+      major_um: major * u, // ImageJ's fitted ellipse
+      minor_um: minor * u,
+      aspect_ratio: minor > 0 ? major / minor : NaN, // ImageJ AR
+      roundness: major > 0 ? (4 * areaPx) / (Math.PI * major ** 2) : NaN, // ImageJ Round
+      feret_ratio: fMin > 0 ? fMax / fMin : NaN, // length:width, used by the rules
+      circularity: perimIJ > 0 ? Math.min(1, (4 * Math.PI * areaPx) / perimIJ ** 2) : NaN, // ImageJ Circ.
+      circularity_subpixel: perim > 0 ? Math.min(1, (4 * Math.PI * outlineArea) / perim ** 2) : NaN,
       solidity: convexArea > 0 ? Math.min(1, areaPx / convexArea) : NaN,
     };
     const cimg = crop(C, ox, oy, ex, ey);

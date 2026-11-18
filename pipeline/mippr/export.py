@@ -41,12 +41,13 @@ COLUMNS = [
     "size_class",
     "length_mm_outer", "length_mm_inner", "width_mm_outer", "width_mm_inner", "size_uncertainty",
     "convex_area_mm2", "convex_perimeter_mm",
-    # Shape
-    "aspect_ratio", "circularity", "solidity",
-    # ImageJ-compatible
-    "perimeter_imagej_mm", "circularity_imagej",
+    # Shape (ImageJ's shape descriptors)
+    "aspect_ratio", "circularity", "solidity", "roundness", "major_mm", "minor_mm",
+    # Other methods, kept alongside ImageJ's
+    "feret_ratio", "perimeter_subpixel_mm", "circularity_subpixel",
     # Color
     "color_L", "color_a", "color_b", "color_L_sd", "color_a_sd", "color_b_sd", "color_hex",
+    "color_R", "color_G", "color_B", "color_H", "color_S", "color_V",
     "opacity", "color_secondary", "color_secondary_fraction", "color_label", "color_confidence",
     # Morphology
     "morphology_label", "morphology_source", "morphology_confidence", "morphology_runner_up",
@@ -125,7 +126,7 @@ def morphology(m):
     The fiber rule uses the straight (Feret) length:width, or the along-the-fiber one
     for a particle that bends, so a curved fiber still counts.
     """
-    ar = m["aspect_ratio"]
+    ar = m["feret_ratio"]
     # The centre-line length:width only takes over for a particle that bends (its length
     # along the centre line is clearly longer than straight across). For straight
     # particles Feret is already right, and the centre line over-reads chunky,
@@ -203,9 +204,12 @@ def build_rows(measurements, sample_id, picture_label, image_id, metadata, app_v
             **_size_range(m),
             "convex_area_mm2": m["convex_area_um2"] / 1e6, "convex_perimeter_mm": m["convex_perimeter_um"] / 1000,
             "aspect_ratio": m["aspect_ratio"], "circularity": m["circularity"], "solidity": m["solidity"],
-            "perimeter_imagej_mm": m["perimeter_imagej_um"] / 1000, "circularity_imagej": m["circularity_imagej"],
+            "roundness": m["roundness"], "major_mm": m["major_um"] / 1000, "minor_mm": m["minor_um"] / 1000,
+            "feret_ratio": m["feret_ratio"], "perimeter_subpixel_mm": m["perimeter_subpixel_um"] / 1000,
+            "circularity_subpixel": m["circularity_subpixel"],
             "color_L": m["L_mean"], "color_a": m["a_mean"], "color_b": m["b_mean"],
             "color_L_sd": m["L_sd"], "color_a_sd": m["a_sd"], "color_b_sd": m["b_sd"], "color_hex": _hex(m),
+            **{f"color_{c}": m[f"{c}_mean"] for c in "RGBHSV"},
             "opacity": "" if m.get("opacity") is None else m["opacity"],
             "color_secondary": m.get("color_secondary", ""),
             "color_secondary_fraction": m.get("color_secondary_fraction", ""),

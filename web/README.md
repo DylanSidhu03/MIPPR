@@ -36,7 +36,7 @@ The website people use: print a background, upload photos, get results, review t
 | `capture/sheet.js`, `subpix.js` | Layout, markers, homography, grid-crossing refinement, flattening, white balance | crossings within 0.002 px on five synthetic photos; flattened grid within 1 grey level |
 | `capture/quality.js` | Photo quality check (same codes, messages, limits) | identical codes on 36 degraded photos |
 | `segmentation/edges.js`, `grid.js` | Per-box background, line bridging, hysteresis, half-maximum edges | labels pixel for pixel on all three backgrounds |
-| `measurement/*.js` | Sizes, Feret (ImageJ convention, in one function), sub-pixel perimeter, colour statistics, fiber length, opacity, size range | floating-point precision on every field |
+| `measurement/*.js` | Sizes and shape as ImageJ computes them (Feret, traced perimeter, fitted ellipse), sub-pixel perimeter, colour statistics, fiber length, opacity, size range | floating-point precision on every field |
 | `color/rules.js`, `morphology/rules.js`, `export/csv.js` | Colour and shape rules, rows, summary, CSV | rows exact; CSV byte for byte |
 | `pipeline.js` | The whole photo → rows run | text and flags identical; numbers within about a pixel (below) |
 

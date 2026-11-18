@@ -38,10 +38,12 @@ create table particles (
   fiber_length_mm       double precision,
   size_uncertainty      double precision,  -- how much the length depends on where the edge is drawn
   area_mm2              double precision,
-  perimeter_mm          double precision,
-  aspect_ratio          double precision,
-  circularity           double precision,
+  perimeter_mm          double precision,  -- ImageJ's traced perimeter
+  aspect_ratio          double precision,  -- ImageJ's AR (fitted ellipse)
+  circularity           double precision,  -- ImageJ's Circ.
   solidity              double precision,
+  roundness             double precision,  -- ImageJ's Round
+  feret_ratio           double precision,  -- length:width, used by the rules
   opacity               double precision,
   color_L double precision, color_a double precision, color_b double precision,
   color_label           text,
