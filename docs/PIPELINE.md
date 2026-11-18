@@ -241,7 +241,7 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
 - [x] Run batches in the browser on the user's machine (several photos per run, no processing server); a photo without a sheet is refused with the reason and the rest carry on
 - [ ] Move the processing into a Web Worker so the page stays responsive on large batches
 - [x] Build the upload and progress screens, and a results table with overlays
-- [ ] Photo guidance on the site: print at actual size, whole sheet in frame with all four markers, even light, no flash; and the message shown when a photo has no sheet
+- [x] Photo guidance on the site: print at actual size, whole sheet in frame with all four markers, even light, no flash; and the message shown when a photo has no sheet
 - [x] Download particles.csv, summary.csv, run.json (with the review decisions) and NOTE.txt
 - [ ] Download the overlay image, and a PDF or HTML summary
 - [ ] Host on Cloudflare Pages from the GitHub repo, with upload size limits
