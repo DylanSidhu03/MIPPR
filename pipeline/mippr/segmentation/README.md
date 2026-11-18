@@ -24,7 +24,7 @@ Find each particle in its box and draw its outline. Errors here carry into every
 
 - [ ] **Clear and translucent films:** low-contrast outlines are flagged (`flag_low_contrast`) but often incomplete. Try the opposite background, or opacity-aware thresholds.
 - [ ] **Thin fibers** (about 24 µm wide, under one pixel on a sheet photo): detect them as faint lines so their length can be measured (`flag_width_unresolved`).
-- [ ] **Particle crops** with the background blanked, for the v3 model and possibly for storage (Drive 9b). Planned: `crop_particle` in `../morphology/model.py`.
+- [x] **Particle crops** with the background blanked: `../crops.py` (written by every run, `crop_file`).
 - [ ] **Test on real phone photos** of the printed sheets, especially particles across a black/white edge on the checkerboard (open question 1).
 - [ ] **Check against labelled photos of the sheets** (part 7): detection counted from the well-to-box list (missed particles, extra detections); outlines are looked at where a particle's size or shape came out wrong. No hand-drawn outlines are needed.
 - [ ] Optional: compare with a learned segmenter (Cellpose, SAM, a small U-Net), only if the threshold falls short.

@@ -1,4 +1,4 @@
-"""Part 5, morphology: the image model (v3). Planned; nothing here is implemented yet.
+"""Part 5, morphology: the image model (v3). Planned; only the model input (model_input) exists.
 
 The model decides what the rules (rules.py) can't, mainly fragment vs rubbery
 fragment vs foam, from a crop of the particle plus its shape values. It is trained
@@ -7,6 +7,11 @@ Runtime Web (web/src/morphology/model.js). This file is the Python side, used fo
 batch runs and to check the browser gives the same answers.
 """
 from dataclasses import dataclass
+
+import cv2
+import numpy as np
+
+from ..crops import crop_particle
 
 CROP_SIZE = 128  # px; to be chosen with the first training runs
 
@@ -20,15 +25,14 @@ class Prediction:
     model_version: str
 
 
-def crop_particle(img, mask, size=CROP_SIZE, pad_frac=0.15):
-    """Planned: a square crop of one particle with the background blanked.
-
-    The crop is centred on the particle, padded by `pad_frac`, and resized to
-    `size` x `size`; pixels outside the mask are set to a neutral value. It returns
-    the crop and its mm per crop-pixel, so size isn't lost (the model also gets the
-    shape values). Also used to save crops for training and storage (Drive 9b).
-    """
-    raise NotImplementedError("Part 5: particle crops are planned (see morphology/README.md)")
+def model_input(img_bgr, mask, size=CROP_SIZE):
+    """The model's input: the particle's crop (crops.py, background transparent) on neutral grey,
+    resized to `size` x `size`, and the crop px per input px (so size isn't lost; the model also
+    gets the shape values). The size and the grey are to be chosen with the first training runs."""
+    crop = crop_particle(img_bgr, mask)
+    a = crop[..., 3:4] / 255.0
+    flat = (crop[..., :3] * a + 128 * (1 - a)).astype(np.uint8)
+    return cv2.resize(flat, (size, size), interpolation=cv2.INTER_AREA), crop.shape[1] / size
 
 
 class MorphologyModel:

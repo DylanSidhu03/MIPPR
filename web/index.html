@@ -76,12 +76,16 @@
     <section id="export" hidden>
       <h2>4. Download</h2>
       <p>One row per particle (<code>particles.csv</code>) and one per sample (<code>summary.csv</code>), as defined in the
-        project's output dictionary. Rejected particles stay in particles.csv and are left out of the summary.</p>
+        project's output dictionary. Rejected particles stay in particles.csv and are left out of the summary. Each row's
+        <code>crop_file</code> names its picture in the crops zip; the overlays and the HTML summary show every particle outlined.</p>
       <div class="buttons">
         <button data-download="particles.csv">particles.csv</button>
         <button data-download="summary.csv">summary.csv</button>
         <button data-download="run.json">run.json</button>
         <button data-download="NOTE.txt">NOTE.txt</button>
+        <button data-download="crops.zip">Particle crops (zip)</button>
+        <button data-download="overlays.zip">Overlay images (zip)</button>
+        <button data-download="summary.html">Summary (HTML)</button>
       </div>
     </section>
   </main>

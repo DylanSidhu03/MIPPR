@@ -31,6 +31,39 @@ function distToPoly(pt, poly) {
   return best;
 }
 
+/**
+ * Draw the photo's flattened grid (`base`, a canvas or image) with every outline, coloured by review
+ * status (CSS variables --auto, --flagged, ...; rejected dashed) and labelled with its box. Used by the
+ * review screen and for the overlay images.
+ */
+export function drawOverlay(ctx, base, photo, { selected = null } = {}) {
+  ctx.drawImage(base, 0, 0);
+  const width = ctx.canvas.width;
+  const lw = Math.max(2, width / 450);
+  const css = typeof document !== "undefined" ? getComputedStyle(document.documentElement) : null;
+  ctx.font = `${Math.round(lw * 7)}px system-ui, sans-serif`;
+  photo.rows.forEach((row, i) => {
+    const status = displayStatus(row);
+    ctx.strokeStyle = css?.getPropertyValue(`--${status}`).trim() || "#1f77b4";
+    ctx.lineWidth = i === selected ? lw * 2.5 : lw;
+    ctx.setLineDash(status === "rejected" ? [lw * 3, lw * 2] : []);
+    let minX = Infinity, minY = Infinity;
+    for (const poly of photo.outlines[i]) {
+      ctx.beginPath();
+      poly.forEach(([x, y], k) => (k ? ctx.lineTo(x + 0.5, y + 0.5) : ctx.moveTo(x + 0.5, y + 0.5)));
+      ctx.closePath();
+      ctx.stroke();
+      for (const [x, y] of poly) (minX = Math.min(minX, x)), (minY = Math.min(minY, y));
+    }
+    ctx.setLineDash([]);
+    ctx.lineWidth = lw * 1.5;
+    ctx.strokeStyle = "rgba(255,255,255,0.85)";
+    ctx.fillStyle = "#111";
+    ctx.strokeText(row.particle_id, minX, minY - lw * 2);
+    ctx.fillText(row.particle_id, minX, minY - lw * 2);
+  });
+}
+
 export class ReviewScreen {
   /**
    * photo: {name, rows, display: {width, height, rgba}, outlines} (rows and outlines in the same order);
@@ -92,32 +125,7 @@ export class ReviewScreen {
   }
 
   draw() {
-    const ctx = this.canvas.getContext("2d");
-    ctx.drawImage(this.base, 0, 0);
-    const lw = Math.max(2, this.canvas.width / 450);
-    const css = getComputedStyle(document.documentElement);
-    ctx.font = `${Math.round(lw * 7)}px system-ui, sans-serif`;
-    this.photo.rows.forEach((row, i) => {
-      const status = displayStatus(row);
-      ctx.strokeStyle = css.getPropertyValue(`--${status}`).trim() || "#1f77b4";
-      ctx.lineWidth = i === this.selected ? lw * 2.5 : lw;
-      ctx.setLineDash(status === "rejected" ? [lw * 3, lw * 2] : []);
-      let minX = Infinity, minY = Infinity;
-      for (const poly of this.photo.outlines[i]) {
-        ctx.beginPath();
-        poly.forEach(([x, y], k) => (k ? ctx.lineTo(x + 0.5, y + 0.5) : ctx.moveTo(x + 0.5, y + 0.5)));
-        ctx.closePath();
-        ctx.stroke();
-        for (const [x, y] of poly) (minX = Math.min(minX, x)), (minY = Math.min(minY, y));
-      }
-      ctx.setLineDash([]);
-      ctx.lineWidth = lw * 1.5;
-      ctx.strokeStyle = "rgba(255,255,255,0.85)";
-      ctx.fillStyle = "#111";
-      const label = row.particle_id;
-      ctx.strokeText(label, minX, minY - lw * 2);
-      ctx.fillText(label, minX, minY - lw * 2);
-    });
+    drawOverlay(this.canvas.getContext("2d"), this.base, this.photo, { selected: this.selected });
   }
 
   renderPanel() {

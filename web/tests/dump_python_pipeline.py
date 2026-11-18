@@ -7,6 +7,8 @@ fields. The photos themselves are the quality_*.png fixtures (dump_python_qualit
     .venv/bin/python web/tests/dump_python_pipeline.py
 """
 import json
+
+import cv2
 import math
 import sys
 import tempfile
@@ -37,7 +39,12 @@ def main():
             rows = run_grid(FIX / name, d, kw["sample_id"], kw["photo"], {"lab": "Moore", "operator": "DS"},
                             kw["line_mm"])
             run = json.loads((Path(d) / "run.json").read_text())
-        out.append({"file": name, **kw, "metadata": {"lab": "Moore", "operator": "DS"},
+            crops = []
+            for r in rows:
+                im = cv2.imread(str(Path(d) / r["crop_file"]), cv2.IMREAD_UNCHANGED)
+                crops.append({"file": r["crop_file"], "width": im.shape[1], "height": im.shape[0],
+                              "opaque": int((im[..., 3] == 255).sum())})
+        out.append({"file": name, **kw, "metadata": {"lab": "Moore", "operator": "DS"}, "crops": crops,
                     "rows": [{k: clean(v) for k, v in r.items()} for r in rows],
                     "run": {k: run[k] for k in ("background_type", "markers_found", "px_per_mm", "mm_per_px",
                                                 "white_balance", "quality", "printed_line_mm", "printer_scale")}})

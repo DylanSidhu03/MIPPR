@@ -32,7 +32,7 @@ METADATA = ("date", "operator", "lab", "setup", "site")
 
 COLUMNS = [
     # Identifiers and sample details
-    "sample_id", "picture_label", "image_id", "particle_id", "particle_ref", *METADATA,
+    "sample_id", "picture_label", "image_id", "photo_file", "particle_id", "particle_ref", "crop_file", *METADATA,
     # Location
     "centroid_x_px", "centroid_y_px", "bbox_x_px", "bbox_y_px", "bbox_w_px", "bbox_h_px",
     "centroid_x_mm", "centroid_y_mm",
@@ -171,12 +171,13 @@ def _size_range(m):
 
 
 def build_rows(measurements, sample_id, picture_label, image_id, metadata, app_version, mm_per_px, processed_at,
-               background_type, scale_source="markers", scale_flag=False):
+               background_type, scale_source="markers", scale_flag=False, photo_file="", crop_dir=""):
     """Per-particle rows, named, ordered and filled as in docs/OUTPUT_CSV.md.
 
     `background_type` is the printed sheet's (white_grid, black_grid or checkerboard);
     `scale_source` is `markers`, `paper_edges` (printer scaling corrected from the paper's edges), or
-    `user_corrected` after the 100 mm line check.
+    `user_corrected` after the 100 mm line check. `photo_file` is the photo's file name; with `crop_dir`,
+    `crop_file` is `<crop_dir>/<particle_ref>.png` (crops.py writes it).
     """
     ids, multi = particle_ids(measurements)
     rows = []
@@ -192,8 +193,9 @@ def build_rows(measurements, sample_id, picture_label, image_id, metadata, app_v
         size_length = max(length, fiber_length) if fiber else length
         row = {c: "" for c in COLUMNS}
         row.update({
-            "sample_id": sample_id, "picture_label": picture_label, "image_id": image_id,
+            "sample_id": sample_id, "picture_label": picture_label, "image_id": image_id, "photo_file": photo_file,
             "particle_id": ids[i], "particle_ref": f"{picture_label}-{ids[i]}",
+            "crop_file": f"{crop_dir}/{picture_label}-{ids[i]}.png" if crop_dir else "",
             **{k: metadata.get(k, "") or "" for k in METADATA},
             "centroid_x_px": round(px["cx"], 1), "centroid_y_px": round(px["cy"], 1),
             "bbox_x_px": px["x"], "bbox_y_px": px["y"], "bbox_w_px": px["w"], "bbox_h_px": px["h"],

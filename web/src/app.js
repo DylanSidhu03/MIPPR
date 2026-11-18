@@ -1,8 +1,11 @@
 // Part 8: the app. Print a background -> measure photos (in the browser) -> check the results -> download.
 // Processing runs on the user's machine; Cloudflare Pages only serves these files.
 import { OPENCV, loadOpenCV } from "./opencv.js";
-import { imageIdFor, runGrid } from "./pipeline.js";
+import { APP_VERSION, imageIdFor, runGrid } from "./pipeline.js";
 import { NOTE, particlesCsv, summaryCsv } from "./export/csv.js";
+import { summaryHtml } from "./export/report.js";
+import { zip } from "./export/zip.js";
+import { drawOverlay } from "./review/screen.js";
 
 export { particlesCsv, summaryCsv };
 
@@ -18,7 +21,8 @@ export async function processPhoto(cv, imageData, file, { sampleId, photo, metad
   const bgr = new cv.Mat();
   try {
     cv.cvtColor(rgba, bgr, cv.COLOR_RGBA2BGR);
-    return runGrid(cv, bgr, { sampleId, photo, imageId, metadata, lineMm, forDisplay: true, keepContext: true });
+    return runGrid(cv, bgr, { sampleId, photo, imageId, photoFile: file.name, metadata, lineMm, forDisplay: true,
+      keepContext: true });
   } finally {
     rgba.delete();
     bgr.delete();
@@ -36,12 +40,44 @@ async function readImage(file) {
 
 const nextFrame = () => new Promise((r) => setTimeout(r, 0));
 
-function download(name, text, type) {
+function download(name, data, type) {
   const a = document.createElement("a");
-  a.href = URL.createObjectURL(new Blob([text], { type }));
+  a.href = URL.createObjectURL(new Blob([data], { type }));
   a.download = name;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+async function canvasBytes(canvas, type = "image/png", quality) {
+  return new Uint8Array(await (await canvas.convertToBlob({ type, quality })).arrayBuffer());
+}
+
+function rgbaCanvas({ width, height, rgba }) {
+  const c = new OffscreenCanvas(width, height);
+  c.getContext("2d").putImageData(new ImageData(rgba, width, height), 0, 0);
+  return c;
+}
+
+/** The photo's overlay (outlines coloured by review status, box labels) on a canvas. */
+function overlayCanvas(photo) {
+  const base = rgbaCanvas(photo.display);
+  const c = new OffscreenCanvas(base.width, base.height);
+  drawOverlay(c.getContext("2d"), base, photo);
+  return c;
+}
+
+/** A JPEG data URL of the overlay, at most `maxWidth` px wide, for summary.html. */
+async function overlayDataUrl(photo, maxWidth = 1200) {
+  const full = overlayCanvas(photo);
+  const s = Math.min(1, maxWidth / full.width);
+  const c = new OffscreenCanvas(Math.round(full.width * s), Math.round(full.height * s));
+  c.getContext("2d").drawImage(full, 0, 0, c.width, c.height);
+  const blob = await c.convertToBlob({ type: "image/jpeg", quality: 0.85 });
+  return new Promise((resolve) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.readAsDataURL(blob);
+  });
 }
 
 function li(text, cls = "") {
@@ -137,9 +173,33 @@ async function main() {
     if (state.screen?.handleKey(e)) e.preventDefault();
   });
 
-  document.querySelectorAll("[data-download]").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll("[data-download]").forEach((b) => b.addEventListener("click", async () => {
     const rows = state.photos.flatMap((p) => p.rows);
     const name = b.dataset.download;
+    if (name === "crops.zip" || name === "overlays.zip" || name === "summary.html") {
+      const label = b.textContent;
+      b.disabled = true;
+      b.textContent = "Preparing…";
+      try {
+        if (name === "crops.zip") {
+          const files = [];
+          for (const p of state.photos) for (const k of p.crops) files.push({ name: k.file, data: await canvasBytes(rgbaCanvas(k)) });
+          download(name, zip(files), "application/zip");
+        } else if (name === "overlays.zip") {
+          const files = [];
+          for (const p of state.photos) files.push({ name: `${p.run.picture_label}_overlay.png`, data: await canvasBytes(overlayCanvas(p)) });
+          download(name, zip(files), "application/zip");
+        } else {
+          const photos = [];
+          for (const p of state.photos) photos.push({ ...p, problems: p.problems.map((q) => q.asDict()), overlay: await overlayDataUrl(p) });
+          download(name, summaryHtml(photos, { appVersion: APP_VERSION }), "text/html");
+        }
+      } finally {
+        b.disabled = false;
+        b.textContent = label;
+      }
+      return;
+    }
     if (name === "particles.csv") download(name, particlesCsv(rows), "text/csv");
     else if (name === "summary.csv") download(name, summaryCsv(rows), "text/csv");
     else if (name === "NOTE.txt") download(name, `${NOTE}\n`, "text/plain");

@@ -110,6 +110,30 @@ try {
   assert.ok(rejected.color_label_original && rejected.reviewed_by === "Tester" && rejected.reviewer_role === "expert");
   const summary = (await download("summary.csv")).trim().split("\r\n");
   assert.equal(summary[1].split(",").slice(0, 3).join(","), "S042,2,5"); // the rejected particle leaves the summary
+  // Crops, overlays and the HTML summary.
+  const binary = async (name) => {
+    const [d] = await Promise.all([page.waitForEvent("download"), page.click(`[data-download="${name}"]`)]);
+    const p = join(tmp, name);
+    await d.saveAs(p);
+    return readFileSync(p);
+  };
+  const entries = (z) => { // names in a ZIP's central directory
+    const end = z.length - 22, n = z.readUInt16LE(end + 10);
+    let p = z.readUInt32LE(end + 16);
+    const names = [];
+    for (let i = 0; i < n; i++) {
+      const len = z.readUInt16LE(p + 28);
+      names.push(z.subarray(p + 46, p + 46 + len).toString());
+      p += 46 + len;
+    }
+    return names;
+  };
+  const crops = entries(await binary("crops.zip"));
+  assert.deepEqual(crops.sort(), rows.map((r) => r.crop_file).sort());
+  assert.deepEqual(entries(await binary("overlays.zip")).sort(), ["S042-P01_overlay.png", "S042-P02_overlay.png"]);
+  const html = (await binary("summary.html")).toString();
+  assert.match(html, /Sample S042/);
+  assert.equal((html.match(/<img src="data:image\/jpeg/g) || []).length, 2);
   assert.deepEqual(errors, []);
   console.log("smoke test passed: measure, refuse a photo without a sheet, review with keys and clicks, download");
 } finally {

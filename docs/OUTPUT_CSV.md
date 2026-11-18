@@ -23,7 +23,9 @@ The app describes particles that have already been hand-picked. It does not deci
 |---|---|
 | `particles.csv` | One row per detected particle. This is the main output and the source of everything else. |
 | `summary.csv` | One row per sample, calculated only from `particles.csv`. This is what researchers usually report. |
-| `overlay.png` | The corrected photo with each particle outlined and labelled with its `particle_id` |
+| `overlay.png` | The corrected photo with each particle outlined and labelled with its `particle_id` (the browser app: `overlays.zip`, one per photo, outlines coloured by review status) |
+| `crops/` | One PNG per particle, `<particle_ref>.png`: a square cut from the white-balanced grid at full resolution, padded 15%, background transparent (alpha 0 outside the outline). The browser app downloads them as `crops.zip`. |
+| `summary.html` | Browser app: a one-file report per run (counts by shape, colour and size, flags, review progress, each photo's overlay) |
 | `run.json` | Settings, scale and versions for the run; `printer_scale` (the paper's edges, the paper they fit and the printer's scale, when all four edges are in the photo); `color_patches` and, on those sheets, `white_balance.color_patches_after_bgr`; and `quality`: the photo check's problems (code, message, value, limit) and the values it measured (edge width, white level, clipped share, glare, light ratio, grey spread) |
 | `NOTE.txt` | "Visual classification only. Whether a particle is plastic, and its polymer type, were not tested." |
 
@@ -50,8 +52,10 @@ Columns appear in this order. Empty means "not available in this release" or "no
 | `sample_id` | Recorded | Typed at upload | v1 |
 | `picture_label` | Recorded | Readable label for the photo: sample ID plus photo number, e.g. `S042-P01`, `S042-P02`. Shown on the overlay. | v1 |
 | `image_id` | Recorded | File name plus a short hash of the file, e.g. `particle-3f9c21ab`. This is the unique technical key; image-level settings (scale, background) apply to all its particles. | v1 |
+| `photo_file` | Recorded | The photo's file name, so each row points to its full photo | v1 |
 | `particle_id` | Recorded | The printed box label, e.g. `B4` (row letter + column number), unique within the photo. If a box holds more than one blob, they become `B4-1`, `B4-2`, ... (top to bottom, then left to right), and each gets `flag_multi_blob`. | v1 |
 | `particle_ref` | Recorded | `picture_label` + `particle_id`, e.g. `S042-P01-B4`: unique across the whole sample | v1 |
+| `crop_file` | Recorded | The particle's crop, relative to the output folder: `crops/S042-P01-B4.png` (batch runs: `photos/<photo>/crops/...`). Not changed when an outline is redrawn. | v1 |
 | `date`, `operator`, `lab`, `setup`, `site` | Recorded | Entered by the user once per upload and repeated on every row, so files from different labs and setups can be combined | v1 |
 
 ### 4.2 Location
@@ -244,6 +248,7 @@ Column names stay the same across releases. Columns not yet available are left e
 - **November 12, 2026:** photos are always on one of the three printed sheets. The lab's old checkerboard is no longer an app input (it is kept in `validation/legacy/` to compare with the lab's ImageJ results), so `scale_source = checkerboard` and the area rule for `flag_merged` are gone.
 - **November 18, 2026:** ImageJ is the main guideline for every measurement. `perimeter_mm`, `circularity` and `aspect_ratio` are now ImageJ's (Perim., Circ., AR from the fitted ellipse); `roundness`, `major_mm`, `minor_mm` were added. The other methods are kept as `feret_ratio` (used by the rules), `perimeter_subpixel_mm` and `circularity_subpixel`, replacing `perimeter_imagej_mm` and `circularity_imagej`. Mean RGB and HSV were added back as `color_R` … `color_V`.
 - **November 18, 2026:** `scale_source = paper_edges`: when all four paper edges are in the photo, the app measures how the printer scaled the sheet and corrects the scale if it is off by more than 1% (a `printer_scaled` photo problem says so).
+- **November 18, 2026:** `photo_file` and `crop_file` (the full photo and each particle's crop, as the user asked), `solidity_subpixel` (used by the pellet rule), and the crops, overlay and HTML summary downloads.
 - **November 12, 2026 (size check):** `length_mm_outer`, `length_mm_inner`, `width_mm_outer`, `width_mm_inner`, `size_uncertainty` and `flag_size_uncertain` added, so a size that depends strongly on where the edge is drawn is flagged for review.
 - **No "likely plastic" column:** it stays out of scope, unless the lab asks for it.
 

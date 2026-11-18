@@ -31,6 +31,7 @@ import numpy as np
 from . import __version__
 from .capture.calibration import check_quality, measure_quality, printer_problem, printer_scale, white_balance
 from .capture.sheet import BACKGROUNDS, PAPERS, Layout, find_sheet, save_sheet
+from .crops import write_crops
 from .export import COLUMNS, METADATA, NOTE, SUMMARY_COLUMNS, build_rows, build_summary
 from .measurement.geometry import measure
 from .segmentation.grid import GridSegmentParams, background_image, box_of, line_band, segment_grid
@@ -120,7 +121,9 @@ def run_grid(photo_path, out_dir, sample_id="sample", photo=1, metadata=None, li
                       datetime.now(timezone.utc).isoformat(timespec="seconds"),
                       background_type=lay.background,
                       scale_source="paper_edges" if from_paper else "user_corrected" if corrected else "markers",
-                      scale_flag=corrected or sheet.markers_found < 4)
+                      scale_flag=corrected or sheet.markers_found < 4,
+                      photo_file=Path(photo_path).name, crop_dir="crops")
+    write_crops(Path(out_dir), labels, balanced, measured, rows)
     _write(out_dir, rows, draw_overlay(balanced, labels, measured, rows), {
         "mode": "grid", "photo": str(photo_path), "sample_id": sample_id, "picture_label": label,
         **(metadata or {}), "background_type": lay.background, "paper": lay.paper, "color_patches": lay.color_patches,

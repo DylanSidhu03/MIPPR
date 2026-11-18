@@ -138,7 +138,7 @@ Folder: [pipeline/mippr/morphology/](../pipeline/mippr/morphology/README.md) (ru
 - [ ] Fibers: on hold (advisor, November 18). The advisor will send fiber photos; the lab usually removes fibers by other methods. Whether a fiber is a thin thread or anything ≥ 3:1, and whether the Gyre sheet's "Line" / "Line Bundle" are fiber / fiber bundle, wait until then.
 - [ ] Rubbery fragment (advisor, November 18): wanted as its own class if the model can tell it apart; if not, the app says fragment and the reviewer marks whether it is rubbery. Decided by how it performs (v3).
 - [ ] Tar-like: reviewer tag or class? Not decided yet (a tag for now)
-- [ ] Cut particle crops with the background blanked (`crop_particle`), for training and inference
+- [x] Cut particle crops with the background blanked (`pipeline/mippr/crops.py`, `web/src/crops.js`): full resolution, square, padded, background transparent; saved as `crops/<particle_ref>.png` and named in `crop_file`, with the photo in `photo_file`. `morphology/model.py` `model_input` puts a crop on grey at the model's size.
 - [ ] Train an image model on crops + shape values (v3) for fragment, rubbery fragment and foam. Compare a classifier chain with one multi-task model.
 - [ ] Decide when the model may overrule a rule (decided that it may; set the confidence from validation data)
 - [ ] Add 2–3 example photos per morphology class to the spec
@@ -252,7 +252,7 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
 - [x] Build the upload and progress screens, and a results table with overlays
 - [x] Photo guidance on the site: print at actual size, whole sheet in frame with all four markers, even light, no flash; and the message shown when a photo has no sheet
 - [x] Download particles.csv, summary.csv, run.json (with the review decisions) and NOTE.txt
-- [ ] Download the overlay image, and a PDF or HTML summary
+- [x] Download the overlay images (`overlays.zip`), the particle crops (`crops.zip`) and an HTML summary (`summary.html`: counts, flags, review progress, each photo's overlay)
 - [ ] Host on Cloudflare Pages from the GitHub repo, with upload size limits. Decided (November 18): stays on the user's GitHub and Cloudflare accounts; OpenCV.js is served with the site, not from a CDN.
 - [x] Keep the browser and Python versions within about a pixel; an exact match is not needed now (November 18)
 - [x] Run the tests on every push (GitHub Actions: pipeline, ruler reader, browser parity tests, plan in sync)

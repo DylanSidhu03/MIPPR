@@ -26,9 +26,19 @@ for (const c of ref) {
     const imageId = await imageIdFor(c.file, bytes);
     assert.equal(imageId, c.rows[0].image_id);
     const img = readPngMat(cv, new URL(c.file, fixtures));
-    const { rows, run } = runGrid(cv, img, {
-      sampleId: c.sample_id, photo: c.photo, imageId, metadata: c.metadata, lineMm: c.line_mm,
-      processedAt: c.rows[0].processed_at,
+    const { rows, run, crops } = runGrid(cv, img, {
+      sampleId: c.sample_id, photo: c.photo, imageId, photoFile: c.file, metadata: c.metadata, lineMm: c.line_mm,
+      processedAt: c.rows[0].processed_at, forDisplay: true,
+    });
+    // Crops (crops.js vs crops.py): same files; sizes within 2 px and opaque areas within 15%, as the
+    // outlines can differ by an edge pixel.
+    assert.deepEqual(crops.map((k) => k.file), c.crops.map((k) => k.file));
+    crops.forEach((k, i) => {
+      const want = c.crops[i];
+      assert.ok(Math.abs(k.width - want.width) <= 2 && Math.abs(k.height - want.height) <= 2, `${k.file} size`);
+      let opaque = 0;
+      for (let j = 3; j < k.rgba.length; j += 4) opaque += k.rgba[j] === 255;
+      assert.ok(Math.abs(opaque - want.opaque) <= 0.15 * want.opaque + 4, `${k.file} opaque ${opaque} vs ${want.opaque}`);
     });
     img.delete();
     assert.equal(run.background_type, c.run.background_type);

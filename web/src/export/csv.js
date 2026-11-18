@@ -22,7 +22,7 @@ export const FLAGS = Object.freeze(["flag_edge", "flag_merged", "flag_low_confid
 export const METADATA = Object.freeze(["date", "operator", "lab", "setup", "site"]);
 
 export const COLUMNS = Object.freeze([
-  "sample_id", "picture_label", "image_id", "particle_id", "particle_ref", ...METADATA,
+  "sample_id", "picture_label", "image_id", "photo_file", "particle_id", "particle_ref", "crop_file", ...METADATA,
   "centroid_x_px", "centroid_y_px", "bbox_x_px", "bbox_y_px", "bbox_w_px", "bbox_h_px",
   "centroid_x_mm", "centroid_y_mm",
   "length_mm", "width_mm", "area_mm2", "perimeter_mm", "ced_mm", "fiber_length_mm", "size_length_source",
@@ -210,7 +210,7 @@ function sizeRange(m) {
  * `backgroundType` is the printed sheet's; `scaleSource` is `markers`, `paper_edges` or `user_corrected`.
  */
 export function buildRows(measurements, { sampleId, pictureLabel, imageId, metadata = {}, appVersion, mmPerPx,
-  processedAt, backgroundType, scaleSource = "markers", scaleFlag = false }) {
+  processedAt, backgroundType, scaleSource = "markers", scaleFlag = false, photoFile = "", cropDir = "" }) {
   const { ids, multi } = particleIds(measurements);
   const order = measurements.map((_, i) => i).sort((i, j) => measurements[i].particle - measurements[j].particle);
   return order.map((i) => {
@@ -224,8 +224,9 @@ export function buildRows(measurements, { sampleId, pictureLabel, imageId, metad
     const sizeLength = fiber ? pyMax(length, fiberLength) : length; // along the fiber for fibers
     const row = Object.fromEntries(COLUMNS.map((c) => [c, ""]));
     Object.assign(row, {
-      sample_id: sampleId, picture_label: pictureLabel, image_id: imageId,
+      sample_id: sampleId, picture_label: pictureLabel, image_id: imageId, photo_file: photoFile,
       particle_id: ids.get(i), particle_ref: `${pictureLabel}-${ids.get(i)}`,
+      crop_file: cropDir ? `${cropDir}/${pictureLabel}-${ids.get(i)}.png` : "",
       ...Object.fromEntries(METADATA.map((k) => [k, get(metadata, k, "") || ""])),
       centroid_x_px: npRound1(px.cx), centroid_y_px: npRound1(px.cy),
       bbox_x_px: px.x, bbox_y_px: px.y, bbox_w_px: px.w, bbox_h_px: px.h,

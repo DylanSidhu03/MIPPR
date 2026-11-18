@@ -82,6 +82,9 @@ def run_batch(folder, out_dir, settings=None, default_sample=None, metadata=None
                     "px_per_mm": info.get("px_per_mm", ""),
                     # mm_per_px includes any scale correction (paper edges or the 100 mm line); px_per_mm is the markers'
                     "scale_source": got[0]["scale_source"] if got else "", "mm_per_px": info.get("mm_per_px", "")})
+        for r in got:  # crops are written per photo; point at them from the batch folder
+            if r.get("crop_file"):
+                r["crop_file"] = f"photos/{p.stem}/{r['crop_file']}"
         rows += got
         report.append(rec)
         print(f"{p.name}: {len(got)} particles", file=sys.stderr)

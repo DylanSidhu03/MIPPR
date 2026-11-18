@@ -28,10 +28,10 @@
     "scale_x": 1.0003,
     "scale_y": 0.9998,
     "edges_mm": {
-      "left": -0.04,
-      "right": 215.79,
-      "top": -0.11,
-      "bottom": 279.34
+      "left": 0.04,
+      "right": 215.87,
+      "top": -0.03,
+      "bottom": 279.41
     }
   },
   "white_balance": {

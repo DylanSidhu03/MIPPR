@@ -5,6 +5,7 @@ import { checkQuality, measureQuality } from "./capture/quality.js";
 import { printerProblem, printerScale } from "./capture/printer.js";
 import { GRID_SEGMENT_DEFAULTS, segmentGrid } from "./segmentation/grid.js";
 import { buildRows } from "./export/csv.js";
+import { cropParticle } from "./crops.js";
 import { balance, makeMeasureContext, measureWith } from "./review/context.js";
 
 export const APP_VERSION = "0.1.0"; // pipeline/mippr/__init__.py __version__
@@ -62,12 +63,14 @@ function displayImage(balanced) {
  * problems appended to the message, like the Python pipeline.
  * `imageId` should come from imageIdFor(); `processedAt` defaults to now (UTC, seconds).
  * With `forDisplay`, also returns `display` (the white-balanced grid as RGBA) and `outlines`
- * (each row's outline polygons in grid px, in the same order as `rows`). With `keepContext`, also
+ * (each row's outline polygons in grid px, in the same order as `rows`) and `crops` (each row's crop,
+ * {file, width, height, rgba}, for crops/<particle_ref>.png; crops.js). With `keepContext`, also
  * returns `context`: what measure() was given, so the review screen can re-measure a redrawn
  * outline (review/corrections.js); the caller owns it and calls `context.delete()`.
  */
 export function runGrid(cv, img, {
-  sampleId = "sample", photo = 1, imageId, metadata = {}, lineMm = null, params = {}, forDisplay = false, keepContext = false,
+  sampleId = "sample", photo = 1, imageId, photoFile = "", metadata = {}, lineMm = null, params = {}, forDisplay = false,
+  keepContext = false,
   processedAt = new Date().toISOString().replace(/\.\d+Z$/, "+00:00"),
 } = {}) {
   const p = { ...GRID_SEGMENT_DEFAULTS, ...params };
@@ -105,7 +108,7 @@ export function runGrid(cv, img, {
     const rows = buildRows(measured, {
       sampleId, pictureLabel: label, imageId, metadata, appVersion: APP_VERSION, mmPerPx, processedAt,
       backgroundType: lay.background, scaleSource: fromPaper ? "paper_edges" : corrected ? "user_corrected" : "markers",
-      scaleFlag: corrected || sheet.markersFound < 4,
+      scaleFlag: corrected || sheet.markersFound < 4, photoFile, cropDir: "crops",
     });
     const run = {
       mode: "grid", sample_id: sampleId, picture_label: label, ...metadata, background_type: lay.background,
@@ -117,7 +120,9 @@ export function runGrid(cv, img, {
     const out = { rows, problems, quality, run, measured };
     if (forDisplay) {
       out.display = displayImage(balanced);
-      out.outlines = [...measured].sort((a, b) => a.particle - b.particle).map((m) => outlineOf(cv, labels, m));
+      const ordered = [...measured].sort((a, b) => a.particle - b.particle); // the order of `rows`
+      out.outlines = ordered.map((m) => outlineOf(cv, labels, m));
+      out.crops = ordered.map((m, i) => ({ file: rows[i].crop_file, ...cropParticle(balanced, labels, m.particle, m._px) }));
     }
     if (keepContext) out.context = context;
     return out;

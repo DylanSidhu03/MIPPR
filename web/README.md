@@ -94,7 +94,7 @@ Serve the repo root (`python -m http.server`) and open `/web/` to try the page; 
 - [ ] Run the processing in a Web Worker so the page stays responsive
 - [x] Photo guidance: print at actual size, whole sheet and all four markers in frame, even light, no flash. A photo without the markers is refused with that message (the app only takes the three printed backgrounds).
 - [x] Export particles.csv, summary.csv, run.json, NOTE.txt
-- [ ] Overlay image download; a PDF or HTML summary
+- [x] Downloads: overlay images and particle crops (zip, `export/zip.js`), and `summary.html` (`export/report.js`)
 - [ ] Redraw an outline on the review screen
 - [x] Python batch command for the lab (`python -m mippr.cli batch`)
 - [ ] Cloudflare Pages deployment from the GitHub repo; upload size limits

@@ -8,13 +8,35 @@
    "lab": "Moore",
    "operator": "DS"
   },
+  "crops": [
+   {
+    "file": "crops/S1-P01-B2.png",
+    "width": 32,
+    "height": 32,
+    "opaque": 519
+   },
+   {
+    "file": "crops/S1-P01-F7.png",
+    "width": 129,
+    "height": 129,
+    "opaque": 1152
+   },
+   {
+    "file": "crops/S1-P01-K9.png",
+    "width": 17,
+    "height": 17,
+    "opaque": 103
+   }
+  ],
   "rows": [
    {
     "sample_id": "S1",
     "picture_label": "S1-P01",
     "image_id": "quality_white_grid-0547ada4",
+    "photo_file": "quality_white_grid.png",
     "particle_id": "B2",
     "particle_ref": "S1-P01-B2",
+    "crop_file": "crops/S1-P01-B2.png",
     "date": "",
     "operator": "DS",
     "lab": "Moore",
@@ -105,14 +127,16 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:49:56+00:00"
+    "processed_at": "2026-11-18T20:55:02+00:00"
    },
    {
     "sample_id": "S1",
     "picture_label": "S1-P01",
     "image_id": "quality_white_grid-0547ada4",
+    "photo_file": "quality_white_grid.png",
     "particle_id": "F7",
     "particle_ref": "S1-P01-F7",
+    "crop_file": "crops/S1-P01-F7.png",
     "date": "",
     "operator": "DS",
     "lab": "Moore",
@@ -203,14 +227,16 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:49:56+00:00"
+    "processed_at": "2026-11-18T20:55:02+00:00"
    },
    {
     "sample_id": "S1",
     "picture_label": "S1-P01",
     "image_id": "quality_white_grid-0547ada4",
+    "photo_file": "quality_white_grid.png",
     "particle_id": "K9",
     "particle_ref": "S1-P01-K9",
+    "crop_file": "crops/S1-P01-K9.png",
     "date": "",
     "operator": "DS",
     "lab": "Moore",
@@ -301,7 +327,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:49:56+00:00"
+    "processed_at": "2026-11-18T20:55:02+00:00"
    }
   ],
   "run": {
@@ -370,13 +396,35 @@
    "lab": "Moore",
    "operator": "DS"
   },
+  "crops": [
+   {
+    "file": "crops/S1-P02-B2.png",
+    "width": 32,
+    "height": 32,
+    "opaque": 518
+   },
+   {
+    "file": "crops/S1-P02-F7.png",
+    "width": 129,
+    "height": 129,
+    "opaque": 1149
+   },
+   {
+    "file": "crops/S1-P02-K9.png",
+    "width": 17,
+    "height": 17,
+    "opaque": 101
+   }
+  ],
   "rows": [
    {
     "sample_id": "S1",
     "picture_label": "S1-P02",
     "image_id": "quality_black_grid-fdcedf53",
+    "photo_file": "quality_black_grid.png",
     "particle_id": "B2",
     "particle_ref": "S1-P02-B2",
+    "crop_file": "crops/S1-P02-B2.png",
     "date": "",
     "operator": "DS",
     "lab": "Moore",
@@ -467,14 +515,16 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:49:58+00:00"
+    "processed_at": "2026-11-18T20:55:05+00:00"
    },
    {
     "sample_id": "S1",
     "picture_label": "S1-P02",
     "image_id": "quality_black_grid-fdcedf53",
+    "photo_file": "quality_black_grid.png",
     "particle_id": "F7",
     "particle_ref": "S1-P02-F7",
+    "crop_file": "crops/S1-P02-F7.png",
     "date": "",
     "operator": "DS",
     "lab": "Moore",
@@ -565,14 +615,16 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:49:58+00:00"
+    "processed_at": "2026-11-18T20:55:05+00:00"
    },
    {
     "sample_id": "S1",
     "picture_label": "S1-P02",
     "image_id": "quality_black_grid-fdcedf53",
+    "photo_file": "quality_black_grid.png",
     "particle_id": "K9",
     "particle_ref": "S1-P02-K9",
+    "crop_file": "crops/S1-P02-K9.png",
     "date": "",
     "operator": "DS",
     "lab": "Moore",
@@ -663,7 +715,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:49:58+00:00"
+    "processed_at": "2026-11-18T20:55:05+00:00"
    }
   ],
   "run": {
@@ -732,13 +784,35 @@
    "lab": "Moore",
    "operator": "DS"
   },
+  "crops": [
+   {
+    "file": "crops/S2-P01-B2.png",
+    "width": 32,
+    "height": 32,
+    "opaque": 519
+   },
+   {
+    "file": "crops/S2-P01-F7.png",
+    "width": 129,
+    "height": 129,
+    "opaque": 1136
+   },
+   {
+    "file": "crops/S2-P01-K9.png",
+    "width": 17,
+    "height": 17,
+    "opaque": 103
+   }
+  ],
   "rows": [
    {
     "sample_id": "S2",
     "picture_label": "S2-P01",
     "image_id": "quality_checkerboard-b92f553c",
+    "photo_file": "quality_checkerboard.png",
     "particle_id": "B2",
     "particle_ref": "S2-P01-B2",
+    "crop_file": "crops/S2-P01-B2.png",
     "date": "",
     "operator": "DS",
     "lab": "Moore",
@@ -829,14 +903,16 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:50:01+00:00"
+    "processed_at": "2026-11-18T20:55:07+00:00"
    },
    {
     "sample_id": "S2",
     "picture_label": "S2-P01",
     "image_id": "quality_checkerboard-b92f553c",
+    "photo_file": "quality_checkerboard.png",
     "particle_id": "F7",
     "particle_ref": "S2-P01-F7",
+    "crop_file": "crops/S2-P01-F7.png",
     "date": "",
     "operator": "DS",
     "lab": "Moore",
@@ -927,14 +1003,16 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:50:01+00:00"
+    "processed_at": "2026-11-18T20:55:07+00:00"
    },
    {
     "sample_id": "S2",
     "picture_label": "S2-P01",
     "image_id": "quality_checkerboard-b92f553c",
+    "photo_file": "quality_checkerboard.png",
     "particle_id": "K9",
     "particle_ref": "S2-P01-K9",
+    "crop_file": "crops/S2-P01-K9.png",
     "date": "",
     "operator": "DS",
     "lab": "Moore",
@@ -1025,7 +1103,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:50:01+00:00"
+    "processed_at": "2026-11-18T20:55:07+00:00"
    }
   ],
   "run": {
@@ -1094,13 +1172,23 @@
    "lab": "Moore",
    "operator": "DS"
   },
+  "crops": [
+   {
+    "file": "crops/S3-P01-B2.png",
+    "width": 25,
+    "height": 25,
+    "opaque": 291
+   }
+  ],
   "rows": [
    {
     "sample_id": "S3",
     "picture_label": "S3-P01",
     "image_id": "printer_white_grid_97-b83039d8",
+    "photo_file": "printer_white_grid_97.png",
     "particle_id": "B2",
     "particle_ref": "S3-P01-B2",
+    "crop_file": "crops/S3-P01-B2.png",
     "date": "",
     "operator": "DS",
     "lab": "Moore",
@@ -1191,7 +1279,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T20:50:02+00:00"
+    "processed_at": "2026-11-18T20:55:08+00:00"
    }
   ],
   "run": {
