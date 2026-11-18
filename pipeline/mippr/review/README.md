@@ -48,7 +48,8 @@ Tests: `tests/test_review.py`.
 
 - [x] **`corrections.py`**: apply a decision to a row; re-measure an edited outline; review order.
 - [ ] **Split and merge**: `remeasure` already measures any mask; still to decide are the new `particle_id`s (B4-1, B4-2?) and what happens to the row merged away (rejected, or removed).
-- [ ] **The review screen** (web, part 8): overlay with outlines, keyboard-friendly accept / reject / relabel, outline redraw. It needs to keep each photo's measurement inputs (rectified image, difference map, background image, line mask) to re-measure outlines.
+- [x] **The review screen** (web: `web/src/review/screen.js`, rules in `corrections.js`, parity-tested): overlay with outlines, click or keys, confirm / reject / relabel, tags. Each photo keeps its measurement inputs (`runGrid(..., {keepContext: true})`), so re-measuring works.
+- [ ] **Outline redraw** on the screen (drawing the polygon; the re-measuring behind it works).
 - [ ] **Who can review:** expert vs community role (sign-in through Supabase Auth, part 9).
 - [ ] **Review history**: the row keeps only the latest reviewer; the full list of decisions belongs in the Supabase labels table (part 9).
 - [ ] **Measure review effort:** how many particles need review, and how long it takes (part 7 reports it).

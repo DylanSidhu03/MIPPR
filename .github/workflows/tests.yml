@@ -35,3 +35,17 @@ jobs:
         run: node web/scripts/fetch_opencv.mjs
       - name: Browser code tests (parity with the Python pipeline)
         run: node --test "web/tests/*.test.mjs"
+
+  app-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Fetch the pinned OpenCV.js (sha256 checked)
+        run: node web/scripts/fetch_opencv.mjs
+      - name: Playwright with Chromium (not a dependency of the app)
+        run: npm install --no-save --no-package-lock playwright@1.63.0 && npx playwright install --with-deps chromium
+      - name: The app in a real browser (measure, refuse a photo without a sheet, review, download)
+        run: node web/scripts/smoke_ui.mjs

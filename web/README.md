@@ -42,7 +42,11 @@ The website people use: print a background, upload photos, get results, review t
 
 **The one known difference.** On the same photo, OpenCV.js 4.10's flattening differs from Python's OpenCV 5 by up to one grey level on a few pixels, which can flip a pixel right at a particle's edge. So, end to end, text, labels and flags are identical, but numbers can differ slightly: for 2–9 mm particles, area within one pixel (≤ 0.3%) and length exact; a 0.6 mm particle (about 60 px in area) moved 6% in area. Rule confidences, from a steep curve, moved up to about 0.04. Each module on identical inputs matches exactly; this comes only from the flattening's resampling, and could be removed by writing the remap in JS like `subpix.js`'s warp, if exact agreement is wanted.
 
-Still stubs: `review/screen.js`, `storage/supabase.js`, `morphology/model.js`, and the screens in `app.js`. Not yet ported: the overlay drawing (the screen will draw outlines on a canvas).
+**The app (`index.html`, `style.css`, `src/app.js`)**: print a background; type the sample details and choose photos; measure (in the browser, a message per photo, refused photos say why); check the results on the review screen (`src/review/screen.js`: the flattened grid with outlines coloured by status, click or keys to select, confirm, reject, relabel, tar-like and bundle tags, in review order, with the rules of `src/review/corrections.js`); download particles.csv, summary.csv, run.json and NOTE.txt. The reviewer's name and role are remembered in the browser. `?opencv=local` loads OpenCV.js from `vendor/` instead of the CDN.
+
+`node web/scripts/smoke_ui.mjs` runs the app in Chromium (Playwright): measures two sheet photos, refuses one without a sheet, reviews with keys and a click, and checks the downloaded CSVs. CI runs it too.
+
+Still stubs: `storage/supabase.js` (part 9) and `morphology/model.js` (v3). Not built yet: redrawing an outline on the screen (the rules and re-measuring work), the overlay image download, and a Web Worker for large batches.
 
 Small tidy-up left: `measurement/_edges.js` repeats `edgeLevel` and `fillHoles` from `segmentation/edges.js` (they take plain arrays rather than Mats); merge them after checking the float32 median rounding is the same.
 
@@ -79,13 +83,16 @@ Serve the repo root (`python -m http.server`) and open `/web/` to try the page; 
 
 ## To build
 
-- [ ] Sketch the screens: print background, upload, sample details, run with progress, review, export
+- [x] Screens: print background, upload, sample details, run with progress, review, export
 - [x] Serve the printable PDFs from `backgrounds/` (links on `index.html`)
 - [x] Port parts 1–5 module by module, each passing the parity tests, and join them (`pipeline.js`), checked end to end against Python on all three backgrounds
-- [ ] Draw the overlay (outlines and box labels) on a canvas for the results and review screens
-- [ ] Batch processing in the browser on the user's machine, with a clear message for each failed photo (quality check, part 1)
-- [ ] Photo guidance: print at actual size, whole sheet and all four markers in frame, even light, no flash. A photo without the markers is refused with that message (the app only takes the three printed backgrounds).
-- [ ] Export the files above; a PDF or HTML summary
+- [x] Draw the overlay (outlines and box labels) on a canvas for the results and review screens
+- [x] Batch processing in the browser on the user's machine, with a clear message for each failed photo (quality check, part 1)
+- [ ] Run the processing in a Web Worker so the page stays responsive
+- [x] Photo guidance: print at actual size, whole sheet and all four markers in frame, even light, no flash. A photo without the markers is refused with that message (the app only takes the three printed backgrounds).
+- [x] Export particles.csv, summary.csv, run.json, NOTE.txt
+- [ ] Overlay image download; a PDF or HTML summary
+- [ ] Redraw an outline on the review screen
 - [x] Python batch command for the lab (`python -m mippr.cli batch`)
 - [ ] Cloudflare Pages deployment from the GitHub repo; upload size limits
 - [x] Automated tests on each push

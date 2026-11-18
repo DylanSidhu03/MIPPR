@@ -155,7 +155,8 @@ Folder: [pipeline/mippr/review/](../pipeline/mippr/review/README.md) (rules for 
 - [ ] Split and merge: decide the new particle IDs and what happens to the merged-away row
 - [x] Order the review list: flagged and low-confidence particles first, then unflagged, reviewed, rejected (`review_queue`). Flagged includes `flag_size_uncertain`, so sizes the app isn't sure of are checked first.
 - [ ] Set the `flag_low_confidence` threshold from validation data
-- [ ] Build the review screen: outlines on the photo, accept / reject / relabel / redraw, keyboard shortcuts, tar-like and bundle tags
+- [x] Build the review screen (`web/src/review/screen.js`): outlines on the photo coloured by status, click or keyboard to select, confirm / reject / relabel, tar-like and bundle tags, review order; the rules are `review/corrections.js`, the port of corrections.py (parity-tested)
+- [ ] Redraw an outline on the review screen (the rules and re-measuring already work: `edit_outline`)
 - [ ] Count how many particles need review and how long it takes
 
 **In:** Rows and overlays from parts 2–5.  
@@ -231,16 +232,18 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
 - [x] Write a README with install steps and a worked example ([pipeline/README.md](../pipeline/README.md))
 - [x] Process a whole folder with one command and one settings file (`python -m mippr.cli batch`, `batch.py`): combined particles and per-sample summary, and a report of every photo processed or refused, with the reason and its quality problems
 - [ ] Time it on 500 images and fix the slowest step
-- [ ] Sketch the screens: print background, upload, sample details, run, review, export
+- [x] Build the screens: print a background, sample details and photos, measure with progress and a message per photo, check the results, download (`web/index.html`, `src/app.js`)
 - [x] Offer the printable backgrounds on the website (download table in `web/index.html`)
 - [x] Port parts 1–5 to the browser module by module (`web/src/`), each passing parity tests against the Python pipeline, and join them (`web/src/pipeline.js`)
   - Markers, crossings, flattening, white balance and the quality check; segmentation; measurement (with JS marching squares and skeleton); colour and shape rules; rows and CSV.
   - End to end on all three backgrounds: text, labels and flags identical to Python; numbers within about a pixel, because OpenCV.js 4.10's resampling differs from OpenCV 5's by up to one grey level (web/README.md).
-- [ ] Draw the overlay (outlines and box labels) on a canvas
-- [ ] Run batches in the browser on the user's machine (no processing server)
-- [ ] Build the upload and progress screens, and a results table with overlays
+- [x] Draw the overlay (outlines and box labels) on a canvas
+- [x] Run batches in the browser on the user's machine (several photos per run, no processing server); a photo without a sheet is refused with the reason and the rest carry on
+- [ ] Move the processing into a Web Worker so the page stays responsive on large batches
+- [x] Build the upload and progress screens, and a results table with overlays
 - [ ] Photo guidance on the site: print at actual size, whole sheet in frame with all four markers, even light, no flash; and the message shown when a photo has no sheet
-- [ ] Export CSV and the overlay image, plus a PDF or HTML summary
+- [x] Download particles.csv, summary.csv, run.json (with the review decisions) and NOTE.txt
+- [ ] Download the overlay image, and a PDF or HTML summary
 - [ ] Host on Cloudflare Pages from the GitHub repo, with upload size limits
 - [x] Run the tests on every push (GitHub Actions: pipeline, ruler reader, browser parity tests, plan in sync)
 - [ ] Choose a license and add contribution notes

@@ -4,24 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>MIPPR</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Part 8: placeholder. Screens planned in web/README.md. -->
-  <main id="app">
+  <header>
     <h1>MIPPR</h1>
-    <p>Microplastic measurement and classification from photos. Under construction.</p>
-
+    <p>Measure and classify hand-picked microplastics (larger than 500 µm) from photos on a printed MIPPR sheet.
+      Everything runs in your browser; photos are not uploaded anywhere.</p>
+  </header>
+  <main id="app">
     <section id="backgrounds">
       <h2>1. Print a background</h2>
-      <p>Print at <strong>actual size (100%)</strong>, not "fit to page", on matte paper. Check the 100 mm line with a ruler.
-        Place one particle per box, not touching a line, and photograph from overhead with all four corner markers in the frame.</p>
+      <p>Print at <strong>actual size (100%)</strong>, not "fit to page", on matte paper, and check the 100 mm line with a ruler.
+        Place one particle per box, off the lines and out of the box's top-left corner, and photograph from overhead
+        with the whole sheet and all four black corner squares in the frame. Even light, no flash.</p>
       <table>
         <thead><tr><th>Background</th><th>For</th><th>Letter</th><th>A4</th></tr></thead>
         <tbody>
-          <tr><td>White grid (white boxes, black lines)</td><td>dark particles</td>
+          <tr><td>White grid</td><td>dark particles</td>
             <td><a href="../backgrounds/mippr_white_grid_letter.pdf" download>PDF</a></td>
             <td><a href="../backgrounds/mippr_white_grid_a4.pdf" download>PDF</a></td></tr>
-          <tr><td>Black grid (black boxes, white lines)</td><td>light and clear particles</td>
+          <tr><td>Black grid</td><td>light and clear particles</td>
             <td><a href="../backgrounds/mippr_black_grid_letter.pdf" download>PDF</a></td>
             <td><a href="../backgrounds/mippr_black_grid_a4.pdf" download>PDF</a></td></tr>
           <tr><td>Checkerboard</td><td>mixed samples</td>
@@ -30,7 +33,52 @@
         </tbody>
       </table>
     </section>
+
+    <section id="measure">
+      <h2>2. Measure photos</h2>
+      <form id="measure-form">
+        <div class="fields">
+          <label>Sample ID <input name="sampleId" required placeholder="S042"></label>
+          <label>First photo number <input name="photo" type="number" min="1" value="1"></label>
+          <label>Date <input name="date" type="date"></label>
+          <label>Operator <input name="operator"></label>
+          <label>Lab <input name="lab"></label>
+          <label>Setup <input name="setup" placeholder="phone, overhead"></label>
+          <label>Site <input name="site"></label>
+          <label>Printed 100 mm line measures (mm) <input name="lineMm" type="number" step="0.1" placeholder="100"></label>
+        </div>
+        <label class="files">Photos <input name="files" type="file" accept="image/*" multiple required></label>
+        <button type="submit" id="run" disabled>Loading image tools…</button>
+      </form>
+      <ol id="status" aria-live="polite"></ol>
+    </section>
+
+    <section id="review" hidden>
+      <h2>3. Check the results</h2>
+      <p class="hint">Particles the app is unsure about come first. Click a particle, or use the keys:
+        <kbd>A</kbd> confirm, <kbd>X</kbd> reject, <kbd>N</kbd>/<kbd>P</kbd> next/previous, <kbd>C</kbd> colour,
+        <kbd>M</kbd> shape, <kbd>T</kbd> tar-like, <kbd>B</kbd> fiber bundle.</p>
+      <div class="fields">
+        <label>Your name <input id="reviewer" autocomplete="name"></label>
+        <label>Role <select id="role"><option value="expert">expert</option><option value="community">community</option></select></label>
+      </div>
+      <nav id="photo-tabs"></nav>
+      <div id="review-area"></div>
+    </section>
+
+    <section id="export" hidden>
+      <h2>4. Download</h2>
+      <p>One row per particle (<code>particles.csv</code>) and one per sample (<code>summary.csv</code>), as defined in the
+        project's output dictionary. Rejected particles stay in particles.csv and are left out of the summary.</p>
+      <div class="buttons">
+        <button data-download="particles.csv">particles.csv</button>
+        <button data-download="summary.csv">summary.csv</button>
+        <button data-download="run.json">run.json</button>
+        <button data-download="NOTE.txt">NOTE.txt</button>
+      </div>
+    </section>
   </main>
+  <footer><p>Visual classification only: whether a particle is plastic, and its polymer type, are not tested.</p></footer>
   <script type="module" src="src/app.js"></script>
 </body>
 </html>
