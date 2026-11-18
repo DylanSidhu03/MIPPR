@@ -19,7 +19,8 @@ from mippr.capture.synthetic import draw_particle, photograph, printed, sheet_bg
 OUT = Path(__file__).resolve().parent / "fixtures"
 DPI = 150
 SCALED = [("printer_white_grid_97.png", "white_grid", "letter", 0.97, None),
-          ("printer_checkerboard_a4_on_letter.png", "checkerboard", "a4", 0.94, "letter")]
+          ("printer_checkerboard_a4_on_letter.png", "checkerboard", "a4", 0.94, "letter"),
+          ("printer_white_grid_letter_on_a4.png", "white_grid", "letter", 210 / 215.9, "a4")]
 for name, bg, paper, scale, on in SCALED:
     lay = Layout(bg, paper)
     img = sheet_bgr(lay, DPI)

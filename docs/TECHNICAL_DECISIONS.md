@@ -32,7 +32,7 @@ Merged with the Drive doc "Output CSV: data dictionary and rationale" (Draft 1).
 - **Files:** `particles.csv` and `summary.csv`, plus `overlay.png`, `run.json` and `NOTE.txt`.
 - **Identity:** `image_id` + per-image `particle_id`, with `well` on the labelled checkerboard. *Replaced on November 4, see below.*
 - **Sample details:** date, operator, lab, setup and site on every row.
-- **Extra columns:** convex area and perimeter, ImageJ-compatible perimeter and circularity, and Lab mean and SD plus a hex code. RGB/HSV statistics, Feret angle and rotated-box size were dropped.
+- **Extra columns:** convex area and perimeter, ImageJ-compatible perimeter and circularity, and Lab mean and SD plus a hex code. RGB/HSV statistics, Feret angle and rotated-box size were dropped. *November 18: ImageJ's perimeter and circularity became the main columns (sub-pixel ones kept alongside), and mean RGB/HSV came back.*
 - **Flags:** True/False columns plus a `review_reason` list:
   - edge, merged, low confidence, scale
   - near cutoff, min width, low contrast
@@ -112,6 +112,7 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 - **Validation:** the lab agrees the standard; consistent rules matter more than always matching hand measurements. Colour threshold and multicolour rules later.
 - **Lab data:** may be used and published. **Older size gap:** left as is.
 - **Coloured patches:** add a coloured-patch version of each sheet (repo and Drive).
+- **Pellet rule:** its circularity cut-off (0.85) was set on the sub-pixel circularity and now applies to ImageJ's, about 0.05–0.08 lower (round particles read 0.91–0.99; the fragment_area pellets fell from 0.98 to 0.91 and still pass); it stays provisional until the advisor's photos. It uses a new `solidity_subpixel` (sub-pixel outline over its hull) instead of ImageJ's solidity, which is 0.87–0.94 on round particles under about 2 mm at sheet resolution because pixel corners pad the hull. Sub-pixel solidity is 0.998–1.0 on discs of 0.6–3 mm at 10 and 20 px/mm, and 0.58–0.89 on star, L and bitten shapes. ImageJ's solidity stays the main column.
 - **Hosting:** stays on the user's GitHub and Cloudflare accounts.
 - **Deliverable:** the full web app in about six months; the batch tool and documentation matter for papers.
 - **Still open:** upkeep after the practicum and where training runs (later), pilot users (unknown).
@@ -249,7 +250,6 @@ Two of the lab's "Rows A–H" photos (EX_01_S01, EX_01_S03) were checked against
 
 - The lab's spreadsheets ([LAB_DATA.md](LAB_DATA.md)) raise new ones: classes for rubbery fragment and line/line bundle, how the lab measures length and width, and whether photos match spreadsheet rows by well.
 
-- Headline perimeter method (after validation).
 - Confidence threshold for `flag_low_confidence` (from v2/v3 data).
 - Tuning the provisional flag thresholds on more photos.
 - Test the grid pipeline on real printed sheets and phone photos, including checking box size and line thickness (Drive 1a).

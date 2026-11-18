@@ -134,7 +134,7 @@ Folder: [pipeline/mippr/morphology/](../pipeline/mippr/morphology/README.md) (ru
 
 - [x] List morphology classes with a written visual rule for each: fragment, rubbery fragment, fiber, film, foam, pellet, other. A fiber is length:width ≥ 3:1. Rubbery fragment was added on November 11 from the lab's records.
 - [x] Classify fiber, pellet and film by rules (v2): length:width ≥ 3 (centre-line ratio for particles that bend), round and solid for pellet, low opacity for film. The thresholds are provisional.
-- [ ] Tune the rule thresholds on labelled particles photographed on the sheets. Pellet: small round particles measure solidity 0.87–0.94 at 10 px/mm, under the 0.95 starting value.
+- [ ] Tune the rule thresholds on labelled particles photographed on the sheets. Pellet: fixed November 18. Small round particles measured ImageJ solidity 0.87–0.94 at 10 px/mm, under the 0.95 starting value, so the rule now uses the sub-pixel solidity (`solidity_subpixel`, 0.998–1.0 on round particles of any size; 0.58–0.89 on star, L and bitten shapes).
 - [ ] Fibers: on hold (advisor, November 18). The advisor will send fiber photos; the lab usually removes fibers by other methods. Whether a fiber is a thin thread or anything ≥ 3:1, and whether the Gyre sheet's "Line" / "Line Bundle" are fiber / fiber bundle, wait until then.
 - [ ] Rubbery fragment (advisor, November 18): wanted as its own class if the model can tell it apart; if not, the app says fragment and the reviewer marks whether it is rubbery. Decided by how it performs (v3).
 - [ ] Tar-like: reviewer tag or class? Not decided yet (a tag for now)

@@ -12,7 +12,8 @@ solidity are ImageJ's shape descriptors.
 Other methods that are useful to know are kept alongside: the sub-pixel
 perimeter and circularity (`perimeter_subpixel_um`, `circularity_subpixel`;
 validation/perimeter_study.py found them the most accurate and least affected
-by rotation) and the Feret length:width (`feret_ratio`, used by the rules).
+by rotation), the sub-pixel solidity (`solidity_subpixel`) and the Feret length:width
+(`feret_ratio`), which the rules use.
 """
 import math
 
@@ -272,7 +273,9 @@ def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margi
         hull = _hull_of_pixel_corners(contour)
         f_max, f_min, f_angle = feret(hull)
         level = edge_level(mask, diff, edge_fraction) if diff is not None else None
-        perim, outline_area = _polygon_length_area(subpixel_outline(mask, diff, level))
+        outline = subpixel_outline(mask, diff, level)
+        perim, outline_area = _polygon_length_area(outline)
+        outline_hull = cv2.contourArea(cv2.convexHull(outline.astype(np.float32)))
         perim_ij = perimeter_imagej(mask)
         major, minor = ellipse_imagej(mask)
         convex_area = cv2.contourArea(hull.astype(np.float32))
@@ -309,6 +312,9 @@ def measure(labels, img_bgr, um_per_px, diff=None, edge_fraction=0.5, edge_margi
             "circularity": min(1.0, 4 * math.pi * area_px / perim_ij ** 2) if perim_ij > 0 else float("nan"),  # ImageJ Circ.
             "circularity_subpixel": min(1.0, 4 * math.pi * outline_area / perim ** 2) if perim > 0 else float("nan"),
             "solidity": min(1.0, area_px / convex_area) if convex_area > 0 else float("nan"),
+            # Solidity of the sub-pixel outline: about 1.0 for a round particle at any size, where ImageJ's
+            # (pixel count over the hull of pixel corners) is 0.87-0.94 below about 2 mm at 10 px/mm. The pellet rule uses it.
+            "solidity_subpixel": min(1.0, outline_area / outline_hull) if outline_hull > 0 else float("nan"),
         }
         cimg = img_bgr if color_img is None else color_img
         row.update(_color_stats(cimg, mask))

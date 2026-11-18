@@ -30,7 +30,7 @@ export const COLUMNS = Object.freeze([
   "length_mm_outer", "length_mm_inner", "width_mm_outer", "width_mm_inner", "size_uncertainty",
   "convex_area_mm2", "convex_perimeter_mm",
   "aspect_ratio", "circularity", "solidity", "roundness", "major_mm", "minor_mm",
-  "feret_ratio", "perimeter_subpixel_mm", "circularity_subpixel",
+  "feret_ratio", "perimeter_subpixel_mm", "circularity_subpixel", "solidity_subpixel",
   "color_L", "color_a", "color_b", "color_L_sd", "color_a_sd", "color_b_sd", "color_hex",
   "color_R", "color_G", "color_B", "color_H", "color_S", "color_V",
   "opacity", "color_secondary", "color_secondary_fraction", "color_label", "color_confidence",
@@ -159,7 +159,7 @@ export function morphology(m) {
   if (get(m, "fiber_uniform") && get(m, "fiber_width_um") && m.fiber_length_um >= CURVED_RATIO * m.feret_max_um) {
     ar = pyMax(ar, m.fiber_length_um / m.fiber_width_um);
   }
-  const r = morphologyRules(ar, m.circularity, m.solidity, get(m, "opacity"), Boolean(get(m, "width_unresolved")));
+  const r = morphologyRules(ar, m.circularity, m.solidity_subpixel, get(m, "opacity"), Boolean(get(m, "width_unresolved")));
   return { label: r.label, source: "rule", confidence: r.confidence, runnerUp: r.runnerUp,
     runnerUpConfidence: r.runnerUpConfidence };
 }
@@ -239,7 +239,7 @@ export function buildRows(measurements, { sampleId, pictureLabel, imageId, metad
       aspect_ratio: m.aspect_ratio, circularity: m.circularity, solidity: m.solidity,
       roundness: m.roundness, major_mm: m.major_um / 1000, minor_mm: m.minor_um / 1000,
       feret_ratio: m.feret_ratio, perimeter_subpixel_mm: m.perimeter_subpixel_um / 1000,
-      circularity_subpixel: m.circularity_subpixel,
+      circularity_subpixel: m.circularity_subpixel, solidity_subpixel: m.solidity_subpixel,
       color_L: m.L_mean, color_a: m.a_mean, color_b: m.b_mean,
       color_L_sd: m.L_sd, color_a_sd: m.a_sd, color_b_sd: m.b_sd, color_hex: hex(m),
       ...Object.fromEntries([..."RGBHSV"].map((c) => [`color_${c}`, m[`${c}_mean`]])),

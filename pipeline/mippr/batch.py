@@ -29,7 +29,7 @@ from .export import COLUMNS, METADATA, NOTE, SUMMARY_COLUMNS, build_summary
 
 PHOTO_TYPES = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".heic", ".webp"}
 REPORT_COLUMNS = ["photo", "sample_id", "picture_label", "status", "message", "particles", "flagged_for_review",
-                  "quality_problems", "background_type", "px_per_mm"]
+                  "quality_problems", "background_type", "px_per_mm", "scale_source", "mm_per_px"]
 
 
 def read_settings(path):
@@ -79,7 +79,9 @@ def run_batch(folder, out_dir, settings=None, default_sample=None, metadata=None
         rec.update({"status": "processed", "message": "", "particles": len(got),
                     "flagged_for_review": sum(bool(r["review_reason"]) for r in got),
                     "quality_problems": ";".join(problems), "background_type": info.get("background_type", ""),
-                    "px_per_mm": info.get("px_per_mm", "")})
+                    "px_per_mm": info.get("px_per_mm", ""),
+                    # mm_per_px includes any scale correction (paper edges or the 100 mm line); px_per_mm is the markers'
+                    "scale_source": got[0]["scale_source"] if got else "", "mm_per_px": info.get("mm_per_px", "")})
         rows += got
         report.append(rec)
         print(f"{p.name}: {len(got)} particles", file=sys.stderr)

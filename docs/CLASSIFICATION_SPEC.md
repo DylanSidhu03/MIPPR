@@ -59,7 +59,7 @@ The classes are **fragment, rubbery_fragment, fiber, film, foam, pellet**, plus 
 | Class | Rule for a person | Measured hint (starting values, tune on labelled data) |
 |---|---|---|
 | **Fiber** | Long and thin, with a roughly even width along its length | **Rule (v2):** length : width **≥ 3 : 1** (decided), using `fiber_length_mm` and the skeleton width for curved fibers. A fiber whose width can't be resolved counts as a fiber. Bundles get `flag_bundle`. |
-| **Pellet** (bead, sphere) | Round or regular, smooth, looks manufactured | **Rule (v2):** circularity > 0.85 (ImageJ's), solidity > 0.95, Feret length:width < 1.3 (starting values) |
+| **Pellet** (bead, sphere) | Round or regular, smooth, looks manufactured | **Rule (v2):** circularity > 0.85 (ImageJ's), sub-pixel solidity > 0.95, Feret length:width < 1.3 (starting values; ImageJ's solidity is too low on small round particles, November 18) |
 | **Fragment** | Hard, irregular, broken or angular edges | Default for opaque pieces that aren't fibers or pellets (v2); confirmed by the model (v3) |
 | **Rubbery fragment** | Soft, rubbery-looking piece, usually black (the lab's second most common class, 1,178 of ~4,600) | Texture; **model only** (v3), trained on the lab's labelled particles re-photographed on the sheets. Until then such particles are labelled fragment. |
 | **Film** | Thin, flexible sheet, often see-through | **Rule (v2):** low `opacity` (starting value < 0.5) and not a fiber; opaque films are left to the model (v3) |

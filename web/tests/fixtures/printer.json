@@ -5,27 +5,27 @@
    "q": -0.039752528211752666,
    "rms": 0.4920411885242604,
    "printerScale": {
-    "scale": 0.9695,
+    "scale": 0.9696,
     "paper": "letter",
     "scale_x": 0.9694,
     "scale_y": 0.9697,
     "edges_mm": {
-     "left": -3.44,
-     "right": 219.28,
-     "top": -4.45,
-     "bottom": 283.69
+     "left": -3.37,
+     "right": 219.34,
+     "top": -4.38,
+     "bottom": 283.74
     }
    },
    "problem": {
     "code": "printer_scaled",
     "message": "The printer scaled the sheet to 97% of its size. Sizes were corrected from the paper's edges; to avoid this, print at actual size (100%).",
-    "value": 0.9695,
+    "value": 0.9696,
     "limit": 0.01
    },
    "problemWithLine": {
     "code": "printer_scaled",
     "message": "The sheet looks printed at 97% of its size (from the paper's edges), but the 100 mm line was entered as 98.5 mm; the entered length was used.",
-    "value": 0.9695,
+    "value": 0.9696,
     "limit": 0.01
    }
   },
@@ -37,12 +37,12 @@
     "scale": 0.94,
     "paper": "letter",
     "scale_x": 0.9404,
-    "scale_y": 0.9396,
+    "scale_y": 0.9395,
     "edges_mm": {
-     "left": -9.72,
-     "right": 219.88,
-     "top": -0.06,
-     "bottom": 297.31
+     "left": -9.65,
+     "right": 219.92,
+     "top": -0.01,
+     "bottom": 297.38
     }
    },
    "problem": {
@@ -59,19 +59,48 @@
    }
   },
   {
+   "photo": "printer_white_grid_letter_on_a4.png",
+   "q": -0.039746582327425596,
+   "rms": 0.5165143020086396,
+   "printerScale": {
+    "scale": 0.9723,
+    "paper": "a4",
+    "scale_x": 0.9723,
+    "scale_y": 0.9723,
+    "edges_mm": {
+     "left": -0.05,
+     "right": 215.94,
+     "top": -12.89,
+     "bottom": 292.57
+    }
+   },
+   "problem": {
+    "code": "printer_scaled",
+    "message": "The printer scaled the sheet to 97% of its size. Sizes were corrected from the paper's edges; to avoid this, print at actual size (100%).",
+    "value": 0.9723,
+    "limit": 0.01
+   },
+   "problemWithLine": {
+    "code": "printer_scaled",
+    "message": "The sheet looks printed at 97% of its size (from the paper's edges), but the 100 mm line was entered as 98.5 mm; the entered length was used.",
+    "value": 0.9723,
+    "limit": 0.01
+   }
+  },
+  {
    "photo": "quality_white_grid.png",
    "q": -0.03001074418900179,
    "rms": 0.36030080330350434,
    "printerScale": {
-    "scale": 1.0,
+    "scale": 0.9999,
     "paper": "letter",
     "scale_x": 0.9999,
     "scale_y": 1.0,
     "edges_mm": {
-     "left": -0.09,
-     "right": 215.82,
-     "top": -0.08,
-     "bottom": 279.31
+     "left": -0.02,
+     "right": 215.9,
+     "top": -0.0,
+     "bottom": 279.4
     }
    },
    "problem": null,
@@ -87,10 +116,10 @@
     "scale_x": 1.0003,
     "scale_y": 0.9999,
     "edges_mm": {
-     "left": -0.04,
-     "right": 215.79,
-     "top": -0.11,
-     "bottom": 279.32
+     "left": 0.03,
+     "right": 215.87,
+     "top": -0.03,
+     "bottom": 279.41
     }
    },
    "problem": null,
@@ -103,13 +132,13 @@
    "printerScale": {
     "scale": 1.0001,
     "paper": "letter",
-    "scale_x": 1.0004,
-    "scale_y": 0.9999,
+    "scale_x": 1.0003,
+    "scale_y": 0.9998,
     "edges_mm": {
-     "left": -0.05,
-     "right": 215.77,
-     "top": -0.12,
-     "bottom": 279.32
+     "left": 0.02,
+     "right": 215.85,
+     "top": -0.04,
+     "bottom": 279.4
     }
    },
    "problem": null,

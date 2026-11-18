@@ -11,6 +11,7 @@
   "site": "",
   "background_type": "black_grid",
   "paper": "letter",
+  "color_patches": false,
   "layout": {
     "box_mm": 12.0,
     "line_mm": 0.5,
@@ -21,6 +22,18 @@
   "px_per_mm": 10.7,
   "mm_per_px": 0.09345794392523366,
   "printed_line_mm": null,
+  "printer_scale": {
+    "scale": 1.0001,
+    "paper": "letter",
+    "scale_x": 1.0003,
+    "scale_y": 0.9998,
+    "edges_mm": {
+      "left": -0.04,
+      "right": 215.79,
+      "top": -0.11,
+      "bottom": 279.34
+    }
+  },
   "white_balance": {
     "white_patch_bgr": [
       230.1,

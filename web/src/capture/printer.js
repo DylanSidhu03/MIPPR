@@ -1,14 +1,14 @@
 // Printer scale from the paper's edges: the JS twin of printer_scale in pipeline/mippr/capture/calibration.py.
 //
-// A printer set to "fit to page" shrinks the whole sheet, markers included, so every size comes out too
-// small by the same factor. Paper is made to a standard size whatever the printer, so when all four paper
+// A printer set to "fit to page" shrinks the whole sheet, markers included, so the markers make every
+// size come out too large by the same factor. Paper is made to a standard size whatever the printer, so when all four paper
 // edges are in the photo, the paper is a ruler that doesn't depend on the printer. Width and height
 // together also say which paper was used (Letter and A4 differ in shape by 9%).
-import { PAPERS, toGray } from "./sheet.js";
+import { PAPERS, pyRound, toGray } from "./sheet.js";
 import { Problem } from "./quality.js";
 
 export const PRINTER_SCALE_TOL = 0.01; // correct the scale when the printer changed it by more than 1%
-const PAPER_SEARCH_MM = 12.0; // how far outside the nominal paper edge to look
+const PAPER_SEARCH_MM = 25.0; // how far outside the nominal paper edge to look (Letter fitted onto A4: 13 mm)
 const PAPER_INSIDE_MM = 5.0; // and how far inside
 const EDGE_PPM = 4.0; // px per mm of the edge search
 const MIN_EDGE_STEP = 25.0; // paper at least this many grey levels brighter than what it lies on
@@ -153,8 +153,8 @@ export function paperEdges(cv, sheet, img) {
       }
       const o = y * cw + x;
       const fx = Math.fround(p[0]), fy = Math.fround(p[1]);
-      mx.data32F[o] = fx - 0.5;
-      my.data32F[o] = fy - 0.5;
+      mx.data32F[o] = fx;
+      my.data32F[o] = fy;
       valid[o] = fx >= 1 && fy >= 1 && fx < pw - 1 && fy < ph - 1 ? 1 : 0;
     }
   }
@@ -186,13 +186,14 @@ export function paperEdges(cv, sheet, img) {
       out[side] = null;
       continue;
     }
-    out[side] = (lo + med) / k - E;
+    out[side] = (lo + med + 0.5) / k - E;
   }
   canvas.delete();
   return out;
 }
 
-const round = (v, d) => Math.round(v * 10 ** d) / 10 ** d;
+const round = pyRound; // Python's round(): half to even, as calibration.py
+const g6 = (v) => String(Number(Number(v).toPrecision(6))); // Python's f"{v:g}" for ordinary values
 
 /**
  * How the printer scaled the sheet: {scale, paper, scale_x, scale_y, edges_mm}. `scale` is printed size /
@@ -220,10 +221,10 @@ export function printerScale(cv, sheet, img) {
 export function printerProblem(ps, lineMm = null) {
   const s = ps.scale;
   if (s === null || Math.abs(s - 1) <= PRINTER_SCALE_TOL) return null;
-  const pct = (100 * s).toFixed(0);
+  const pct = pyRound(100 * s, 0).toFixed(0); // f"{100 * s:.0f}" rounds half to even
   if (lineMm !== null && lineMm !== undefined) {
     return new Problem("printer_scaled", `The sheet looks printed at ${pct}% of its size (from the paper's edges), ` +
-      `but the 100 mm line was entered as ${lineMm} mm; the entered length was used.`, s, PRINTER_SCALE_TOL);
+      `but the 100 mm line was entered as ${g6(lineMm)} mm; the entered length was used.`, s, PRINTER_SCALE_TOL);
   }
   return new Problem("printer_scaled", `The printer scaled the sheet to ${pct}% of its size. Sizes were corrected ` +
     "from the paper's edges; to avoid this, print at actual size (100%).", s, PRINTER_SCALE_TOL);

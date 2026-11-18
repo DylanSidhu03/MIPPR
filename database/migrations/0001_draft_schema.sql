@@ -44,6 +44,7 @@ create table particles (
   solidity              double precision,
   roundness             double precision,  -- ImageJ's Round
   feret_ratio           double precision,  -- length:width, used by the rules
+  solidity_subpixel     double precision,  -- used by the pellet rule
   opacity               double precision,
   color_L double precision, color_a double precision, color_b double precision,
   color_label           text,

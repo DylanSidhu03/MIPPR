@@ -99,6 +99,7 @@ On the lab's fragment_area sample (24 particles) these match ImageJ's own result
 | `feret_ratio` | Derived | `length_mm` ÷ `width_mm` (Feret length:width). The rules use it: 3 or more counts as a fiber in the spec. | v1 |
 | `perimeter_subpixel_mm` | Measured | Length of the sub-pixel outline × scale: the most accurate and least rotation-dependent method in `validation/perimeter_study.py` | v1 |
 | `circularity_subpixel` | Derived | Circularity from that perimeter; on real particles about 0.08–0.10 higher than ImageJ's | v1 |
+| `solidity_subpixel` | Derived | Area ÷ convex area of the sub-pixel outline. About 1.0 for a round particle at any size, where ImageJ's solidity is 0.87–0.94 for round particles under about 2 mm at 10 px/mm (pixel corners pad its hull). The pellet rule uses it. | v1 |
 
 ### 4.6 Color
 

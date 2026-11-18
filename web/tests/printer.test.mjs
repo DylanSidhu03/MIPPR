@@ -42,3 +42,18 @@ for (const c of ref.cases) {
     }
   });
 }
+
+test("re-measuring later (photoContext) keeps the paper-edge scale", { skip }, async () => {
+  const { photoContext } = await import("../src/review/context.js");
+  const { runGrid } = await import("../src/pipeline.js");
+  const img = readPngMat(cv, new URL("printer_white_grid_97.png", fixtures).pathname);
+  try {
+    const res = runGrid(cv, img, { imageId: "x" });
+    const ctx = photoContext(cv, img);
+    assert.equal(res.run.mm_per_px, ctx.mmPerPx);
+    assert.ok(ctx.scaleCorrected);
+    ctx.delete();
+  } finally {
+    img.delete();
+  }
+});

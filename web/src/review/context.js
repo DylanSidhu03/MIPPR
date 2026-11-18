@@ -1,6 +1,7 @@
 // Part 6: what measure() was given for one photo, kept so an outline the reviewer redraws is measured
 // exactly as the pipeline measured it. The JS twin of pipeline/mippr/review/corrections.py MeasureContext,
 // built with the same steps as runGrid (pipeline.js) and cli.run_grid.
+import { printerProblem, printerScale } from "../capture/printer.js";
 import { findSheet, rectifyGrid, whiteBalance } from "../capture/sheet.js";
 import { GRID_SEGMENT_DEFAULTS, backgroundImage, boxOf, lineBand, segmentGrid } from "../segmentation/grid.js";
 import { measure } from "../measurement/geometry.js";
@@ -74,11 +75,16 @@ export function measureWith(ctx, labels) {
 /**
  * The context for a photo (CV_8UC3 BGR Mat) on a printed sheet, from the same steps as runGrid.
  * For when the rows were made earlier (e.g. reopened from a CSV) and only the photo is at hand.
- * Throws if no sheet is found.
+ * The scale is found the same way: an entered `lineMm` if given, else the printer's scale from the
+ * paper's edges when it is off by more than 1%. Throws if no sheet is found.
  */
 export function photoContext(cv, img, { params = {}, lineMm = null } = {}) {
   const p = { ...GRID_SEGMENT_DEFAULTS, ...params };
   const sheet = findSheet(cv, img);
+  if (lineMm === null || lineMm === undefined) {
+    const printer = printerScale(cv, sheet, img);
+    if (printerProblem(printer)) lineMm = 100.0 * printer.scale;
+  }
   const rect = rectifyGrid(cv, sheet, img);
   const { gains } = whiteBalance(cv, sheet, img);
   const balanced = balance(cv, rect, gains);

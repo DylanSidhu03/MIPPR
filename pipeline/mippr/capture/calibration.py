@@ -280,14 +280,14 @@ def check_quality(photo, sheet=None, limits=QualityLimits(), metrics=None):
 
 # ── Printer scale from the paper's edges ───────────────────────────────────
 #
-# A printer set to "fit to page" shrinks the whole sheet, markers included, so every size comes
-# out too small by the same factor. Paper is made to a standard size whatever the printer, so
+# A printer set to "fit to page" shrinks the whole sheet, markers included, so measured against the
+# markers every size comes out too large by the same factor. Paper is made to a standard size whatever the printer, so
 # when all four paper edges are in the photo, the paper is a ruler that doesn't depend on the
 # printer. Width and height together also say which paper was used (Letter and A4 differ in
 # shape by 9%), so an A4 sheet fitted onto Letter paper is recognised.
 
 PRINTER_SCALE_TOL = 0.01  # correct the scale when the printer changed it by more than 1%
-PAPER_SEARCH_MM = 12.0  # how far outside the nominal paper edge to look (covers printing down to ~90%)
+PAPER_SEARCH_MM = 25.0  # how far outside the nominal paper edge to look (covers a Letter sheet fitted onto A4, 13 mm, with room for printers that fit to the printable area)
 PAPER_INSIDE_MM = 5.0  # and how far inside (printers offset the page by a few mm)
 EDGE_PPM = 4.0  # px per mm of the edge search
 MIN_EDGE_STEP = 25.0  # paper must be at least this many grey levels brighter than what it lies on
@@ -405,7 +405,7 @@ def paper_edges(sheet, photo):
         p = c + (u - c) / (1 + q * (((p - c) / n) ** 2).sum(axis=1, keepdims=True))
     mx = p[:, 0].reshape(size[1], size[0]).astype(np.float32)
     my = p[:, 1].reshape(size[1], size[0]).astype(np.float32)
-    canvas = cv2.remap(gray, mx - 0.5, my - 0.5, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    canvas = cv2.remap(gray, mx, my, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
     valid = (mx >= 1) & (my >= 1) & (mx < pw - 1) & (my < ph - 1)
     px = lambda v: int(round((v + E) * k))  # noqa: E731  sheet mm -> canvas px
     clear = lay.margin_mm + lay.marker_mm + 4  # stay clear of the corner markers along each side
@@ -428,7 +428,7 @@ def paper_edges(sheet, photo):
         if float(np.median(np.abs(pos - med))) / k > MAX_EDGE_SPREAD_MM:
             out[side] = None
             continue
-        out[side] = (lo + med) / k - E
+        out[side] = (lo + med + 0.5) / k - E
     return out
 
 

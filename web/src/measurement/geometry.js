@@ -204,6 +204,17 @@ export function subpixelOutline(cv, mask, diff = null, level = null, pad = 4, ox
   return line.map(([r, c]) => [c - 1 + (x0 + ox), r - 1 + (y0 + oy)]);
 }
 
+/** Area of the convex hull of float points [[x, y]], computed on float32 like cv2.convexHull(pts.astype(np.float32)). */
+function convexArea32(cv, pts) {
+  const m = cv.matFromArray(pts.length, 1, cv.CV_32FC2, pts.flat());
+  const hull = new cv.Mat();
+  cv.convexHull(m, hull, false, true);
+  const a = cv.contourArea(hull);
+  m.delete();
+  hull.delete();
+  return a;
+}
+
 function polygonLengthArea(pts) {
   const n = pts.length;
   let length = 0, sxy = 0, syx = 0;
@@ -409,7 +420,9 @@ export function measure(cv, labels, img, umPerPx, diff = null, edgeFraction = 0.
     const hullMat = hullMatOfPixelCorners(cv, contour);
     const [fMax, fMin, fAngle] = feret(matPoints(hullMat));
     const level = d ? edgeLevel(cv, mask, d, edgeFraction) : null;
-    const [perim, outlineArea] = polygonLengthArea(subpixelOutline(cv, mask, d, level, 4, ox, oy));
+    const outline = subpixelOutline(cv, mask, d, level, 4, ox, oy);
+    const [perim, outlineArea] = polygonLengthArea(outline);
+    const outlineHull = convexArea32(cv, outline);
     const perimIJ = perimeterImageJ(mask);
     const [major, minor] = ellipseImageJ(mask);
     const convexArea = cv.contourArea(hullMat);
@@ -446,6 +459,8 @@ export function measure(cv, labels, img, umPerPx, diff = null, edgeFraction = 0.
       circularity: perimIJ > 0 ? Math.min(1, (4 * Math.PI * areaPx) / perimIJ ** 2) : NaN, // ImageJ Circ.
       circularity_subpixel: perim > 0 ? Math.min(1, (4 * Math.PI * outlineArea) / perim ** 2) : NaN,
       solidity: convexArea > 0 ? Math.min(1, areaPx / convexArea) : NaN,
+      // Solidity of the sub-pixel outline (about 1.0 for a round particle at any size); the pellet rule uses it.
+      solidity_subpixel: outlineHull > 0 ? Math.min(1, outlineArea / outlineHull) : NaN,
     };
     const cimg = crop(C, ox, oy, ex, ey);
     Object.assign(row, colorStats(cv, cimg, mask));

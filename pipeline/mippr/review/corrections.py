@@ -44,7 +44,7 @@ REMEASURED = (
     "size_class", "length_mm_outer", "length_mm_inner", "width_mm_outer", "width_mm_inner", "size_uncertainty",
     "convex_area_mm2", "convex_perimeter_mm",
     "aspect_ratio", "circularity", "solidity", "roundness", "major_mm", "minor_mm",
-    "feret_ratio", "perimeter_subpixel_mm", "circularity_subpixel",
+    "feret_ratio", "perimeter_subpixel_mm", "circularity_subpixel", "solidity_subpixel",
     "color_L", "color_a", "color_b", "color_L_sd", "color_a_sd", "color_b_sd", "color_hex",
     "color_R", "color_G", "color_B", "color_H", "color_S", "color_V",
     "opacity", "color_secondary", "color_secondary_fraction",

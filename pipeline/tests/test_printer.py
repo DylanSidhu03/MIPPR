@@ -32,12 +32,16 @@ def test_lens_model_recovers_the_distortion():
     ("black_grid", "a4", 0.96, None),
     ("checkerboard", "a4", 0.94, "letter"),  # an A4 sheet fitted onto Letter paper
     ("black_grid", "letter", 1.0, "a4"),  # a Letter sheet on A4 paper at 100%: no scaling
+    ("white_grid", "letter", 210 / 215.9, "a4"),  # a Letter sheet fitted onto A4: edges 13 mm out
 ])
 def test_printer_scale(background, paper, scale, on):
     p = shot(background, paper, scale, on)
     ps = printer_scale(find_sheet(p), p)
     assert ps["paper"] == (on or paper)
     assert ps["scale"] == pytest.approx(scale, abs=0.002)
+    if on is None and scale == 1.0:  # edges reported where the paper is, in sheet mm
+        assert ps["edges_mm"]["left"] == pytest.approx(0, abs=0.08)
+        assert ps["edges_mm"]["right"] == pytest.approx(215.9, abs=0.08)
     problem = printer_problem(ps)
     assert (problem is not None) == (abs(scale - 1) > 0.01)
     if problem:
