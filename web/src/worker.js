@@ -16,7 +16,15 @@ async function init(url) {
 }
 
 async function imageDataOf(file) {
+  const { fileProblem, pixelProblem } = await import("./limits.js");
+  const tooBig = fileProblem(file);
+  if (tooBig) throw new Error(tooBig);
   const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  const px = pixelProblem(bitmap.width, bitmap.height);
+  if (px) {
+    bitmap.close();
+    throw new Error(px);
+  }
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
   const ctx = canvas.getContext("2d");
   ctx.drawImage(bitmap, 0, 0);

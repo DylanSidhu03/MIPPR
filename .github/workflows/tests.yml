@@ -53,3 +53,7 @@ jobs:
         run: node web/scripts/smoke_ui.mjs
         env:
           SMOKE_QUERY: "?worker=off"
+      - name: The built site (Cloudflare Pages output) under its own security headers
+        run: node scripts/build_site.mjs && node web/scripts/smoke_ui.mjs
+        env:
+          SMOKE_ROOT: dist

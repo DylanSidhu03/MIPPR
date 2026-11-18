@@ -2,6 +2,7 @@
 // Processing runs on the user's machine; Cloudflare Pages only serves these files.
 import { OPENCV_LOCAL_URL, loadOpenCV } from "./opencv.js";
 import { photoContext } from "./review/context.js";
+import { fileProblem, pixelProblem } from "./limits.js";
 import { APP_VERSION, imageIdFor, runGrid } from "./pipeline.js";
 import { NOTE, particlesCsv, summaryCsv } from "./export/csv.js";
 import { summaryHtml } from "./export/report.js";
@@ -81,7 +82,14 @@ async function contextFor(file, lineMm) {
 }
 
 async function readImage(file) {
+  const tooBig = fileProblem(file);
+  if (tooBig) throw new Error(tooBig);
   const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+  const px = pixelProblem(bitmap.width, bitmap.height);
+  if (px) {
+    bitmap.close();
+    throw new Error(px);
+  }
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
   const ctx = canvas.getContext("2d");
   ctx.drawImage(bitmap, 0, 0);

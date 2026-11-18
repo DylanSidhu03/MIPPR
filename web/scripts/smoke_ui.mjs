@@ -16,12 +16,39 @@ const fixtures = join(root, "web/tests/fixtures");
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css",
   ".png": "image/png", ".pdf": "application/pdf", ".json": "application/json" };
 
+// SMOKE_ROOT=dist serves the built site (scripts/build_site.mjs) at / with its Cloudflare _headers applied,
+// so the security policy is tested too; by default the repo is served and the app is at /web/.
+const siteRoot = process.env.SMOKE_ROOT ? join(root, process.env.SMOKE_ROOT) + "/" : root;
+const appPath = process.env.SMOKE_ROOT ? "/" : "/web/";
+
+/** Cloudflare Pages _headers: [[path pattern, {header: value}]] (patterns are exact or end in *). */
+function readHeaders() {
+  const file = join(siteRoot, "_headers");
+  if (!process.env.SMOKE_ROOT || !existsSync(file)) return [];
+  const rules = [];
+  for (const line of readFileSync(file, "utf8").split("\n")) {
+    if (!line.trim()) continue;
+    if (!/^\s/.test(line)) rules.push([line.trim(), {}]);
+    else {
+      const i = line.indexOf(":");
+      rules[rules.length - 1][1][line.slice(0, i).trim()] = line.slice(i + 1).trim();
+    }
+  }
+  return rules;
+}
+const headerRules = readHeaders();
+
 function serve() {
   const server = createServer((req, res) => {
-    const path = normalize(join(root, decodeURIComponent(new URL(req.url, "http://x").pathname)));
+    const url = decodeURIComponent(new URL(req.url, "http://x").pathname);
+    const path = normalize(join(siteRoot, url));
     const file = path.endsWith("/") ? join(path, "index.html") : path;
-    if (!file.startsWith(root) || !existsSync(file) || statSync(file).isDirectory()) return res.writeHead(404).end();
-    res.writeHead(200, { "content-type": TYPES[extname(file)] ?? "application/octet-stream" });
+    if (!file.startsWith(siteRoot) || !existsSync(file) || statSync(file).isDirectory()) return res.writeHead(404).end();
+    const headers = { "content-type": TYPES[extname(file)] ?? "application/octet-stream" };
+    for (const [pattern, h] of headerRules) {
+      if (pattern.endsWith("*") ? url.startsWith(pattern.slice(0, -1)) : url === pattern) Object.assign(headers, h);
+    }
+    res.writeHead(200, headers);
     createReadStream(file).pipe(res);
   });
   return new Promise((resolve) => server.listen(0, "127.0.0.1", () => resolve(server)));
@@ -55,7 +82,7 @@ function blankPng(path, w = 400, h = 300) {
 
 const { chromium } = createRequire(import.meta.url)("playwright");
 const server = await serve();
-const base = `http://127.0.0.1:${server.address().port}/web/${process.env.SMOKE_QUERY ?? ""}`; // SMOKE_QUERY="?worker=off": on the page
+const base = `http://127.0.0.1:${server.address().port}${appPath}${process.env.SMOKE_QUERY ?? ""}`; // SMOKE_QUERY="?worker=off": on the page
 const tmp = mkdtempSync(join(tmpdir(), "mippr-smoke-"));
 blankPng(join(tmp, "not_a_sheet.png"));
 const browser = await chromium.launch();
