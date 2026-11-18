@@ -229,7 +229,7 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
 - [x] Write per-sample summary counts (`summary.csv`: counts by morphology, color and size class, length distribution, review and flag counts)
 - [x] Log versions, settings and scale used for every run so results can be reproduced (`run.json`)
 - [x] Write a README with install steps and a worked example ([pipeline/README.md](../pipeline/README.md))
-- [ ] Process a whole folder with one command and one settings file (`batch.py`, planned); report each failed photo and why
+- [x] Process a whole folder with one command and one settings file (`python -m mippr.cli batch`, `batch.py`): combined particles and per-sample summary, and a report of every photo processed or refused, with the reason and its quality problems
 - [ ] Time it on 500 images and fix the slowest step
 - [ ] Sketch the screens: print background, upload, sample details, run, review, export
 - [x] Offer the printable backgrounds on the website (download table in `web/index.html`)

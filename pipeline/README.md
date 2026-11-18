@@ -12,7 +12,7 @@ sub-folder per part, each with its own README:
 | 4. Colour | [mippr/color/](mippr/color/README.md) |
 | 5. Morphology | [mippr/morphology/](mippr/morphology/README.md) |
 | 6. Review and correction | [mippr/review/](mippr/review/README.md) |
-| 8. Export, command line, batch | `mippr/export.py`, `mippr/cli.py`, `mippr/batch.py` (planned) |
+| 8. Export, command line, batch | `mippr/export.py`, `mippr/cli.py`, `mippr/batch.py` |
 
 Validation scripts (part 7) are in [../validation/](../validation/README.md).
 
@@ -39,8 +39,17 @@ cd pipeline
 ../.venv/bin/python -m mippr.cli grid PHOTO.jpg --sample-id S042 --photo 1 \
     --date 2026-11-04 --operator DS --lab "Moore Institute" --setup "phone, overhead" --site "Site 3" --out out/
 
+# 3. A whole folder of sheet photos at once (settings CSV optional: photo, sample_id, photo_number,
+#    line_mm, date, operator, lab, setup, site)
+../.venv/bin/python -m mippr.cli batch PHOTOS/ --settings photos.csv --lab "Moore Institute" --out out/
+
 ../.venv/bin/python -m pytest tests
 ```
+
+A batch writes each photo's outputs to `out/photos/<photo>/`, plus one combined
+`particles.csv`, a `summary.csv` with one row per sample across its photos, and
+`batch_report.csv` listing every photo as processed or refused (with the reason and
+its quality problems). A photo without a printed sheet is refused; the rest carry on.
 
 ### Printable backgrounds ([`backgrounds/`](../backgrounds/README.md))
 

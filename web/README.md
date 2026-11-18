@@ -72,7 +72,7 @@ Serve the repo root (`python -m http.server`) and open `/web/` to try the page; 
 - [ ] Batch processing in the browser on the user's machine, with a clear message for each failed photo (quality check, part 1)
 - [ ] Photo guidance: print at actual size, whole sheet and all four markers in frame, even light, no flash. A photo without the markers is refused with that message (the app only takes the three printed backgrounds).
 - [ ] Export the files above; a PDF or HTML summary
-- [ ] Python batch command for the lab (`pipeline/mippr/batch.py`, planned)
+- [x] Python batch command for the lab (`python -m mippr.cli batch`)
 - [ ] Cloudflare Pages deployment from the GitHub repo; upload size limits
 - [x] Automated tests on each push
 - [ ] License and contribution notes

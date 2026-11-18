@@ -6,6 +6,9 @@
     # A photo of particles on a printed sheet, one particle per box
     python -m mippr.cli grid photo.jpg --sample-id S042 --photo 1 --out results/
 
+    # A whole folder of sheet photos (optional settings CSV: photo, sample_id, photo_number, line_mm, ...)
+    python -m mippr.cli batch photos/ --settings photos.csv --out results/
+
 Photos must be taken on one of the three printed backgrounds (white grid, black grid,
 checkerboard): the corner markers give the scale, the flattening and the background type.
 
@@ -143,6 +146,14 @@ def main(argv=None):
     g.add_argument("--line-mm", type=float, help="measured length of the printed 100 mm line, if it isn't 100 mm")
     common(g)
 
+    b = sub.add_parser("batch", help="measure every photo in a folder (see batch.py for the settings file)")
+    b.add_argument("folder", help="folder of photos on printed MIPPR sheets")
+    b.add_argument("--settings", help="CSV with one row per photo: photo, sample_id, photo_number, line_mm, metadata")
+    b.add_argument("--out", default="out", help="output folder")
+    b.add_argument("--sample-id", help="sample ID for photos the settings file doesn't name (default: file name)")
+    for k in METADATA:
+        b.add_argument(f"--{k}", default="", help=f"{k} for photos the settings file doesn't give it for")
+
     a = ap.parse_args(argv)
     try:
         if a.cmd == "sheet":
@@ -154,6 +165,13 @@ def main(argv=None):
             print(f"{lay.rows} x {lay.cols} boxes of {lay.box_mm:g} mm -> {stem}.pdf (print at actual size)")
             return
         meta = {k: getattr(a, k) for k in METADATA}
+        if a.cmd == "batch":
+            from .batch import run_batch
+            rows, report = run_batch(a.folder, a.out, a.settings, a.sample_id, meta)
+            refused = [r for r in report if r["status"] == "refused"]
+            print(f"{len(report) - len(refused)} photos processed, {len(refused)} refused, {len(rows)} particles "
+                  f"-> {a.out}/particles.csv, {a.out}/summary.csv, {a.out}/batch_report.csv")
+            return
         rows = run_grid(a.image, a.out, a.sample_id, a.photo, meta, a.line_mm)
     except ValueError as e:
         sys.exit(f"error: {e}")
