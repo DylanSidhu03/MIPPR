@@ -34,6 +34,7 @@ Parts 1–6 flow in order for every photo: capture → segment → measure → c
 - [Technical decisions](docs/TECHNICAL_DECISIONS.md): technical choices and findings, made after Drive
 - [The lab's existing particle records](docs/LAB_DATA.md): the hand-classification spreadsheets and photos in Drive, and how the app compares
 - [Methods](docs/METHODS.md): how the app works, class definitions, calibration, accuracy so far and known limits
+- [Printer test kit](docs/PRINTER_TEST.md): check the printer-scale correction on your own phone photos
 - [Hosting](docs/HOSTING.md): putting the app on Cloudflare Pages (build command, output folder, headers, limits)
 
 ## Try it

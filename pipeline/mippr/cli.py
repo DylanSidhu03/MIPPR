@@ -6,6 +6,9 @@
     # A photo of particles on a printed sheet, one particle per box
     python -m mippr.cli grid photo.jpg --sample-id S042 --photo 1 --out results/
 
+    # Check how a printer scaled the sheet, from the paper's edges (docs/PRINTER_TEST.md)
+    python -m mippr.cli printer photo1.jpg photo2.jpg --line-mm 97.0 --out printer_check/
+
     # A whole folder of sheet photos (optional settings CSV: photo, sample_id, photo_number, line_mm, ...)
     python -m mippr.cli batch photos/ --settings photos.csv --out results/
 
@@ -166,8 +169,23 @@ def main(argv=None):
     for k in METADATA:
         b.add_argument(f"--{k}", default="", help=f"{k} for photos the settings file doesn't give it for")
 
+    pc = sub.add_parser("printer", help="check how the printer scaled a printed sheet, from the paper's edges "
+                                         "(docs/PRINTER_TEST.md)")
+    pc.add_argument("photos", nargs="+", help="photos of a printed sheet with all four paper edges in view")
+    pc.add_argument("--line-mm", type=float, help="the printed 100 mm line measured with a ruler, to compare")
+    pc.add_argument("--out", help="folder for images showing the edges found")
+
     a = ap.parse_args(argv)
     try:
+        if a.cmd == "printer":
+            from .capture.printer_check import check
+            for p in a.photos:
+                r = check(p, a.line_mm, a.out)
+                cmp = (f"; ruler {100 * r['ruler_scale']:.1f}%, difference {r['difference_pct']:+.2f} points"
+                       if r.get("difference_pct") is not None else "")
+                print(f"{r['photo']}: {r['verdict']} (paper {r['paper'] or '?'}, width {r['scale_x'] or '?'}, "
+                      f"height {r['scale_y'] or '?'}{cmp})" + (f" -> {r['image']}" if r.get("image") else ""))
+            return
         if a.cmd == "sheet":
             out = Path(a.out)
             out.mkdir(parents=True, exist_ok=True)

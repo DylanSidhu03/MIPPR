@@ -73,3 +73,18 @@ def test_sizes_corrected_end_to_end(tmp_path):
         assert r["scale_source"] == "paper_edges" and r["flag_scale"] is True
         assert 0.965 < r["length_mm"] / rows[1.0][pid]["length_mm"] < 0.985
     assert all(r["scale_source"] == "markers" for r in rows[1.0].values())
+
+
+def test_printer_check_command(tmp_path):
+    from mippr.capture.printer_check import check
+    path = tmp_path / "p97.png"
+    cv2.imwrite(str(path), shot(scale=0.97))
+    r = check(path, line_mm=97.2, out_dir=tmp_path / "out")
+    assert r["paper"] == "letter" and r["missing_edges"] == []
+    assert r["scale"] == pytest.approx(0.97, abs=0.002)
+    assert r["difference_pct"] == pytest.approx(-0.2, abs=0.25)
+    assert "97.0%" in r["verdict"] and cv2.imread(r["image"]) is not None
+    cropped = tmp_path / "top_cut.png"
+    cv2.imwrite(str(cropped), shot(scale=0.97, seed=2))  # the top edge is out of frame
+    r = check(cropped)
+    assert r["scale"] is None and "top" in r["verdict"]

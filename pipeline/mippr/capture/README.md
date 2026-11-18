@@ -20,6 +20,7 @@ Turn a phone or camera photo into a flat, correctly scaled, colour-corrected ima
 |---|---|
 | `sheet.py` | The printable sheets (layout, vector PDF, PNG), ArUco marker detection, homography, and refinement from the grid's own line crossings (about 0.1 px in synthetic tests) |
 | `calibration.py` | White balance from the printed white patch; the grey patch is checked, and coloured patches are recorded. The photo quality check (`check_quality`, below). The printer's scale from the paper's edges (`printer_scale`, below) |
+| `printer_check.py` | The printer test kit's check (`python -m mippr.cli printer`, [docs/PRINTER_TEST.md](../../../docs/PRINTER_TEST.md)): edges found, scale, comparison with a ruler, and an image of the edges |
 | `synthetic.py` | Fake photos (tilt, lens distortion, uneven light, blur, noise) for tests |
 | `../../scripts/preview_backgrounds.py` | Renders the sheet design options side by side |
 | `../../../backgrounds/` | The printed sheets this part generates |

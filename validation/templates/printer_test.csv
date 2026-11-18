@@ -1,0 +1,3 @@
+photo,printer,paper,print_setting,ruler_100mm_line_mm,app_scale_pct,app_paper,difference_points,notes
+IMG_0412.jpg,Lab HP LaserJet,letter,actual size,100.0,,,,example row: fill app_scale_pct from the printer command
+IMG_0413.jpg,Lab HP LaserJet,letter,fit to page,97.0,,,,example row
