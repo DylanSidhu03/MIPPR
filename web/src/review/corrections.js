@@ -30,7 +30,7 @@ export const REMEASURED = Object.freeze([
   "feret_ratio", "perimeter_subpixel_mm", "circularity_subpixel", "solidity_subpixel",
   "color_L", "color_a", "color_b", "color_L_sd", "color_a_sd", "color_b_sd", "color_hex",
   "color_R", "color_G", "color_B", "color_H", "color_S", "color_V",
-  "opacity", "color_secondary", "color_secondary_fraction",
+  "opacity", "color_secondary", "color_secondary_fraction", "contrast",
   "color_label", "color_confidence", "color_rules_version",
   "morphology_label", "morphology_source", "morphology_confidence", "morphology_runner_up",
   "morphology_runner_up_confidence",

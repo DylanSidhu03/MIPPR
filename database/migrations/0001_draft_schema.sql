@@ -54,6 +54,7 @@ create table particles (
   morphology_label      text,
   morphology_source     text,             -- rule or model
   morphology_confidence double precision,
+  contrast              double precision,  -- behind flag_low_contrast
   review_reason         text,             -- semicolon list of flags
   review_status         text not null default 'auto',  -- auto, confirmed, corrected, rejected
   crop_path             text,             -- crop in Storage, if stored (9b)

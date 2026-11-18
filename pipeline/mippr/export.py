@@ -4,6 +4,7 @@ Two files: particles.csv (one row per particle) and summary.csv (one row
 per sample, calculated only from particles.csv). Columns that a release
 doesn't fill yet are left empty, so files from different versions combine.
 """
+import math
 import statistics
 from collections import Counter
 
@@ -53,7 +54,7 @@ COLUMNS = [
     "morphology_label", "morphology_source", "morphology_confidence", "morphology_runner_up",
     "morphology_runner_up_confidence",
     # Quality flags
-    *FLAGS, "review_reason",
+    "contrast", *FLAGS, "review_reason",
     # Review
     "review_status", "color_label_original", "morphology_label_original", "outline_edited", "derived_from", "tar_like",
     "reviewed_by", "reviewer_role", "reviewed_at",
@@ -221,6 +222,8 @@ def build_rows(measurements, sample_id, picture_label, image_id, metadata, app_v
             "morphology_label": morph, "morphology_source": source, "morphology_confidence": mconf,
             "morphology_runner_up": runner, "morphology_runner_up_confidence": rconf,
             **f,
+            # The particle's contrast against its box (0-255), behind flag_low_contrast; empty without a difference map.
+            "contrast": "" if math.isnan(m.get("_contrast", float("nan"))) else m["_contrast"],
             "review_reason": review_reason(f),
             "review_status": "auto", "outline_edited": False, "tar_like": "",
             "background_type": background_type, "mm_per_px": mm_per_px, "scale_source": scale_source,

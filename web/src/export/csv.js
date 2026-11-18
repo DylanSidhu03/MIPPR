@@ -36,7 +36,7 @@ export const COLUMNS = Object.freeze([
   "opacity", "color_secondary", "color_secondary_fraction", "color_label", "color_confidence",
   "morphology_label", "morphology_source", "morphology_confidence", "morphology_runner_up",
   "morphology_runner_up_confidence",
-  ...FLAGS, "review_reason",
+  "contrast", ...FLAGS, "review_reason",
   "review_status", "color_label_original", "morphology_label_original", "outline_edited", "derived_from", "tar_like",
   "reviewed_by", "reviewer_role", "reviewed_at",
   "polymer_confirmed", "polymer_method",
@@ -252,6 +252,8 @@ export function buildRows(measurements, { sampleId, pictureLabel, imageId, metad
       morphology_label: morph.label, morphology_source: morph.source, morphology_confidence: morph.confidence,
       morphology_runner_up: morph.runnerUp, morphology_runner_up_confidence: morph.runnerUpConfidence,
       ...f,
+      // The particle's contrast against its box (0-255), behind flag_low_contrast; empty without a difference map.
+      contrast: isNone(get(m, "_contrast")) || Number.isNaN(get(m, "_contrast")) ? "" : m._contrast,
       review_reason: reviewReason(f),
       review_status: "auto", outline_edited: false, tar_like: "",
       background_type: backgroundType, mm_per_px: mmPerPx, scale_source: scaleSource,

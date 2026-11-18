@@ -134,6 +134,7 @@ On the lab's fragment_area sample (24 particles) these match ImageJ's own result
 
 | Column | Rule | From |
 |---|---|---|
+| `contrast` (value) | The particle's contrast against its own box (0–255; the median difference inside it), behind `flag_low_contrast`. Empty without a difference map. | v1 |
 | `flag_edge` | The outline is within 3 px of the grid's outer edge or the photo's. The particle may be cut off. It is kept, not dropped, so the reviewer decides. | v1 |
 | `flag_merged` | Solidity < 0.75 (provisional). Particles sit one per box, so touching particles are rare; `flag_multi_blob` covers two blobs in a box. | v1 |
 | `flag_low_confidence` | Color or morphology confidence below the threshold. The **threshold is still to be decided** from v2/v3 data; empty until then. | v2 / v3 |
@@ -251,6 +252,7 @@ Column names stay the same across releases. Columns not yet available are left e
 - **November 18, 2026:** `scale_source = paper_edges`: when all four paper edges are in the photo, the app measures how the printer scaled the sheet and corrects the scale if it is off by more than 1% (a `printer_scaled` photo problem says so).
 - **November 18, 2026:** `photo_file` and `crop_file` (the full photo and each particle's crop, as the user asked), `solidity_subpixel` (used by the pellet rule), and the crops, overlay and HTML summary downloads.
 - **November 18, 2026:** `derived_from`, for split and merge.
+- **November 18, 2026:** `contrast`, so every tunable flag can be recomputed from the CSV (validation/flag_thresholds.py).
 - **November 12, 2026 (size check):** `length_mm_outer`, `length_mm_inner`, `width_mm_outer`, `width_mm_inner`, `size_uncertainty` and `flag_size_uncertain` added, so a size that depends strongly on where the edge is drawn is flagged for review.
 - **No "likely plastic" column:** it stays out of scope, unless the lab asks for it.
 

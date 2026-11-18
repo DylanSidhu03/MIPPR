@@ -195,7 +195,7 @@ The app only takes photos on the three printed backgrounds, so the labelled set,
 - [ ] Compare box by box: length and width against the lab's sizes, colour and morphology against the lab's labels; report agreement per class and the confusion between classes
 - [ ] Count detection from the well-to-box list: boxes with a particle the app missed, and extra detections in boxes listed empty
 - [ ] Measure 30–50 of those particles with calipers (not yet agreed with the advisor), to decide which is right where the app and the lab's sizes disagree (the lab's older sizes vary by session)
-- [ ] Set each flag's threshold from the results: `flag_size_uncertain` (which `size_uncertainty` goes with a wrong size), `flag_low_contrast`, `flag_merged`, and `flag_low_confidence` once confidences exist. Record how many wrong results each flag catches and how many it misses.
+- [ ] Set each flag's threshold from the results: `flag_size_uncertain` (which `size_uncertainty` goes with a wrong size), `flag_low_contrast`, `flag_merged`, and `flag_low_confidence` once confidences exist. Record how many wrong results each flag catches and how many it misses. The report is ready: `validation/flag_thresholds.py` (written by `sheet_check.py` as `thresholds.md`); the particle's contrast is now a CSV column (`contrast`) so every flag can be recomputed.
 - [ ] Shoot a pilot batch of 50 to 100 particles on the printed sheets, covering every class
 - [ ] Set up a per-box label sheet (sample, photo, box, colour, morphology, labeller), with the class lists from the spec; no outline annotation tool is needed
 - [ ] Label colour and morphology (one label per box, no outlines) on at least 300 more particles on the sheets, including film, foam and clear particles

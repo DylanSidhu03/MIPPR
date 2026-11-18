@@ -98,6 +98,7 @@
     "morphology_confidence": 0.9984325765710376,
     "morphology_runner_up": "fragment",
     "morphology_runner_up_confidence": 0.0015674234289624334,
+    "contrast": 174.5067138671875,
     "flag_edge": false,
     "flag_merged": false,
     "flag_low_confidence": "",
@@ -128,7 +129,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:30:48+00:00"
+    "processed_at": "2026-11-18T22:49:06+00:00"
    },
    {
     "sample_id": "S1",
@@ -199,6 +200,7 @@
     "morphology_confidence": 0.9999999999508977,
     "morphology_runner_up": "fragment",
     "morphology_runner_up_confidence": 4.910227779930665e-11,
+    "contrast": 162.645263671875,
     "flag_edge": false,
     "flag_merged": false,
     "flag_low_confidence": "",
@@ -229,7 +231,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:30:48+00:00"
+    "processed_at": "2026-11-18T22:49:06+00:00"
    },
    {
     "sample_id": "S1",
@@ -300,6 +302,7 @@
     "morphology_confidence": 0.9935489282992781,
     "morphology_runner_up": "fragment",
     "morphology_runner_up_confidence": 0.0064510717007219,
+    "contrast": 157.32553100585938,
     "flag_edge": false,
     "flag_merged": false,
     "flag_low_confidence": "",
@@ -330,7 +333,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:30:48+00:00"
+    "processed_at": "2026-11-18T22:49:06+00:00"
    }
   ],
   "run": {
@@ -489,6 +492,7 @@
     "morphology_confidence": 0.9984325765710376,
     "morphology_runner_up": "fragment",
     "morphology_runner_up_confidence": 0.0015674234289624334,
+    "contrast": 162.64752197265625,
     "flag_edge": false,
     "flag_merged": false,
     "flag_low_confidence": "",
@@ -519,7 +523,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:30:50+00:00"
+    "processed_at": "2026-11-18T22:49:08+00:00"
    },
    {
     "sample_id": "S1",
@@ -590,6 +594,7 @@
     "morphology_confidence": 0.999999999961662,
     "morphology_runner_up": "fragment",
     "morphology_runner_up_confidence": 3.833799944175098e-11,
+    "contrast": 151.28335571289062,
     "flag_edge": false,
     "flag_merged": false,
     "flag_low_confidence": "",
@@ -620,7 +625,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:30:50+00:00"
+    "processed_at": "2026-11-18T22:49:08+00:00"
    },
    {
     "sample_id": "S1",
@@ -691,6 +696,7 @@
     "morphology_confidence": 0.9952023975017539,
     "morphology_runner_up": "fragment",
     "morphology_runner_up_confidence": 0.004797602498246123,
+    "contrast": 151.07057189941406,
     "flag_edge": false,
     "flag_merged": false,
     "flag_low_confidence": "",
@@ -721,7 +727,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:30:50+00:00"
+    "processed_at": "2026-11-18T22:49:08+00:00"
    }
   ],
   "run": {
@@ -880,6 +886,7 @@
     "morphology_confidence": 0.9962532734914702,
     "morphology_runner_up": "fragment",
     "morphology_runner_up_confidence": 0.0037467265085298074,
+    "contrast": 174.50181579589844,
     "flag_edge": false,
     "flag_merged": false,
     "flag_low_confidence": "",
@@ -910,7 +917,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:30:52+00:00"
+    "processed_at": "2026-11-18T22:49:11+00:00"
    },
    {
     "sample_id": "S2",
@@ -981,6 +988,7 @@
     "morphology_confidence": 0.9999999999606264,
     "morphology_runner_up": "fragment",
     "morphology_runner_up_confidence": 3.9373615479121327e-11,
+    "contrast": 151.38082885742188,
     "flag_edge": false,
     "flag_merged": false,
     "flag_low_confidence": "",
@@ -1011,7 +1019,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:30:52+00:00"
+    "processed_at": "2026-11-18T22:49:11+00:00"
    },
    {
     "sample_id": "S2",
@@ -1082,6 +1090,7 @@
     "morphology_confidence": 0.9935489282992781,
     "morphology_runner_up": "fragment",
     "morphology_runner_up_confidence": 0.0064510717007219,
+    "contrast": 157.49009704589844,
     "flag_edge": false,
     "flag_merged": false,
     "flag_low_confidence": "",
@@ -1112,7 +1121,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:30:52+00:00"
+    "processed_at": "2026-11-18T22:49:11+00:00"
    }
   ],
   "run": {
@@ -1259,6 +1268,7 @@
     "morphology_confidence": 0.9985826272367978,
     "morphology_runner_up": "fragment",
     "morphology_runner_up_confidence": 0.001417372763202196,
+    "contrast": 199.1865692138672,
     "flag_edge": false,
     "flag_merged": false,
     "flag_low_confidence": "",
@@ -1289,7 +1299,7 @@
     "app_version": "0.1.0",
     "color_rules_version": "0.1-provisional",
     "model_version": "",
-    "processed_at": "2026-11-18T21:30:54+00:00"
+    "processed_at": "2026-11-18T22:49:12+00:00"
    }
   ],
   "run": {

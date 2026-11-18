@@ -24,12 +24,15 @@ Inputs:
 - `--line-mm` (optional): measured length of the sheets' printed 100 mm line.
 
 Writes OUT_DIR/particles.csv (one row per box: the lab's answer next to the app's),
-OUT_DIR/report.md (the agreement tables) and each photo's normal outputs in
+OUT_DIR/report.md (the agreement tables), OUT_DIR/thresholds.md and .json (for each tunable
+flag, the wrong results each threshold catches and misses, with suggested thresholds:
+flag_thresholds.py) and each photo's normal outputs in
 OUT_DIR/photos/. Outlines are not labelled by hand: where a size or label is wrong,
 look at that particle in its photo's overlay.png to see why.
 """
 import argparse
 import csv
+import json
 import statistics
 import sys
 from collections import Counter, defaultdict
@@ -42,6 +45,7 @@ sys.path.insert(0, str(HERE))
 from mippr.cli import run_grid  # noqa: E402
 from mippr.export import FLAGS  # noqa: E402
 
+import flag_thresholds  # noqa: E402
 from lab_sheets import lab_color, lab_shape, normalise_id, read_lab_records  # noqa: E402
 
 THRESHOLDS = (0.03, 0.05, 0.075, 0.10, 0.15, 0.20, 0.30)  # size_uncertainty values tried
@@ -182,6 +186,10 @@ def compare(boxes, results, lab, calipers):
                             "app_length_mm": _f(r["fiber_length_mm"]) if fiber else _f(r["length_mm"]),
                             "app_width_mm": _f(r["width_mm"]), "size_length_source": r["size_length_source"],
                             "size_uncertainty": _f(r["size_uncertainty"]),
+                            # the scores behind the tunable flags (flag_thresholds.py)
+                            "contrast": _f(r.get("contrast")), "solidity": _f(r.get("solidity")),
+                            "color_confidence": _f(r.get("color_confidence")),
+                            "morphology_confidence": _f(r.get("morphology_confidence")),
                             "app_color": r["color_label"], "app_morphology": r["morphology_label"],
                             "app_color_secondary": r.get("color_secondary", ""),
                             "review_reason": r["review_reason"], **{f: _true(r[f]) for f in SIZE_FLAGS}})
@@ -313,7 +321,8 @@ FIELDS = ["photo", "box", "sample_id", "particle_id", "status", "photo_error", "
           "lab_tar_like",
           "size_reference", "lab_length_mm", "caliper_length_mm", "app_length_mm", "length_error", "size_length_source",
           "lab_width_mm", "caliper_width_mm", "app_width_mm", "width_error", "lab_vs_caliper_length",
-          "size_uncertainty", *SIZE_FLAGS, "review_reason", "lab_found", "labeller", "note"]
+          "size_uncertainty", "contrast", "solidity", "color_confidence", "morphology_confidence",
+          *SIZE_FLAGS, "review_reason", "lab_found", "labeller", "note"]
 
 
 def main(argv=None):
@@ -324,6 +333,8 @@ def main(argv=None):
     ap.add_argument("--calipers")
     ap.add_argument("--tolerance", type=float, default=0.10, help="a size more than this far off counts as wrong")
     ap.add_argument("--line-mm", type=float)
+    ap.add_argument("--recall", type=float, default=0.8,
+                    help="thresholds.md suggests thresholds that catch this share of the wrong results")
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     boxes = read_boxes(a.boxes)
@@ -344,7 +355,10 @@ def main(argv=None):
         w.writeheader()
         w.writerows(recs)
     (out / "report.md").write_text(report(recs, a.tolerance, results))
-    print(f"{len(recs)} rows -> {out / 'particles.csv'}, {out / 'report.md'}")
+    thresholds = flag_thresholds.analyse(recs, a.tolerance, a.recall)
+    (out / "thresholds.md").write_text(flag_thresholds.markdown(thresholds, a.tolerance, a.recall))
+    (out / "thresholds.json").write_text(json.dumps(flag_thresholds.summary_json(thresholds), indent=2))
+    print(f"{len(recs)} rows -> {out / 'particles.csv'}, {out / 'report.md'}, {out / 'thresholds.md'}")
     return recs
 
 
