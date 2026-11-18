@@ -125,3 +125,46 @@ def test_report_and_csv_are_written(run):
         assert heading in text
     rows = list(csv.DictReader(open(out / "particles.csv")))
     assert len(rows) == len(PLACED) + 2 and (out / "photos" / "white" / "overlay.png").exists()
+
+
+def test_box_label_sheet_needs_no_lab_spreadsheet(run, tmp_path):
+    """The advisor's box-label sheet (templates/advisor_labels.csv layout, loose names and spellings)."""
+    _, out = run
+    labels = tmp_path / "labels.csv"
+    with open(labels, "w", newline="") as fh:
+        w = csv.writer(fh)
+        w.writerow(["Photo file name", "Background", "Box", "Shape", "Color", "Second colour", "Tar-like",
+                    "Length (mm)", "Width (mm)", "Labeler", "Notes"])
+        w.writerow(["white.jpg", "white grid", "b2", "Fragment", "Red", "", "", "2.0", "2.0", "AB", ""])
+        w.writerow(["white.jpg", "white_grid", "F7", "Fibre", "blue", "", "", "", "", "AB", "crosses a line"])
+        w.writerow(["white.jpg", "white_grid", "H5", "rubbery-fragment", "Black", "", "yes", "", "", "AB", ""])
+        w.writerow(["black.jpg", "black_grid", "C4", "other", "White", "gray", "", "", "", "AB", "unsure"])
+    boxes = sheet_check.read_boxes(labels)
+    assert [b["box"] for b in boxes] == ["B2", "F7", "H5", "C4"] and boxes[0]["sheet"] == "white_grid"
+    assert boxes[1]["truth"]["shape_class"] == "fiber" and boxes[2]["truth"]["shape_class"] == "rubbery_fragment"
+    assert boxes[2]["truth"]["tar_like"] is True and boxes[3]["truth"]["color_secondary"] == "grey"
+    assert boxes[3]["truth"]["shape_class"] is None  # "other" (unsure) is not scored
+    # reuse the photos already run by the fixture: compare() against the saved app rows
+    results = sheet_check.run_photos(out.parent / "photos", {"white.jpg", "black.jpg"}, tmp_path / "out")
+    recs = {r["box"]: r for r in sheet_check.compare(boxes, results, {}, {}) if r["status"] != "extra"}
+    assert recs["B2"]["color_correct"] is True and recs["B2"]["size_reference"] == "calipers"
+    assert abs(recs["B2"]["length_error"]) < SIZE_TOLERANCE
+    assert recs["F7"]["morphology_correct"] is True and recs["C4"]["morphology_correct"] is None
+    assert recs["C4"]["color_correct"] is True and recs["H5"]["lab_tar_like"] is True
+
+
+def test_template_files_parse():
+    from pathlib import Path
+    boxes = sheet_check.read_boxes(Path(sheet_check.HERE) / "templates" / "advisor_labels.csv")
+    assert len(boxes) == 3 and all("truth" in b for b in boxes)
+    assert boxes[1]["truth"]["color_class"] == "multicolor" and boxes[1]["hand"]["length_mm"] == 6.2
+    old = sheet_check.read_boxes(Path(sheet_check.HERE) / "templates" / "well_to_box.csv")
+    assert old[0]["particle_id"] == "W05" and "truth" not in old[0]
+
+
+def test_app_class_names_and_spellings():
+    assert lab_shape("Fiber") == lab_shape("fibre") == lab_shape("Fibers") == "fiber"
+    assert lab_shape("rubbery_fragment") == lab_shape("Rubbery-Fragment") == "rubbery_fragment"
+    assert lab_shape("pellet") == "pellet" and lab_shape("other") is None and lab_shape("") is None
+    assert lab_color("Gray") == "grey" and lab_color("multi-colour") == "multicolor"
+    assert lab_color("Transparent") == "clear" and lab_color("") is None

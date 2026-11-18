@@ -89,7 +89,7 @@ Folder: [pipeline/mippr/measurement/](../pipeline/mippr/measurement/README.md).
 
 - [x] Fix the size cutoff and which dimension it applies to. Decided: longest length (max Feret) is the main size. A particle is flagged if its min width is under 500 µm or its longest length is 450–550 µm.
 - [x] Compute area, CED, max and min Feret, aspect ratio, perimeter, convex area/perimeter, bounding box, circularity and solidity (ImageJ conventions)
-- [x] Compare perimeter methods on shapes with a known answer. The sub-pixel outline is most accurate; ImageJ-compatible values are kept alongside (provisional).
+- [x] Compare perimeter methods on shapes with a known answer. The sub-pixel outline is most accurate; since November 18 ImageJ's values are the main columns and the sub-pixel ones are kept alongside.
 - [x] Measure fiber length along the centre line (`fiber_length_mm`): skeleton path smoothed, ends trimmed and added back; within about 1–3% on test shapes; used only for particles that bend
 - [x] Measure opacity against the known background of each box (`opacity`): a lower bound on one background, measured directly across a checkerboard edge
 - [x] Convert pixels to mm and mm² with the stored scale; flag particles near the 500 µm cutoff or narrower than it

@@ -113,7 +113,7 @@ Each comes with a `MatchValue` (library match score). Wells sent to the plate re
 The check now reads each ruler on its own, works on black backgrounds and on plates with fewer rows, and pairs particles with wells even when specks or missing particles break the counts. Full table: [validation/reports/lab_photos.md](../validation/reports/lab_photos.md).
 
 - **8 photos pair reliably** (650 particles, r = 0.91–1.00); the rest have too many specks or broken outlines.
-- **The size gap varies by photo:** EX_01_S01, S03, S05, S06, S07 are 8–12% larger than the sheet, but EX_01_S08, OC_03_DS1 and EX_02_S08 agree within 2%. So it isn't the app's scale; the lab's ImageJ scale was probably set per session.
+- **The size gap varies by photo:** EX_01_S01, S03, S05, S06, S07 are 8–12% larger than the sheet, but EX_01_S08 and OC_03_DS1 agree within 2% (and EX_02_S08, just outside the reliability cut, within 1%). So it isn't the app's scale; the lab's ImageJ scale was probably set per session.
 - **Colour:** 96% agreement on white backgrounds (almost all black particles), 24.5% on black ones, where white and pale blue particles read as grey. The photos have a strong colour cast and no white reference, so the colour rules weren't changed.
 
 ## What this means for MIPPR
@@ -131,7 +131,7 @@ The check now reads each ruler on its own, works on black backgrounds and on pla
 
 ## Questions for the lab
 
-- **Scale:** how is the ImageJ scale set for the "Rows A–H" photos, and was it set again each session? Using the ruler in each photo, the app's sizes are 8–12% larger than the sheet on EX_01_S01, S03, S05, S06 and S07, but within 2% on EX_01_S08, OC_03_DS1 and EX_02_S08. Measuring one particle from EX_01_S07 with calipers would settle it.
+- **Scale:** how is the ImageJ scale set for the "Rows A–H" photos, and was it set again each session? Using the ruler in each photo, the app's sizes are 8–12% larger than the sheet on EX_01_S01, S03, S05, S06 and S07, but within 2% on EX_01_S08 and OC_03_DS1 (and EX_02_S08, a less reliable photo). Measuring one particle from EX_01_S07 with calipers would settle it.
 - **Fibers:** is a fiber a thin thread (like the F-numbered fibers), rather than anything with length:width ≥ 3? Some ≥ 3:1 particles are recorded as fragments.
 
 - How are ParticleLength and ParticleWidth measured (tool, and which axes)? Why is width larger than length in SF_02/SF_03?

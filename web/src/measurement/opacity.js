@@ -1,6 +1,6 @@
 // Part 3: browser port of pipeline/mippr/measurement/opacity.py.
 // How much of the known background a particle blocks: 0 (see-through) to 1 (opaque).
-import { count, morph } from "./_grid.js";
+import { count, morph } from "../grids.js";
 
 function median(vals) {
   const s = Float64Array.from(vals).sort();

@@ -3,7 +3,7 @@
 // trimmed where the skeleton runs into corners and the true end length added back. The thinning is
 // skimage's skeletonize (Zhang-Suen, same lookup table) and the path search reproduces SciPy's Dijkstra,
 // so the results match the Python reference. Plain JS, no OpenCV.js.
-import { crop } from "./_grid.js";
+import { crop } from "../grids.js";
 
 export const UNIFORM_MAX = 1.5;
 export const END_TRIM = 0.9;

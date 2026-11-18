@@ -10,9 +10,14 @@ sizes, which is how the flag thresholds are set (docs/PIPELINE.md, part 7).
         --lab EX_01_ParticleCount.xlsx [more sheets ...] [--calipers calipers.csv] \\
         [--tolerance 0.10] --out OUT_DIR
 
+    python validation/sheet_check.py --photos PHOTO_DIR --boxes advisor_labels.csv --out OUT_DIR
+
 Inputs:
 - `--boxes`: one row per particle placed: photo, box, sample_id, particle_id (the lab's
-  ID, e.g. W05 or F03). Boxes not listed are expected to be empty.
+  ID, e.g. W05 or F03). Boxes not listed are expected to be empty. Or a box-label sheet
+  (`templates/advisor_labels.csv`) with the morphology and colour in each row, which needs
+  no `--lab`; its optional hand-measured length_mm/width_mm are the size reference.
+  Column names and class names are matched loosely (Colour/color, Fibre/Fiber/fiber ...).
 - `--lab`: the lab's ParticleCount spreadsheets (.xlsx or .csv) with those particles.
 - `--calipers` (optional): sample_id, particle_id, length_mm, width_mm. Where given,
   calipers are the size reference instead of the spreadsheet.
@@ -37,20 +42,77 @@ sys.path.insert(0, str(HERE))
 from mippr.cli import run_grid  # noqa: E402
 from mippr.export import FLAGS  # noqa: E402
 
-from lab_sheets import normalise_id, read_lab_records  # noqa: E402
+from lab_sheets import lab_color, lab_shape, normalise_id, read_lab_records  # noqa: E402
 
 THRESHOLDS = (0.03, 0.05, 0.075, 0.10, 0.15, 0.20, 0.30)  # size_uncertainty values tried
 SIZE_FLAGS = [f for f in FLAGS if f not in ("flag_low_confidence", "flag_bundle", "flag_scale")]
 
 
+# Column names accepted in the --boxes file, matched ignoring case, spaces and punctuation
+# ("Photo file name", "photo_file", "Colour", "color" ...).
+_BOX_KEYS = {
+    "photo": ("photo", "photofile", "photofilename", "filename", "file", "image"),
+    "box": ("box", "boxlabel"),
+    "sample_id": ("sampleid", "sample"),
+    "particle_id": ("particleid",),
+    "sheet": ("sheet", "background", "backgroundtype", "sheettype"),
+    "morphology": ("morphology", "shape", "particleshape", "morphologylabel"),
+    "color": ("colour", "color", "particlecolour", "particlecolor", "colourlabel", "colorlabel"),
+    "color_secondary": ("secondcolour", "secondcolor", "colour2", "color2", "secondarycolour", "secondarycolor",
+                        "coloursecondary", "colorsecondary"),
+    "tar_like": ("tarlike", "tar"),
+    "length_mm": ("lengthmm", "length"),
+    "width_mm": ("widthmm", "width"),
+    "labeller": ("labeller", "labeler", "labelledby", "labeledby"),
+    "note": ("note", "notes", "comment", "comments"),
+}
+_ALIAS = {a: k for k, names in _BOX_KEYS.items() for a in names}
+
+
+def _key(h):
+    return _ALIAS.get("".join(c for c in str(h).lower() if c.isalnum()))
+
+
+def _yes(v):
+    return str(v or "").strip().lower() in ("yes", "y", "true", "1", "x")
+
+
+def _sheet(v):
+    s = "_".join(str(v or "").lower().replace("-", " ").replace("_", " ").split())
+    return {"white": "white_grid", "black": "black_grid", "checker": "checkerboard"}.get(s, s)
+
+
 def read_boxes(path):
+    """One row per particle placed. Two layouts, mixed freely:
+
+    - well-to-box (templates/well_to_box.csv): photo, box, sample_id, particle_id; the labels come
+      from the lab's spreadsheets (--lab).
+    - box labels (templates/advisor_labels.csv): photo, sheet, box, morphology, colour, second_colour,
+      tar_like, length_mm, width_mm, labeller, notes; the labels are in the row itself (`truth`), and
+      hand-measured length/width (`hand`) are the size reference like calipers.
+    """
     rows = []
-    with open(path, newline="") as fh:
-        for r in csv.DictReader(fh):
-            r = {k.strip(): (v or "").strip() for k, v in r.items() if k}
-            if r.get("photo") and r.get("box"):
-                rows.append({"photo": r["photo"], "box": r["box"].upper(), "sample_id": r.get("sample_id", ""),
-                             "particle_id": normalise_id(r.get("particle_id", "")), "note": r.get("note", "")})
+    with open(path, newline="", encoding="utf-8-sig") as fh:
+        for raw in csv.DictReader(fh):
+            r = {}
+            for k, v in raw.items():
+                if k and _key(k) and not r.get(_key(k)):
+                    r[_key(k)] = (v or "").strip()
+            if not (r.get("photo") and r.get("box")):
+                continue
+            box = r["box"].upper()
+            row = {"photo": r["photo"], "box": box, "sample_id": r.get("sample_id", "") or Path(r["photo"]).stem,
+                   "particle_id": normalise_id(r.get("particle_id", "")) or box, "note": r.get("note", ""),
+                   "sheet": _sheet(r.get("sheet")), "labeller": r.get("labeller", "")}
+            if r.get("morphology") or r.get("color"):
+                L, W = _f(r.get("length_mm")), _f(r.get("width_mm"))
+                row["truth"] = {"shape": r.get("morphology", ""), "color": r.get("color", ""),
+                                "shape_class": lab_shape(r.get("morphology")), "color_class": lab_color(r.get("color")),
+                                "color_secondary": lab_color(r.get("color_secondary")) or "",
+                                "tar_like": _yes(r.get("tar_like")), "length_mm": None, "width_mm": None}
+                if L or W:
+                    row["hand"] = {"length_mm": L, "width_mm": W}
+            rows.append(row)
     return rows
 
 
@@ -102,9 +164,11 @@ def compare(boxes, results, lab, calipers):
         for box, b in sorted(expected[photo].items()):
             rec = {"photo": photo, "box": box, "sample_id": b["sample_id"], "particle_id": b["particle_id"],
                    "photo_error": error}
-            truth = lab.get((b["sample_id"], b["particle_id"]))
-            cal = calipers.get((b["sample_id"], b["particle_id"]), {})
-            rec.update({"lab_found": truth is not None,
+            truth = b.get("truth") or lab.get((b["sample_id"], b["particle_id"]))
+            cal = b.get("hand") or calipers.get((b["sample_id"], b["particle_id"]), {})
+            rec.update({"lab_found": truth is not None, "sheet": b.get("sheet", ""), "labeller": b.get("labeller", ""),
+                        "note": b.get("note", ""), "lab_color_secondary": (truth or {}).get("color_secondary", ""),
+                        "lab_tar_like": (truth or {}).get("tar_like", ""),
                         "lab_shape": truth["shape"] if truth else "", "lab_shape_class": (truth or {}).get("shape_class"),
                         "lab_color": truth["color"] if truth else "", "lab_color_class": (truth or {}).get("color_class"),
                         "lab_length_mm": (truth or {}).get("length_mm"), "lab_width_mm": (truth or {}).get("width_mm"),
@@ -119,6 +183,7 @@ def compare(boxes, results, lab, calipers):
                             "app_width_mm": _f(r["width_mm"]), "size_length_source": r["size_length_source"],
                             "size_uncertainty": _f(r["size_uncertainty"]),
                             "app_color": r["color_label"], "app_morphology": r["morphology_label"],
+                            "app_color_secondary": r.get("color_secondary", ""),
                             "review_reason": r["review_reason"], **{f: _true(r[f]) for f in SIZE_FLAGS}})
             # the size reference: calipers where measured, else the lab's spreadsheet
             ref = "calipers" if rec["caliper_length_mm"] else ("lab" if rec["lab_length_mm"] else "")
@@ -242,28 +307,32 @@ def report(recs, tolerance, results):
     return "\n".join(L) + "\n"
 
 
-FIELDS = ["photo", "box", "sample_id", "particle_id", "status", "photo_error", "background_type", "particle_ref",
+FIELDS = ["photo", "box", "sample_id", "particle_id", "status", "photo_error", "sheet", "background_type", "particle_ref",
           "lab_shape", "lab_shape_class", "app_morphology", "morphology_correct",
-          "lab_color", "lab_color_class", "app_color", "color_correct",
+          "lab_color", "lab_color_class", "app_color", "color_correct", "lab_color_secondary", "app_color_secondary",
+          "lab_tar_like",
           "size_reference", "lab_length_mm", "caliper_length_mm", "app_length_mm", "length_error", "size_length_source",
           "lab_width_mm", "caliper_width_mm", "app_width_mm", "width_error", "lab_vs_caliper_length",
-          "size_uncertainty", *SIZE_FLAGS, "review_reason", "lab_found"]
+          "size_uncertainty", *SIZE_FLAGS, "review_reason", "lab_found", "labeller", "note"]
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--photos", required=True)
     ap.add_argument("--boxes", required=True)
-    ap.add_argument("--lab", nargs="+", required=True)
+    ap.add_argument("--lab", nargs="+", default=[], help="not needed when the --boxes file has the labels")
     ap.add_argument("--calipers")
     ap.add_argument("--tolerance", type=float, default=0.10, help="a size more than this far off counts as wrong")
     ap.add_argument("--line-mm", type=float)
     ap.add_argument("--out", required=True)
     a = ap.parse_args(argv)
     boxes = read_boxes(a.boxes)
-    lab = read_lab_records(a.lab)
+    lab = read_lab_records(a.lab) if a.lab else {}
     calipers = read_calipers(a.calipers)
-    missing = [(b["sample_id"], b["particle_id"]) for b in boxes if (b["sample_id"], b["particle_id"]) not in lab]
+    if not a.lab and not any("truth" in b for b in boxes):
+        ap.error("--boxes has no morphology/colour columns, so --lab spreadsheets are needed")
+    missing = [(b["sample_id"], b["particle_id"]) for b in boxes
+               if "truth" not in b and (b["sample_id"], b["particle_id"]) not in lab]
     if missing:
         print(f"warning: {len(missing)} placed particles aren't in the lab sheets, e.g. {missing[:3]}", file=sys.stderr)
     out = Path(a.out)

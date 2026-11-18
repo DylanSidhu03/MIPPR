@@ -33,6 +33,7 @@ Parts 1–6 flow in order for every photo: capture → segment → measure → c
 - [Output CSV](docs/OUTPUT_CSV.md): every exported column
 - [Technical decisions](docs/TECHNICAL_DECISIONS.md): technical choices and findings, made after Drive
 - [The lab's existing particle records](docs/LAB_DATA.md): the hand-classification spreadsheets and photos in Drive, and how the app compares
+- [Methods](docs/METHODS.md): how the app works, class definitions, calibration, accuracy so far and known limits
 
 ## Try it
 

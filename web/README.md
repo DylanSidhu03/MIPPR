@@ -49,7 +49,7 @@ The website people use: print a background, upload photos, get results, review t
 
 Still stubs: `storage/supabase.js` (part 9) and `morphology/model.js` (v3). Not built yet: redrawing an outline on the screen (the rules and re-measuring work), the overlay image download, and a Web Worker for large batches.
 
-Small tidy-up left: `measurement/_edges.js` repeats `edgeLevel` and `fillHoles` from `segmentation/edges.js` (they take plain arrays rather than Mats); merge them after checking the float32 median rounding is the same.
+Shared helpers: `grids.js` (plain pixel grids and the OpenCV.js morphology and contour calls), and `segmentation/edges.js`, whose `edgeLevel` and `fillHolesGrid` the measurement modules use too (merged November 18; the parity tests are unchanged).
 
 ## Technical choices
 

@@ -35,7 +35,7 @@ The lab's data stays in Drive and is not committed here: it's the lab's, and the
 
 ## To build
 
-- [ ] **Settle the scale gap with the lab:** measure one particle with calipers. The lab's older sizes vary by session (+12% to −2% against the ruler), so they can't be ground truth as they are.
+- [x] ~~Settle the scale gap with the lab~~: left as is (November 18). The lab's older sizes vary by session (+12% to −2% against the ruler), so they aren't ground truth; the new sheet photos are.
 - [x] **Run `lab_photo_check.py` on more photos** and collect the matches into one table: 20 photos from EX_01, EX_02, OC_03, OC_05–07 and an LFB (see `reports/lab_photos.md`).
 - [ ] SF_04 photos: their sheet (SF_04) isn't in Drive's ParticleCount folder.
 - [ ] **Re-photograph the lab's labelled particles on the printed sheets** (all three backgrounds), with a well-to-box list, so their hand labels carry over. Then measure a few with calipers as the size reference.

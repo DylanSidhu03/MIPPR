@@ -2,8 +2,8 @@
 // Deterministic size, shape and colour measurements from particle masks, with the same keys and values
 // as Python's measure(). Functions that need OpenCV.js take it as their first argument; the outline
 // tracing (marching squares, ImageJ's traced perimeter) and the Feret calipers are plain JS.
-import { edgeLevel } from "./_edges.js";
-import { count, crop, externalContours, maskMat, morph, plain, toMat } from "./_grid.js";
+import { edgeLevel } from "../segmentation/edges.js";
+import { count, crop, externalContours, maskMat, morph, plain, toMat } from "../grids.js";
 import { fiberMetrics } from "./fiber.js";
 import { opacity } from "./opacity.js";
 import { REACH_PX, sizeRange } from "./uncertainty.js";

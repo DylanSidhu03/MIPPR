@@ -55,10 +55,33 @@ Write them in [templates/calipers.csv](templates/calipers.csv) in mm, with the s
 
 For particles that aren't in a spreadsheet yet, especially film, foam and clear ones, label them in the usual ParticleCount layout ([templates/particle_count.csv](templates/particle_count.csv)): shape and colour per particle. Sizes are optional.
 
+## 6b. Labelling particles box by box (advisor's label sheet)
+
+If you are labelling particles straight from the sheet photos rather than carrying over ParticleCount labels, use [templates/advisor_labels.csv](templates/advisor_labels.csv). Open it in Excel or Google Sheets, delete the three example rows, and save as CSV when done. It goes straight into the check with no reformatting.
+
+- **One row per box that has a particle in it.** Leave empty boxes out.
+- **photo**: the photo's file name exactly, e.g. `EX_01_S01_white_grid_1.jpg`.
+- **sheet**: `white_grid`, `black_grid` or `checkerboard`.
+- **box**: the label printed in the box, e.g. `B4`.
+- **morphology**: one of `fragment`, `rubbery_fragment`, `fiber`, `film`, `foam`, `pellet`. **Unsure? Write `other`.** It is kept but not scored.
+- **colour**: one of `clear`, `white`, `black`, `grey`, `blue`, `green`, `red`, `yellow`, `orange`, `brown`, `pink`, `purple`, `multicolor`. **Unsure? Leave it blank.**
+- **Multicolor rule:** write `multicolor` only when a second colour covers **20% or more** of the particle. Put that second colour in **second_colour**. A smaller streak or spot keeps the main colour in **colour**; you can still write the streak's colour in second_colour.
+- **tar_like**: `yes` if the particle looks like tar; otherwise leave it blank.
+- **length_mm, width_mm** (optional): only if you measured the particle by hand (calipers), in mm. Length is the longest distance across, width the narrowest. Where filled in, these are what the app's sizes are checked against.
+- **labeller**: your initials. **notes**: anything else, e.g. "crosses the line into B5".
+
+Capital letters and common spellings are fine (`Fiber`, `fibre`, `Gray`, `Colour`/`Color` headers), but stick to the names above where you can.
+
+Check it with:
+
+```bash
+python validation/sheet_check.py --photos PHOTOS --boxes advisor_labels.csv --out results/
+```
+
 ## 7. What to send
 
 - The photos (original files)
-- The well-to-box list(s)
+- The well-to-box list(s), or the box-by-box label sheet (`advisor_labels.csv`)
 - The calipers sheet
 - Which ParticleCount spreadsheets the particles come from, and any new label sheets
 - The 100 mm line measurement, if it wasn't 100 mm

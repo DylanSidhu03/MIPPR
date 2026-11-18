@@ -1,6 +1,8 @@
 // Part 2: browser port of pipeline/mippr/segmentation/edges.py.
 // Hysteresis threshold, hole filling and the half-maximum edge rule, whatever the background.
 // Masks are CV_8UC1 Mats holding 0/1, difference maps CV_32FC1 Mats; every returned Mat is the caller's to delete.
+// edgeLevel and fillHolesGrid also take the plain grids the measurement modules use.
+import { count, maskMat, morph as morphGrid, plain } from "../grids.js";
 
 function ellipse(cv, grow) {
   return cv.getStructuringElement(cv.MORPH_ELLIPSE, new cv.Size(2 * grow + 1, 2 * grow + 1));
@@ -66,40 +68,47 @@ export function fillHoles(cv, mask) {
   return filled;
 }
 
-function median32(values) {
-  values.sort();
-  const m = values.length >> 1;
-  return values.length % 2 ? values[m] : Math.fround(Math.fround(values[m - 1] + values[m]) / 2);
-}
-
-function percentile32(values, q) {
-  values.sort();
-  const pos = (q / 100) * (values.length - 1);
-  const i = Math.floor(pos);
-  const t = pos - i;
-  const a = values[i];
-  const b = values[Math.min(i + 1, values.length - 1)];
-  return Math.fround(t >= 0.5 ? b - (b - a) * (1 - t) : a + (b - a) * t);
+/**
+ * numpy's median and 90th percentile (method "linear"). A Float32Array is treated as numpy float32,
+ * whose mean of the two middle values and interpolation are rounded to float32.
+ */
+function quantile(values, q, f32) {
+  const r = f32 ? Math.fround : (v) => v;
+  const s = Float64Array.from(values).sort();
+  const n = s.length;
+  if (q === 0.5) return n % 2 ? s[(n - 1) / 2] : r(s[n / 2 - 1] + s[n / 2]) / 2;
+  const v = (n - 1) * q;
+  if (v >= n - 1) return s[n - 1];
+  const i = Math.floor(v);
+  const t = v - i;
+  const a = s[i], b = s[i + 1];
+  const d = r(b - a);
+  return t >= 0.5 ? r(b - r(d * r(1 - t))) : r(a + r(d * r(t)));
 }
 
 /**
  * Difference value at which this particle's edge is drawn: `fraction` of its contrast, the median
- * difference over the particle's interior (its outer `grow` px left out).
+ * difference over the particle's interior (its outer `grow` px left out), or the 90th percentile over
+ * the whole region when the interior has under 5 px. `region` and `diff` are Mats or plain grids
+ * (grids.js) of the same size.
  */
 export function edgeLevel(cv, region, diff, fraction = 0.5, grow = 2) {
-  const kernel = ellipse(cv, grow);
-  const core = morph(cv, cv.MORPH_ERODE, region, kernel);
-  const d = diff.data32F;
-  const inCore = [];
-  const inRegion = [];
-  for (let i = 0; i < d.length; i++) {
-    if (core.data[i]) inCore.push(d[i]);
-    if (region.data[i]) inRegion.push(d[i]);
-  }
-  kernel.delete();
-  core.delete();
-  const contrast = inCore.length >= 5 ? median32(Float32Array.from(inCore)) : percentile32(Float32Array.from(inRegion), 90);
+  const reg = plain(region), d = plain(diff);
+  const core = morphGrid(cv, "erode", reg, 2 * grow + 1, "ellipse");
+  const f32 = d.data instanceof Float32Array;
+  const pick = (m) => d.data.filter((_, i) => m.data[i]);
+  const contrast = count(core) >= 5 ? quantile(pick(core), 0.5, f32) : quantile(pick(reg), 0.9, f32);
   return fraction * contrast;
+}
+
+/** fillHoles for a plain 0/1 grid (grids.js); returns a grid. */
+export function fillHolesGrid(cv, mask) {
+  const src = maskMat(cv, mask);
+  const filled = fillHoles(cv, src);
+  const out = { width: mask.width, height: mask.height, channels: 1, data: Uint8Array.from(filled.data) };
+  src.delete();
+  filled.delete();
+  return out;
 }
 
 /**

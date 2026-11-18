@@ -198,9 +198,9 @@ All counts leave out rejected particles.
 
 | Release | Columns available |
 |---|---|
-| v1 | Identifiers, sample details, location, size, shape, ImageJ-compatible, color values, quality flags (except low confidence), outline review, provenance |
-| v2 | Adds `color_label`, `color_confidence`, `color_label_original`, `color_rules_version` |
-| v3 | Adds the morphology columns, `morphology_label_original`, `model_version`, and `flag_low_confidence` |
+| v1 | Identifiers, sample details, location, size, shape (ImageJ's), the other methods, color values, quality flags (except low confidence), outline review, provenance |
+| v2 | Adds `color_label`, `color_confidence`, `color_label_original`, `color_rules_version`, and the rule-based morphology (`morphology_label` for fiber, pellet and film, `morphology_source = rule`, `morphology_confidence`) |
+| v3 | Adds the model's morphology (the remaining classes, `morphology_runner_up` and its confidence), `morphology_label_original`, `model_version`, and `flag_low_confidence` |
 | v4 | Review columns feed the shared dataset for retraining |
 
 Column names stay the same across releases. Columns not yet available are left empty, so files from different versions can be combined.
@@ -248,7 +248,7 @@ Column names stay the same across releases. Columns not yet available are left e
 
 ## 8b. Decisions on November 11, 2026 (standard backgrounds and the lab's records)
 
-- **Morphology:** rules from v2 for fiber (aspect ratio ≥ 3), pellet (round and solid) and film (low opacity); the v3 model for the rest, allowed to overrule a rule when confident. `morphology_source` records which.
+- **Morphology:** rules from v2 for fiber (Feret length:width, `feret_ratio`, ≥ 3), pellet (round and solid) and film (low opacity); the v3 model for the rest, allowed to overrule a rule when confident. `morphology_source` records which.
 - **Classes:** fragment, rubbery_fragment, fiber, film, foam, pellet, other. The lab's labels map onto them ([LAB_DATA.md](LAB_DATA.md)).
 - **New columns:**
   - `opacity`, measured against the known background

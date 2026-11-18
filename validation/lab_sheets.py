@@ -11,9 +11,11 @@ from pathlib import Path
 # The lab's names -> the app's classes (docs/CLASSIFICATION_SPEC.md). None: no class to compare with.
 SHAPES = {"fragment": "fragment", "rubbery fragment": "rubbery_fragment", "fiber": "fiber", "fibre": "fiber",
           "line": "fiber", "line bundle": "fiber", "fiber bundle": "fiber", "sphere": "pellet", "pellet": "pellet",
-          "bead": "pellet", "film": "film", "foam": "foam"}
+          "bead": "pellet", "rubbery": "rubbery_fragment", "film": "film", "foam": "foam"}
 COLORS = {"multicolor (2+ colors)": "multicolor", "multicolor": "multicolor", "multicolour": "multicolor",
-          "gray": "grey", "unknown": None}
+          "multi color": "multicolor", "multi colour": "multicolor", "multi": "multicolor",
+          "gray": "grey", "transparent": "clear", "colorless": "clear", "colourless": "clear",
+          "unknown": None, "unsure": None, "other": None}
 
 _KEYS = {"sampleid": "sample_id", "particleid": "particle_id", "particleshape": "shape", "particlecolor": "color",
          "particlecolour": "color", "particlelength": "length_um", "particlelengthum": "length_um",
@@ -24,12 +26,21 @@ def _norm(h):
     return re.sub(r"[^a-z0-9]", "", str(h).lower()) if h is not None else ""
 
 
+def _words(name):
+    """'Rubbery_Fragment ' -> 'rubbery fragment': case, underscores, hyphens and extra spaces ignored."""
+    return " ".join(re.sub(r"[_\-]", " ", str(name or "")).lower().split())
+
+
 def lab_shape(name):
-    return SHAPES.get(str(name or "").strip().lower())
+    """The app's morphology class for a label (the lab's names or the app's own), or None.
+
+    Plurals are accepted (Fibers -> fiber). "other", "unsure" and blank give None: not compared."""
+    s = _words(name)
+    return SHAPES.get(s) or (SHAPES.get(s[:-1]) if s.endswith("s") else None)
 
 
 def lab_color(name):
-    s = str(name or "").strip().lower()
+    s = _words(name)
     return COLORS.get(s, s) or None
 
 

@@ -1,4 +1,4 @@
-// Small helpers shared by the measurement modules: plain pixel grids, crops, and the OpenCV.js
+// Small helpers shared by the segmentation and measurement modules: plain pixel grids, crops, and the OpenCV.js
 // morphology and contour calls they need. A grid is {width, height, channels, data} in row-major order.
 
 /** A cv.Mat (or an existing grid) as a plain grid. Mat data is copied: views into the WASM heap go stale when it grows. */

@@ -1,8 +1,8 @@
 // Part 3: browser port of pipeline/mippr/measurement/uncertainty.py.
 // How much a particle's size depends on where its edge is drawn: the particle is outlined again with
 // the edge at 40% and 60% of its contrast and its length and width measured each time.
-import { edgeLevel, fillHoles } from "./_edges.js";
-import { crop, morph } from "./_grid.js";
+import { edgeLevel, fillHolesGrid as fillHoles } from "../segmentation/edges.js";
+import { crop, morph } from "../grids.js";
 
 export const EDGE_SPREAD = 0.1;
 export const REACH_PX = 10;

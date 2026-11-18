@@ -15,7 +15,7 @@ The printed background makes most of this deterministic: the app knows the scale
 | Sample details | sample ID, photo number, date, operator, lab, setup, site | Typed at upload |
 | Find the sheet | background type, paper, scale (`mm_per_px`) | Corner markers (their IDs encode the background); 100 mm line checks printer scaling |
 | Flatten | a corrected image | Homography from the markers, refined with the grid's own line crossings (removes tilt and lens distortion, ~0.1 px) |
-| White balance | colour correction | The printed white and grey patches |
+| White balance | colour correction | The paper white in the printed white patch (the grey patch is a check) |
 | Find each particle | the **outline** (mask) and its box (`particle_id`) | **Threshold**: difference from the box's own known background colour, hysteresis threshold, half-maximum edge. Printed lines and label corners are masked. |
 | Measure | length, width, area, perimeter, convex values, CED, fiber length | **Geometry** from the outline × scale |
 | Size uncertainty | `size_uncertainty`, length and width at the outer and inner edge | **Geometry**: the outline redrawn with the edge at 40% and 60% of the particle's contrast; how much the length changes |
@@ -42,7 +42,7 @@ The printed background makes most of this deterministic: the app knows the scale
 | Size classes | `length_mm` (or `fiber_length_mm` for fibers) in bins `<0.5`, `0.5-1`, `1-2`, `2-5`, `>5` (`>5` = above the usual 5 mm microplastic limit) |
 | Units | mm for lengths and mm² for areas, everywhere (changed from µm in v0.2) |
 
-At the current photo resolution (about 75 µm per pixel), ±10% is about ±1 pixel, which is roughly the measurement uncertainty.
+On the lab's older photos (about 75 µm per pixel), ±10% is about ±1 pixel; whole-sheet photos of the printed sheets must reach at least 10 px per mm (100 µm per pixel), which is roughly the measurement uncertainty.
 
 **Thin fibers.** The lab's fibers are typically about 24 µm wide, below one pixel in a photo of a whole sheet (about 55 µm per pixel for a phone photo of a Letter sheet). The app detects them as faint lines and reports their length. When width is under about 2 pixels, `width_mm` is left empty and `flag_width_unresolved` is set. Fiber widths keep coming from the microscope.
 
@@ -79,7 +79,7 @@ There are 13 classes: **clear, white, black, grey, blue, green, red, yellow, ora
 | Clear vs white | Kept separate, decided by **`opacity`** (decided November 11, 2026): the box's background colour is known from the printed design, so the app measures how much of it shows through. **Clear:** low opacity. **White:** opaque and light. |
 | Multicolor | A second color covers **≥ 20%** of the particle's area. The app always records the second colour and its share (`color_secondary`, `color_secondary_fraction`), so a blue particle with 10% red streaks keeps that information even though it is labelled blue. |
 | Unclear colours | Rules always choose the nearest class; borderline cases get a low `color_confidence` and go to review. There is no automatic "unknown" class, but a reviewer can set one (the lab uses "unknown" 25 times). |
-| Consistency between photos | A **color reference in every frame**. The app corrects white balance from it before measuring color. The v0.4 printable backgrounds carry white and grey patches. Whether hue classes also need colored patches or a commercial card is decided in issue #2. |
+| Consistency between photos | A **color reference in every frame**. The app corrects white balance from it before measuring color. The v0.4 printable backgrounds carry white and grey patches. Since November 18 there is also a version of each sheet with six coloured patches; they are recorded per photo but are not a colour standard, because printers render colours differently. |
 | How the app assigns color (v2) | Rule-based ranges in Lab (HSV can be derived from it), fitted to labelled particles photographed with the reference. The output has mean and SD of Lab and a hex code for this. |
 
 - **Swatches:** each class needs a reference swatch and its HSV/Lab range added here once the color reference is settled.
@@ -140,7 +140,7 @@ The no-plastic statement goes in `NOTE.txt`, not in the CSV, so the CSV opens cl
 ## Still open
 
 - Example photos per morphology class (from the stage 2 pilot)
-- Color swatches and HSV/Lab ranges (once the color reference is settled in issue #2)
+- Color swatches and HSV/Lab ranges (once the colour rules are fitted on the advisor's sheet photos)
 - Validation tolerance against hand measurements (project open question 6). **Method:** compare length, width, shape and colour per class on labelled particles photographed on the printed sheets (the lab's labelled particles re-photographed, labels carried over by well), and set the pass mark after seeing the agreement. The match against the lab's older "Rows A–H" photos (November 11–12) is a first check of the measurement code, not the pass mark: their scale settings vary by session.
 - How the lab measures length and width, and why width is larger than length in SF_02/SF_03 ([LAB_DATA.md](LAB_DATA.md))
 - Rule thresholds for fiber, pellet and film, tuned on labelled particles photographed on the sheets

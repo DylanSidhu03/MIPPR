@@ -1,0 +1,4 @@
+photo,sheet,box,morphology,colour,second_colour,tar_like,length_mm,width_mm,labeller,notes
+EXAMPLE_white_grid_1.jpg,white_grid,A1,fragment,blue,,,,,AB,example row: delete before use
+EXAMPLE_white_grid_1.jpg,white_grid,A2,fiber,multicolor,red,,6.2,0.3,AB,example row: crosses the line into A3
+EXAMPLE_black_grid_1.jpg,black_grid,B4,rubbery_fragment,black,,yes,,,AB,example row: unsure of shape? write other
