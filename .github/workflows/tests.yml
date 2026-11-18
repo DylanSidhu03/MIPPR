@@ -34,4 +34,4 @@ jobs:
       - name: Fetch the pinned OpenCV.js (sha256 checked)
         run: node web/scripts/fetch_opencv.mjs
       - name: Browser code tests (parity with the Python pipeline)
-        run: node --test web/tests/
+        run: node --test "web/tests/*.test.mjs"

@@ -2,6 +2,7 @@
 // The layout is plain geometry (no DOM, no OpenCV). Detection and rectification take the OpenCV.js
 // module as their first argument (see ../opencv.js), so the same code runs in the browser and in Node.
 // Parity with the Python reference is checked by web/tests/.
+import { cornerSubPix, warpPerspectiveLinear } from "./subpix.js";
 
 export const BACKGROUNDS = Object.freeze(["white_grid", "black_grid", "checkerboard"]);
 export const PAPERS = Object.freeze({ letter: Object.freeze([215.9, 279.4]), a4: Object.freeze([210.0, 297.0]) });
@@ -140,11 +141,26 @@ export function layoutFromMarkerIds(ids) {
 
 // ── Finding the sheet in a photo ───────────────────────────────────────────
 
+/** Python's round() to an integer: half to even. */
+function roundHalfEven(x) {
+  const r = Math.round(x);
+  return r - x === 0.5 && r % 2 ? r - 1 : r;
+}
+
 function toGray(cv, img) {
   if (img.channels() === 1) return img.clone();
   const gray = new cv.Mat();
   cv.cvtColor(img, gray, img.channels() === 4 ? cv.COLOR_RGBA2GRAY : cv.COLOR_BGR2GRAY);
   return gray;
+}
+
+/** A 3-channel BGR copy, as the Python reference expects (4 channels are taken as RGBA). Caller deletes it. */
+export function toBgr(cv, img) {
+  const n = img.channels();
+  if (n === 3) return img.clone();
+  const out = new cv.Mat();
+  cv.cvtColor(img, out, n === 4 ? cv.COLOR_RGBA2BGR : cv.COLOR_GRAY2BGR);
+  return out;
 }
 
 /**
@@ -177,9 +193,9 @@ export function detectMarkers(cv, img) {
 }
 
 /**
- * Locate a printed MIPPR sheet from its corner markers: layout, px per mm and the photo -> sheet homography.
- * Mirrors the marker stage of find_sheet in sheet.py; the grid-crossing refinement is not ported yet.
- * Throws an Error with a readable reason.
+ * Locate a printed MIPPR sheet: layout, px per mm, the photo -> sheet homography from the corner markers,
+ * and the grid crossings in photo px (`crossings[row][col] = [x, y]`), refined onto the printed lines.
+ * Mirrors find_sheet in sheet.py. Throws an Error with a readable reason.
  */
 export function findSheet(cv, img, { pxPerMm = null, layout = null } = {}) {
   let found = detectMarkers(cv, img);
@@ -204,7 +220,8 @@ export function findSheet(cv, img, { pxPerMm = null, layout = null } = {}) {
   const homography = Array.from(H.data64F);
   [srcMat, dstMat, H].forEach((m) => m.delete());
   if (homography.length !== 9) throw new Error("Could not fit the sheet's perspective from the markers.");
-  return { layout, pxPerMm, homography, markers: found, markersFound: keys.length };
+  const crossings = refineCrossings(cv, img, layout, homography, pxPerMm);
+  return { layout, pxPerMm, homography, crossings, markers: found, markersFound: keys.length };
 }
 
 /** Sheet size in px at the sheet's px per mm. */
@@ -222,12 +239,323 @@ export function rectifySheet(cv, sheet, img, interpolation = cv.INTER_LINEAR) {
   return out;
 }
 
-/** The flattened grid image (box by box, from the refined grid crossings). */
-export function rectifyGrid(sheet, img) {
-  throw new Error("Part 1: rectifyGrid (grid-crossing refinement) is not implemented yet");
+/** Grid size in px at the sheet's px per mm. */
+export function gridSizePx(sheet) {
+  return sheet.layout.gridSizeMm.map((v) => pyRound(v * sheet.pxPerMm));
 }
 
-/** Per-channel gains from the printed white patch; grey patch check. */
-export function whiteBalance(sheet, img) {
-  throw new Error("Part 1: whiteBalance is not implemented yet");
+export function boxPx(sheet) {
+  return sheet.layout.boxMm * sheet.pxPerMm;
 }
+
+const gridMaps = new WeakMap();
+
+/** remap() maps from the grid crossings: each box warped bilinearly from its four corners. */
+function gridMapsOf(sheet) {
+  if (gridMaps.has(sheet)) return gridMaps.get(sheet);
+  const g = sheet.crossings;
+  const [w, h] = gridSizePx(sheet);
+  const b = boxPx(sheet);
+  const { rows, cols } = sheet.layout;
+  const mapX = new Float32Array(w * h);
+  const mapY = new Float32Array(w * h);
+  const i0 = new Int32Array(w), fu = new Float64Array(w);
+  for (let x = 0; x < w; x++) {
+    const u = (x + 0.5) / b;
+    i0[x] = Math.min(Math.max(Math.floor(u), 0), cols - 1);
+    fu[x] = u - i0[x];
+  }
+  for (let y = 0; y < h; y++) {
+    const v = (y + 0.5) / b;
+    const j = Math.min(Math.max(Math.floor(v), 0), rows - 1);
+    const fv = v - j;
+    for (let x = 0; x < w; x++) {
+      const i = i0[x], f = fu[x];
+      for (let k = 0; k < 2; k++) {
+        const top = g[j][i][k] * (1 - f) + g[j][i + 1][k] * f;
+        const bot = g[j + 1][i][k] * (1 - f) + g[j + 1][i + 1][k] * f;
+        (k ? mapY : mapX)[y * w + x] = top * (1 - fv) + bot * fv - 0.5;
+      }
+    }
+  }
+  const maps = { w, h, mapX, mapY };
+  gridMaps.set(sheet, maps);
+  return maps;
+}
+
+/** The grid area only, flattened box by box from the refined crossings: origin at the grid's top-left. Caller deletes it. */
+export function rectifyGrid(cv, sheet, img, interpolation = cv.INTER_LINEAR) {
+  const { w, h, mapX, mapY } = gridMapsOf(sheet);
+  const mx = new cv.Mat(h, w, cv.CV_32FC1);
+  const my = new cv.Mat(h, w, cv.CV_32FC1);
+  mx.data32F.set(mapX);
+  my.data32F.set(mapY);
+  const out = new cv.Mat();
+  cv.remap(img, out, mx, my, interpolation, cv.BORDER_REPLICATE, new cv.Scalar());
+  mx.delete();
+  my.delete();
+  return out;
+}
+
+// ── Grid-crossing refinement (_refine_crossings in sheet.py) ───────────────
+
+function applyH(H, x, y) {
+  const z = H[6] * x + H[7] * y + H[8];
+  return [(H[0] * x + H[1] * y + H[2]) / z, (H[3] * x + H[4] * y + H[5]) / z];
+}
+
+function invert3(m) {
+  const [a, b, c, d, e, f, g, h, i] = m;
+  const A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g;
+  const det = a * A + b * B + c * C;
+  return [A, -(b * i - c * h), b * f - c * e, B, a * i - c * g, -(a * f - c * d), C, -(a * h - b * g), a * e - b * d]
+    .map((v) => v / det);
+}
+
+function median(values) {
+  const a = Float64Array.from(values).sort();
+  const n = a.length;
+  return n % 2 ? a[(n - 1) / 2] : (a[n / 2 - 1] + a[n / 2]) / 2;
+}
+
+/**
+ * Grid crossings in photo px, moved onto the printed lines (or checkerboard corners).
+ * Pass 1 searches just under half a box wide, a smooth surface is fitted to what it finds,
+ * and passes 2 and 3 search ever more narrowly around that prediction.
+ */
+export function refineCrossings(cv, img, layout, H, ppm) {
+  const gray = toGray(cv, img);
+  const [w, h] = layout.sizeMm.map((v) => pyRound(v * ppm));
+  const canvas = warpPerspectiveLinear(cv, gray, H, w, h);
+  gray.delete();
+  const { rows, cols } = layout;
+  const b = layout.boxMm * ppm;
+  const [gx, gy] = layout.gridOriginMm.map((v) => v * ppm);
+  const n = (rows + 1) * (cols + 1);
+  const ideal = new Float64Array(2 * n);
+  for (let r = 0; r <= rows; r++) {
+    for (let c = 0; c <= cols; c++) {
+      ideal[2 * (r * (cols + 1) + c)] = gx + c * b;
+      ideal[2 * (r * (cols + 1) + c) + 1] = gy + r * b;
+    }
+  }
+  let guess = new Float64Array(2 * n);
+  let shift, ok;
+  try {
+    for (const frac of [0.42, 0.25, 0.12]) {
+      ({ shift, ok } = searchCrossings(cv, canvas, layout, ideal, guess, Math.trunc(Math.max(4, frac * b)), ppm));
+      guess = smoothFit(ideal, shift, ok);
+    }
+  } finally {
+    canvas.delete();
+  }
+  // Keep measured crossings that agree with the smooth surface; use the surface elsewhere.
+  const tol = Math.max(2.0, 0.03 * b);
+  const Hinv = invert3(H);
+  const out = [];
+  for (let r = 0; r <= rows; r++) {
+    const row = [];
+    for (let c = 0; c <= cols; c++) {
+      const k = r * (cols + 1) + c;
+      const good = ok[k] && Math.hypot(shift[2 * k] - guess[2 * k], shift[2 * k + 1] - guess[2 * k + 1]) < tol;
+      const s = good ? shift : guess;
+      row.push(applyH(Hinv, ideal[2 * k] + s[2 * k], ideal[2 * k + 1] + s[2 * k + 1]));
+    }
+    out.push(row);
+  }
+  return out;
+}
+
+/** Find each crossing within `half` px of ideal + guess on the sheet canvas. Returns {shift from ideal, ok}. */
+function searchCrossings(cv, canvas, layout, ideal, guess, half, ppm) {
+  const { rows, cols, background } = layout;
+  const shift = Float64Array.from(guess);
+  const ok = new Uint8Array(ideal.length / 2);
+  const W = canvas.cols, Hh = canvas.rows;
+  if (background === "checkerboard") {
+    const idx = [];
+    const start = [];
+    for (let r = 1; r < rows; r++) {
+      for (let c = 1; c < cols; c++) {
+        const k = r * (cols + 1) + c;
+        idx.push(k);
+        start.push([Math.fround(ideal[2 * k] + guess[2 * k]), Math.fround(ideal[2 * k + 1] + guess[2 * k + 1])]);
+      }
+    }
+    const refined = cornerSubPix(cv, canvas, start, [half, half], [-1, -1], { maxCount: 60, epsilon: 0.01 });
+    idx.forEach((k, i) => {
+      const dx = Math.fround(refined[i][0] - start[i][0]);
+      const dy = Math.fround(refined[i][1] - start[i][1]);
+      if (Math.hypot(dx, dy) < half) {
+        shift[2 * k] += dx;
+        shift[2 * k + 1] += dy;
+        ok[k] = 1;
+      }
+    });
+    return { shift, ok };
+  }
+  const data = canvas.data;
+  const invert = background === "white_grid";
+  const lw = Math.max(1.0, layout.lineMm * ppm);
+  const size = 2 * half + 1;
+  const keep = Array.from({ length: size }, (_, i) => Math.abs(i - half) > 2 * lw + 2);
+  // On the black grid the outer border is a white line on white paper, so it can't be seen.
+  const innerOnly = background === "black_grid";
+  const px = new Float64Array(size), py = new Float64Array(size);
+  for (let r = 0; r <= rows; r++) {
+    for (let c = 0; c <= cols; c++) {
+      if (innerOnly && (r === 0 || r === rows || c === 0 || c === cols)) continue;
+      const k = r * (cols + 1) + c;
+      const x0 = ideal[2 * k] + guess[2 * k], y0 = ideal[2 * k + 1] + guess[2 * k + 1];
+      const xi = roundHalfEven(x0), yi = roundHalfEven(y0);
+      if (xi - half < 0 || yi - half < 0 || xi + half + 1 > W || yi + half + 1 > Hh) continue;
+      px.fill(0);
+      py.fill(0);
+      for (let i = 0; i < size; i++) {
+        const row = (yi - half + i) * W + xi - half;
+        for (let j = 0; j < size; j++) {
+          const v = invert ? 255 - data[row + j] : data[row + j];
+          if (keep[i]) px[j] += v;
+          if (keep[j]) py[i] += v;
+        }
+      }
+      // The band of the crossing line, flat along the other axis, is left out of each profile.
+      const dx = peak(px, half), dy = peak(py, half);
+      if (dx !== null && dy !== null) {
+        shift[2 * k] = guess[2 * k] + dx + (xi - x0);
+        shift[2 * k + 1] = guess[2 * k + 1] + dy + (yi - y0);
+        ok[k] = 1;
+      }
+    }
+  }
+  return { shift, ok };
+}
+
+/** Sub-pixel offset of the profile's peak from the window centre, or null if there is no clear line. */
+function peak(profile, half) {
+  const med = median(profile);
+  const p = Array.from(profile, (v) => v - med);
+  let k = 0;
+  for (let i = 1; i < p.length; i++) if (p[i] > p[k]) k = i;
+  if (p[k] <= 0 || p[k] < 4 * (median(p.map(Math.abs)) + 1e-6)) return null;
+  let sw = 0, swi = 0;
+  for (let i = Math.max(0, k - 3); i < Math.min(p.length, k + 4); i++) {
+    const wt = Math.max(p[i], 0);
+    sw += wt;
+    swi += i * wt;
+  }
+  return swi / sw - half;
+}
+
+/** Least-squares cubic surface through the found shifts, with one round of outlier removal. */
+function smoothFit(ideal, shift, ok, degree = 3) {
+  const n = ok.length;
+  if (ok.reduce((a, v) => a + v, 0) < 10) return new Float64Array(2 * n);
+  let sx = -Infinity, sy = -Infinity;
+  for (let k = 0; k < n; k++) {
+    sx = Math.max(sx, ideal[2 * k]);
+    sy = Math.max(sy, ideal[2 * k + 1]);
+  }
+  const terms = [];
+  for (let i = 0; i <= degree; i++) for (let j = 0; j <= degree - i; j++) terms.push([i, j]);
+  const A = [];
+  for (let k = 0; k < n; k++) {
+    const x = (ideal[2 * k] / sx) * 2 - 1, y = (ideal[2 * k + 1] / sy) * 2 - 1;
+    A.push(terms.map(([i, j]) => x ** i * y ** j));
+  }
+  let mask = Uint8Array.from(ok);
+  let fit;
+  for (let round = 0; round < 2; round++) {
+    const coef = leastSquares(A, shift, mask);
+    fit = new Float64Array(2 * n);
+    const err = new Float64Array(n);
+    for (let k = 0; k < n; k++) {
+      for (let t = 0; t < terms.length; t++) {
+        fit[2 * k] += A[k][t] * coef[t][0];
+        fit[2 * k + 1] += A[k][t] * coef[t][1];
+      }
+      err[k] = Math.hypot(fit[2 * k] - shift[2 * k], fit[2 * k + 1] - shift[2 * k + 1]);
+    }
+    const limit = Math.max(2.0, 3 * median(err.filter((_, k) => ok[k])));
+    mask = Uint8Array.from(ok, (v, k) => v && err[k] < limit);
+  }
+  return fit;
+}
+
+/** Least squares A[mask] coef = shift[mask] for the x and y columns (normal equations, partial pivoting). */
+function leastSquares(A, shift, mask) {
+  const m = A[0].length;
+  const M = Array.from({ length: m }, () => new Float64Array(m + 2));
+  A.forEach((a, k) => {
+    if (!mask[k]) return;
+    for (let i = 0; i < m; i++) {
+      for (let j = 0; j < m; j++) M[i][j] += a[i] * a[j];
+      M[i][m] += a[i] * shift[2 * k];
+      M[i][m + 1] += a[i] * shift[2 * k + 1];
+    }
+  });
+  for (let col = 0; col < m; col++) {
+    let p = col;
+    for (let r = col + 1; r < m; r++) if (Math.abs(M[r][col]) > Math.abs(M[p][col])) p = r;
+    [M[col], M[p]] = [M[p], M[col]];
+    for (let r = 0; r < m; r++) {
+      if (r === col) continue;
+      const f = M[r][col] / M[col][col];
+      for (let j = col; j < m + 2; j++) M[r][j] -= f * M[col][j];
+    }
+  }
+  return M.map((row, i) => [row[m] / row[i], row[m + 1] / row[i]]);
+}
+
+// ── White balance (white_balance in calibration.py) ────────────────────────
+
+/** {patch name: [B, G, R] channel values} of the printed white and grey patches, from the marker homography. */
+export function patchPixels(cv, sheet, img, inset = 2.0) {
+  const bgr = toBgr(cv, img);
+  const canvas = rectifySheet(cv, sheet, bgr);
+  bgr.delete();
+  const ppm = sheet.pxPerMm;
+  const out = {};
+  for (const [name, [x, y, w, h]] of Object.entries(sheet.layout.patchesMm())) {
+    const y0 = Math.trunc((y + inset) * ppm), y1 = Math.trunc((y + h - inset) * ppm);
+    const x0 = Math.trunc((x + inset) * ppm), x1 = Math.trunc((x + w - inset) * ppm);
+    const n = Math.max(0, y1 - y0) * Math.max(0, x1 - x0);
+    const ch = [new Uint8Array(n), new Uint8Array(n), new Uint8Array(n)];
+    const data = canvas.data;
+    let i = 0;
+    for (let yy = y0; yy < y1; yy++) {
+      for (let xx = x0; xx < x1; xx++, i++) {
+        const o = 3 * (yy * canvas.cols + xx);
+        ch[0][i] = data[o];
+        ch[1][i] = data[o + 1];
+        ch[2][i] = data[o + 2];
+      }
+    }
+    out[name] = ch;
+  }
+  canvas.delete();
+  return out;
+}
+
+/**
+ * Per-channel gains (B, G, R) that make the printed white patch neutral, and a report of how neutral
+ * the grey patch came out (the same keys as Python, for run.json).
+ */
+export function whiteBalance(cv, sheet, img) {
+  const px = patchPixels(cv, sheet, img);
+  const mean = (a) => a.reduce((s, v) => s + v, 0) / a.length;
+  const white = px.white.map(mean);
+  const gains = white.map((v) => 240.0 / Math.max(v, 1.0));
+  const grey = px.grey.map((a, i) => mean(a) * gains[i]);
+  const r = (a, d) => a.map((v) => pyRound(v, d));
+  return {
+    gains,
+    report: {
+      white_patch_bgr: r(white, 1),
+      gains_bgr: r(gains, 3),
+      grey_patch_after_bgr: r(grey, 1),
+      grey_spread_after: Math.max(...grey) - Math.min(...grey),
+    },
+  };
+}
+

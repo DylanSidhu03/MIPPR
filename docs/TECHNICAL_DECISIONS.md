@@ -132,7 +132,7 @@ Decided by the user: the project runs on the assumption that every photo is take
   - Missing from 4.10.0 and needed later: `cornerSubPix` (checkerboard crossing refinement) and `boxPoints`. These need small JS versions or a custom build.
   - The page loads the file from jsDelivr with an SRI hash. `web/scripts/fetch_opencv.mjs` downloads the same file for tests (from the npm package `@techstark/opencv-js@4.10.0-release.1`, which is the official file plus a one-line UMD wrapper; sha256 checked). Not committed (10.4 MB).
   - To decide: serve it from jsDelivr or from Cloudflare Pages itself (files up to 25 MiB are allowed).
-- **Parity tests:** `node --test web/tests/` compares the JS layout with Python's (within 1e-6 mm), the marker corners, the homography (within 0.01 px) and the rectified sheet (within 1 grey level). Fixtures are generated from the Python pipeline by `web/tests/dump_python_*.py`.
+- **Parity tests:** `node --test "web/tests/*.test.mjs"` compares the JS layout with Python's (within 1e-6 mm), the marker corners, the homography (within 0.01 px) and the rectified sheet (within 1 grey level). Fixtures are generated from the Python pipeline by `web/tests/dump_python_*.py`.
 - Functions take `cv` as their first argument, so they have no DOM or global dependency and run in Node for tests.
 
 ### Photo quality check (November 12, 2026)

@@ -49,7 +49,7 @@ Missing from the 4.10.0 build, and needed later: `cornerSubPix` (checkerboard cr
 
 ```bash
 node web/scripts/fetch_opencv.mjs   # once: downloads the pinned opencv.js (10 MB) to web/vendor/ and checks its sha256
-node --test web/tests/
+node --test "web/tests/*.test.mjs"
 ```
 
 - `sheet_layout.test.mjs`: the JS layout against `fixtures/layouts.json` (every background and paper, plus non-default box sizes), within 1e-6 mm.

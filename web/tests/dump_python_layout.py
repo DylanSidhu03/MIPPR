@@ -1,7 +1,7 @@
 """Dump the Python sheet layouts (pipeline/mippr/capture/sheet.py) to JSON for the JS parity test.
 
 Run from the repo root: .venv/bin/python web/tests/dump_python_layout.py
-Writes web/tests/fixtures/layouts.json (committed, so `node --test web/tests/` needs no Python).
+Writes web/tests/fixtures/layouts.json (committed, so `node --test "web/tests/*.test.mjs"` needs no Python).
 """
 import json
 import sys
