@@ -175,7 +175,8 @@ def build_rows(measurements, sample_id, picture_label, image_id, metadata, app_v
     """Per-particle rows, named, ordered and filled as in docs/OUTPUT_CSV.md.
 
     `background_type` is the printed sheet's (white_grid, black_grid or checkerboard);
-    `scale_source` is `markers`, or `user_corrected` after the 100 mm line check.
+    `scale_source` is `markers`, `paper_edges` (printer scaling corrected from the paper's edges), or
+    `user_corrected` after the 100 mm line check.
     """
     ids, multi = particle_ids(measurements)
     rows = []

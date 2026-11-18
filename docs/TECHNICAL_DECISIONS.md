@@ -116,6 +116,12 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 - **Deliverable:** the full web app in about six months; the batch tool and documentation matter for papers.
 - **Still open:** upkeep after the practicum and where training runs (later), pilot users (unknown).
 
+### The printer shouldn't matter; coloured-patch sheets (November 18, 2026)
+
+- **Printer black, grey and colour** change no result: segmentation compares each particle with its own box measured in the photo, white balance uses the paper white, and the grey patch (colour-cast check) and coloured patches (record only) never feed a measurement.
+- **Printer scale** is measured from the paper: Letter and A4 are standard sizes whatever the printer. When all four paper edges are in the photo, a radial lens model (one coefficient about the photo centre) is fitted to the grid crossings and marker corners, the photo is flattened onto the sheet plus a 12 mm band, and each edge is the strongest dark-to-paper step. Width and height together pick the paper. A scale off by more than 1% is corrected (`scale_source = paper_edges`, `flag_scale`, problem `printer_scaled`); an entered 100 mm line wins; with an edge out of frame nothing changes. Synthetic results: lens coefficient recovered to 0.002; scale within 0.1% at 94–100%, including A4 fitted onto Letter. **Finding:** without the lens model, barrel distortion moved the edges about 4 mm, because they lie outside the markers.
+- **Coloured-patch sheets:** six 12 mm patches (red, yellow, green, cyan, blue, magenta) beside the white and grey ones, on their own marker IDs (24–47, so the app knows they are there). Their colours after white balance go in `run.json` (`color_patches_after_bgr`) to compare photos of one printout. They are not a colour standard, because printers render them differently.
+
 ### The browser pipeline (November 18, 2026)
 
 - Parts 1–5 are ported to `web/src/` and joined in `pipeline.js` (`runGrid`), checked against Python module by module and end to end. Details and numbers in [web/README.md](../web/README.md).

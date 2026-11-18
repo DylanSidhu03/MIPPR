@@ -19,7 +19,9 @@ from mippr.cli import run_grid  # noqa: E402
 FIX = ROOT / "web" / "tests" / "fixtures"
 CASES = [("quality_white_grid.png", {"sample_id": "S1", "photo": 1, "line_mm": None}),
          ("quality_black_grid.png", {"sample_id": "S1", "photo": 2, "line_mm": None}),
-         ("quality_checkerboard.png", {"sample_id": "S2", "photo": 1, "line_mm": 100.4})]
+         ("quality_checkerboard.png", {"sample_id": "S2", "photo": 1, "line_mm": 100.4}),
+         # printed at 97% ("fit to page"): the scale is corrected from the paper's edges
+         ("printer_white_grid_97.png", {"sample_id": "S3", "photo": 1, "line_mm": None})]
 
 
 def clean(v):
@@ -38,7 +40,7 @@ def main():
         out.append({"file": name, **kw, "metadata": {"lab": "Moore", "operator": "DS"},
                     "rows": [{k: clean(v) for k, v in r.items()} for r in rows],
                     "run": {k: run[k] for k in ("background_type", "markers_found", "px_per_mm", "mm_per_px",
-                                                "white_balance", "quality")}})
+                                                "white_balance", "quality", "printed_line_mm", "printer_scale")}})
     (FIX / "pipeline.json").write_text(json.dumps(out, indent=1))
     print(f"{sum(len(c['rows']) for c in out)} rows from {len(out)} photos -> {FIX / 'pipeline.json'}")
 

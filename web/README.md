@@ -34,7 +34,8 @@ The website people use: print a background, upload photos, get results, review t
 | Module | Does | Parity with Python |
 |---|---|---|
 | `capture/sheet.js`, `subpix.js` | Layout, markers, homography, grid-crossing refinement, flattening, white balance | crossings within 0.002 px on five synthetic photos; flattened grid within 1 grey level |
-| `capture/quality.js` | Photo quality check (same codes, messages, limits) | identical codes on 36 degraded photos |
+| `capture/quality.js` | Photo quality check (same codes, messages, limits) | identical codes on 37 degraded photos |
+| `capture/printer.js` | Printer scale from the paper's edges, through a radial lens model (`printer_scale` in calibration.py) | scale within 5 parts in 10,000 and edges within 0.1 mm on five photos, incl. 97% and A4-on-Letter prints |
 | `segmentation/edges.js`, `grid.js` | Per-box background, line bridging, hysteresis, half-maximum edges | labels pixel for pixel on all three backgrounds |
 | `measurement/*.js` | Sizes and shape as ImageJ computes them (Feret, traced perimeter, fitted ellipse), sub-pixel perimeter, colour statistics, fiber length, opacity, size range | floating-point precision on every field |
 | `color/rules.js`, `morphology/rules.js`, `export/csv.js` | Colour and shape rules, rows, summary, CSV | rows exact; CSV byte for byte |
@@ -77,6 +78,8 @@ To regenerate the fixtures after changing `pipeline/mippr/capture/sheet.py` (fro
 ```bash
 .venv/bin/python web/tests/dump_python_layout.py
 .venv/bin/python web/tests/dump_python_markers.py
+.venv/bin/python web/tests/dump_python_quality.py
+.venv/bin/python web/tests/dump_python_printer.py
 ```
 
 Serve the repo root (`python -m http.server`) and open `/web/` to try the page; the background links point to `../backgrounds/`.

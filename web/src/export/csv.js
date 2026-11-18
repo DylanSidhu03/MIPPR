@@ -207,7 +207,7 @@ function sizeRange(m) {
 
 /**
  * Per-particle rows, named, ordered and filled as in docs/OUTPUT_CSV.md, from measure() output (Python's keys).
- * `backgroundType` is the printed sheet's; `scaleSource` is `markers`, or `user_corrected` after the 100 mm check.
+ * `backgroundType` is the printed sheet's; `scaleSource` is `markers`, `paper_edges` or `user_corrected`.
  */
 export function buildRows(measurements, { sampleId, pictureLabel, imageId, metadata = {}, appVersion, mmPerPx,
   processedAt, backgroundType, scaleSource = "markers", scaleFlag = false }) {

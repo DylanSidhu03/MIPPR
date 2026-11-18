@@ -29,7 +29,7 @@ import cv2
 import numpy as np
 
 from . import __version__
-from .capture.calibration import check_quality, measure_quality, white_balance
+from .capture.calibration import check_quality, measure_quality, printer_problem, printer_scale, white_balance
 from .capture.sheet import BACKGROUNDS, PAPERS, Layout, find_sheet, save_sheet
 from .export import COLUMNS, METADATA, NOTE, SUMMARY_COLUMNS, build_rows, build_summary
 from .measurement.geometry import measure
@@ -87,6 +87,14 @@ def run_grid(photo_path, out_dir, sample_id="sample", photo=1, metadata=None, li
     # Photo quality check: warn, but measure anyway (the problems go into run.json).
     quality = measure_quality(img, sheet)
     problems = check_quality(img, sheet, metrics=quality)
+    # Printer scaling, from the paper's edges when all four are in the photo (calibration.py).
+    printer = printer_scale(sheet, img)
+    pp = printer_problem(printer, line_mm)
+    if pp:
+        problems.append(pp)
+    from_paper = line_mm is None and pp is not None  # correct the scale from the paper
+    if from_paper:
+        line_mm = 100.0 * printer["scale"]
     for p in problems:
         print(f"warning: {p.message}", file=sys.stderr)
     lay, ppm = sheet.layout, sheet.px_per_mm
@@ -111,14 +119,14 @@ def run_grid(photo_path, out_dir, sample_id="sample", photo=1, metadata=None, li
     rows = build_rows(measured, sample_id, label, image_id(photo_path), metadata or {}, __version__, mm_per_px,
                       datetime.now(timezone.utc).isoformat(timespec="seconds"),
                       background_type=lay.background,
-                      scale_source="user_corrected" if corrected else "markers",
+                      scale_source="paper_edges" if from_paper else "user_corrected" if corrected else "markers",
                       scale_flag=corrected or sheet.markers_found < 4)
     _write(out_dir, rows, draw_overlay(balanced, labels, measured, rows), {
         "mode": "grid", "photo": str(photo_path), "sample_id": sample_id, "picture_label": label,
-        **(metadata or {}), "background_type": lay.background, "paper": lay.paper,
+        **(metadata or {}), "background_type": lay.background, "paper": lay.paper, "color_patches": lay.color_patches,
         "layout": {"box_mm": lay.box_mm, "line_mm": lay.line_mm, "rows": lay.rows, "cols": lay.cols},
         "markers_found": sheet.markers_found, "px_per_mm": ppm, "mm_per_px": mm_per_px,
-        "printed_line_mm": line_mm, "white_balance": wb,
+        "printed_line_mm": None if from_paper else line_mm, "printer_scale": printer, "white_balance": wb,
         "quality": {"problems": [p.as_dict() for p in problems], "metrics": quality}, "params": vars(params)})
     return rows
 
@@ -130,6 +138,7 @@ def main(argv=None):
     s = sub.add_parser("sheet", help="make a printable background (vector PDF; --png also writes an image)")
     s.add_argument("--background", choices=BACKGROUNDS, default="white_grid")
     s.add_argument("--paper", choices=tuple(PAPERS), default="letter")
+    s.add_argument("--color-patches", action="store_true", help="the version with six coloured patches")
     s.add_argument("--png", action="store_true", help="also write a PNG at --dpi")
     s.add_argument("--dpi", type=int, default=600)
     s.add_argument("--out", default="sheets")
@@ -159,8 +168,8 @@ def main(argv=None):
         if a.cmd == "sheet":
             out = Path(a.out)
             out.mkdir(parents=True, exist_ok=True)
-            lay = Layout(a.background, a.paper)
-            stem = out / f"mippr_{a.background}_{a.paper}"
+            lay = Layout(a.background, a.paper, color_patches=a.color_patches)
+            stem = out / lay.name
             save_sheet(lay, f"{stem}.png" if a.png else None, f"{stem}.pdf", a.dpi)
             print(f"{lay.rows} x {lay.cols} boxes of {lay.box_mm:g} mm -> {stem}.pdf (print at actual size)")
             return

@@ -7,12 +7,11 @@ light, blur and sensor noise.
 import cv2
 import numpy as np
 
-from .sheet import Layout, render
+from .sheet import Layout, render_bgr
 
 
 def sheet_bgr(layout, dpi):
-    g = render(layout, dpi)
-    return cv2.cvtColor(g, cv2.COLOR_GRAY2BGR)
+    return render_bgr(layout, dpi)
 
 
 def draw_particle(img, layout, dpi, box, shape="disc", size_mm=2.0, color=(40, 40, 200), offset_mm=(0, 0),
@@ -30,6 +29,23 @@ def draw_particle(img, layout, dpi, box, shape="disc", size_mm=2.0, color=(40, 4
         box_pts = cv2.boxPoints(((cx, cy), (size_mm * ppm, size_mm / aspect * ppm), angle))
         cv2.fillPoly(img, [np.round(box_pts).astype(np.int32)], color, cv2.LINE_AA)
     return img
+
+
+def printed(img, layout, dpi, scale=1.0, paper=None):
+    """The sheet image as a printer would put it on `paper` (default: the layout's), scaled by `scale`
+    about the page centre, as "fit to page" does; parts that don't fit are cut off."""
+    from .sheet import PAPERS
+    ppm = dpi / 25.4
+    pw, ph = (int(round(v * ppm)) for v in PAPERS[paper or layout.paper])
+    out = np.full((ph, pw, 3), 255, np.uint8)
+    small = cv2.resize(img, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+    h, w = small.shape[:2]
+    x0, y0 = (pw - w) // 2, (ph - h) // 2
+    sx, sy = max(0, -x0), max(0, -y0)
+    dx, dy = max(0, x0), max(0, y0)
+    cw, ch = min(w - sx, pw - dx), min(h - sy, ph - dy)
+    out[dy:dy + ch, dx:dx + cw] = small[sy:sy + ch, sx:sx + cw]
+    return out
 
 
 def photograph(img, seed=0, tilt=0.04, k1=-0.04, out_width=2400, blur=1.0, noise=2.0, light=0.15):

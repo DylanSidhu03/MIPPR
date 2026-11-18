@@ -35,10 +35,11 @@ Folder: [pipeline/mippr/capture/](../pipeline/mippr/capture/README.md) and `back
 - [ ] Test the Standard design with the largest particles and long fibers on real photos (open question 1a)
 - [ ] Test the checkerboard against the two lined grids on real photos, especially particles across a black/white edge (open question 1)
 - [x] Choose paper: matte paper (decided November 18, 2026)
-- [ ] Make the printer not matter (user, November 18): segmentation already measures each box's own colour in the photo and white balance uses the paper white, so printer black doesn't matter. Remaining: catch a printer that scaled the sheet without relying on the user measuring the 100 mm line, and keep printer-made grey and coloured patches out of anything that changes results
+- [x] Make the printer not matter (user, November 18). Printer black, grey and colours change no result: segmentation measures each box's own colour in the photo, white balance uses the paper white, and the grey and coloured patches are only a check and a record. Printer scaling ("fit to page") is measured from the paper's four edges when they are in the photo, through a lens model fitted to the crossings and markers, and corrected above 1% (`scale_source = paper_edges`); within 0.1% on synthetic prints at 94–100%, including A4 fitted onto Letter. Python and browser.
+- [ ] Check the paper-edge scale on real phone photos (paper on a darker surface), and how often all four edges are in frame
 - [x] Put a scale reference in every frame: corner markers at a known printed size, plus a printed 100 mm line to check printer scaling.
   - Four corner markers alone can't correct lens distortion. The grid's own line crossings do: about 0.1 px in synthetic tests.
-- [ ] Put a color reference in every frame. The white and grey patches are on the sheets. A version of each sheet with coloured patches was requested (user, November 18): make it, in the repo and Drive.
+- [x] Put a color reference in every frame: white and grey patches on every sheet, plus a version of each sheet with six coloured patches (`backgrounds/*_color.pdf`, own marker IDs 24–47; their colours after white balance go in `run.json`). Printers render colours differently, so they are a record, not a standard (user, November 18).
 - [x] Keep the grid in the center, clear of the markers, with row/column labels and the patches in the margin
 - [x] Correct perspective and lens distortion on the printed grids: markers first, then the grid's line crossings (or checkerboard corners). About 0.1 px in synthetic tests; not yet tested on real photos.
 - [x] Read the scale from the corner markers, with the 100 mm check line correction (`--line-mm`, sets `flag_scale`)

@@ -24,8 +24,8 @@ OUT = Path(__file__).resolve().parent / "fixtures"
 DPI = 300
 
 
-def good_photo(background, seed=2):
-    lay = Layout(background, "letter")
+def good_photo(background, seed=2, color_patches=False):
+    lay = Layout(background, "letter", color_patches=color_patches)
     img = sheet_bgr(lay, DPI)
     draw_particle(img, lay, DPI, "B2", "disc", 2.0, (40, 40, 200))
     draw_particle(img, lay, DPI, "F7", "rect", 9.0, (200, 120, 40), offset_mm=(2, 0), aspect=12, angle=10)
@@ -135,6 +135,13 @@ for bg in BACKGROUNDS:
     if bg == "white_grid":
         for name, steps in NO_SHEET.items():
             cases.append({"background": bg, **case(name, bg, base, steps, False)})
+# The coloured-patch version of a sheet: found, and its patches reported after white balance.
+base = good_photo("checkerboard", color_patches=True)
+cv2.imwrite(str(OUT / "quality_checkerboard_color.png"), base, [cv2.IMWRITE_PNG_COMPRESSION, 9])
+base = cv2.imread(str(OUT / "quality_checkerboard_color.png"))
+c = case("good_color_patches", "checkerboard_color", base, [], True)
+c["photo"] = "quality_checkerboard_color.png"
+cases.append({"background": "checkerboard", **c})
 for c in cases:
     print(c["background"], c["name"], [q["code"] for q in c["problems"]])
 (OUT / "quality.json").write_text(json.dumps({"opencv": cv2.__version__, "cases": cases}) + "\n")

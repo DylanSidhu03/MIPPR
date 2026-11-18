@@ -19,7 +19,8 @@ def dump(lay):
     return {
         "options": {"background": lay.background, "paper": lay.paper, "boxMm": lay.box_mm, "lineMm": lay.line_mm,
                     "marginMm": lay.margin_mm, "markerMm": lay.marker_mm, "gapMm": lay.gap_mm,
-                    "boxLabels": lay.box_labels, "labelZoneMm": list(lay.label_zone_mm)},
+                    "boxLabels": lay.box_labels, "labelZoneMm": list(lay.label_zone_mm),
+                    "colorPatches": lay.color_patches},
         "sizeMm": list(lay.size_mm),
         "cols": lay.cols,
         "rows": lay.rows,
@@ -30,19 +31,22 @@ def dump(lay):
         "boxLabels": [[lay.box_label(r, c) for c in range(lay.cols)] for r in range(lay.rows)],
         "scaleLineMm": [list(p) for p in lay.scale_line_mm()],
         "patchesMm": {k: list(v) for k, v in lay.patches_mm().items()},
+        "colorPatchesMm": {k: [*v[:4], list(v[4])] for k, v in lay.color_patches_mm().items()},
+        "name": lay.name,
     }
 
 
 def from_id(i):
     try:
         lay = layout_from_marker_ids([i])
-        return [lay.background, lay.paper]
+        return [lay.background, lay.paper, lay.color_patches]
     except ValueError:
         return None
 
 
 layouts = [Layout(bg, paper) for bg in BACKGROUNDS for paper in PAPERS]
 layouts += [Layout(bg, paper, **kw) for kw in CUSTOM for bg in BACKGROUNDS[:1] for paper in PAPERS]
+layouts += [Layout(bg, paper, color_patches=True) for bg in BACKGROUNDS for paper in PAPERS]
 data = {
     "layoutVersion": LAYOUT_VERSION,
     "backgrounds": list(BACKGROUNDS),

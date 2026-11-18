@@ -11,7 +11,7 @@ Turn a phone or camera photo into a flat, correctly scaled, colour-corrected ima
 | A photo of particles on a printed sheet | `Sheet`: background type, paper, `px_per_mm`, and the mapping that flattens the photo |
 | | The flattened grid image (`Sheet.rectify_grid`) |
 | | White-balance gains, and how neutral the grey patch came out |
-| | `flag_scale` inputs: markers found, printed-line correction |
+| | `flag_scale` inputs: markers found, printer scaling corrected from the paper's edges, printed-line correction |
 | | Photo quality problems (`check_quality`): a stable code and a plain message each, recorded in `run.json` |
 
 ## What exists
@@ -19,7 +19,7 @@ Turn a phone or camera photo into a flat, correctly scaled, colour-corrected ima
 | File | Does |
 |---|---|
 | `sheet.py` | The printable sheets (layout, vector PDF, PNG), ArUco marker detection, homography, and refinement from the grid's own line crossings (about 0.1 px in synthetic tests) |
-| `calibration.py` | White balance from the printed white patch; the grey patch is checked. The photo quality check (`check_quality`, below) |
+| `calibration.py` | White balance from the printed white patch; the grey patch is checked, and coloured patches are recorded. The photo quality check (`check_quality`, below). The printer's scale from the paper's edges (`printer_scale`, below) |
 | `synthetic.py` | Fake photos (tilt, lens distortion, uneven light, blur, noise) for tests |
 | `../../scripts/preview_backgrounds.py` | Renders the sheet design options side by side |
 | `../../../backgrounds/` | The printed sheets this part generates |
@@ -30,7 +30,29 @@ Turn a phone or camera photo into a flat, correctly scaled, colour-corrected ima
 - [x] **Minimum resolution rule:** 10 px per mm for 0.5 mm particles (below). Fiber length still to check.
 - [ ] **Uneven light on the black grid:** it has no white boxes, so the shadow check doesn't run there yet.
 - [ ] **Test on real phone photos** of the printed sheets: flattening, scale against a ruler, white balance.
-- [ ] **Colour reference:** decide whether colour patches (not only white and grey) are needed for the colour classes.
+- [x] **Colour reference:** a version of each sheet with six coloured patches (`--color-patches`, marker IDs 24–47); their colours after white balance go in `run.json`. Printers render colours differently, so they are a record, not a standard.
+- [x] **Printer independence:** the printer's scale from the paper's edges (below).
+
+## The printer shouldn't matter
+
+What a printer can change, and how each is handled:
+- **How dark its black is, or how its grey and colours come out:** segmentation compares each particle
+  with its own box's colour, measured in the photo, and white balance uses the paper white in the white
+  patch. The grey patch is only a check (`color_cast`), and the coloured patches only a record, so a
+  printer's grey or colours never change a result. (A printer that mixes grey from colour inks can set
+  off the `color_cast` warning.)
+- **Its scale ("fit to page"):** this shrinks everything, markers included, so every size would be off by
+  the same factor. `printer_scale` uses the paper as the ruler: Letter (215.9 × 279.4 mm) and A4
+  (210 × 297 mm) are made to size whatever the printer. When all four paper edges are in the photo,
+  against a darker surface, the photo is flattened onto the sheet plus a 12 mm band round it and each
+  edge is found to about 0.1 mm. The edges lie outside the markers, where barrel distortion pulls a
+  plain homography off by millimetres, so a radial lens model is fitted to the grid crossings and markers
+  first (`lens_model`; it recovers synthetic.py's distortion exactly). Width and height together pick the
+  paper (they differ in shape by 9%), so an A4 sheet fitted onto Letter paper is recognised. If the
+  scale is off by more than 1%, sizes are corrected (`scale_source = paper_edges`, `flag_scale`) and the
+  `printer_scaled` problem says so; a measured 100 mm line, if entered, wins. With an edge out of the
+  frame nothing is corrected, so the 100 mm line stays the fallback. On synthetic photos printed at 94–100%,
+  including A4 fitted onto Letter, the scale comes out within 0.1%.
 
 ## Photo quality check
 

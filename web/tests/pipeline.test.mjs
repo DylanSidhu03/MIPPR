@@ -34,7 +34,15 @@ for (const c of ref) {
     assert.equal(run.background_type, c.run.background_type);
     assert.equal(run.markers_found, c.run.markers_found);
     assert.ok(Math.abs(run.px_per_mm - c.run.px_per_mm) < 1e-9);
-    assert.deepEqual(run.quality.problems, c.run.quality.problems);
+    // The printer scale comes from edges found to a few hundredths of a mm, so its value (and the scale it
+    // corrects) agrees to a few parts in 10,000; everything else in the quality report is identical.
+    const strip = (ps) => ps.map((q) => (q.code === "printer_scaled" ? { ...q, value: null } : q));
+    assert.deepEqual(strip(run.quality.problems), strip(c.run.quality.problems));
+    run.quality.problems.forEach((q, i) => q.code === "printer_scaled" &&
+      assert.ok(Math.abs(q.value - c.run.quality.problems[i].value) <= 5e-4, "printer scale"));
+    assert.equal(run.printed_line_mm, c.run.printed_line_mm);
+    assert.equal(run.printer_scale.paper, c.run.printer_scale.paper);
+    assert.ok(Math.abs(run.mm_per_px - c.run.mm_per_px) <= 5e-4 * c.run.mm_per_px, "mm_per_px");
     assert.deepEqual(rows.map((r) => r.particle_ref), c.rows.map((r) => r.particle_ref));
     // The flattened grid differs from Python's by at most 1 grey level on a few pixels (OpenCV.js 4.10 vs
     // OpenCV 5's remap), which can flip an edge pixel at the threshold. So text and flags must be identical,

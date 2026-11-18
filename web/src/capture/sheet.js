@@ -21,7 +21,13 @@ const DEFAULTS = Object.freeze({
   gapMm: 8.0, // between the markers' inner edge and the grid, room for labels
   boxLabels: true, // also print each box's label (e.g. B4) small in its top-left corner
   labelZoneMm: Object.freeze([6.5, 3.2]), // top-left corner kept for the label
+  colorPatches: false, // also print six coloured patches beside the white and grey ones
 });
+export const COLOR_PATCH_ID_OFFSET = 24; // the coloured-patch sheets use marker IDs 24-47
+// Printer primaries and secondaries (RGB 0-1): a record and a consistency check between photos of one
+// printout, not a colour standard, since printers render them differently. No result uses them.
+export const COLOR_PATCHES = Object.freeze({ red: [1, 0, 0], yellow: [1, 1, 0], green: [0, 1, 0],
+  cyan: [0, 1, 1], blue: [0, 0, 1], magenta: [1, 0, 1] });
 
 /** Python's float floor division (`a // b`), which can differ from Math.floor(a / b) near whole numbers. */
 function floorDiv(a, b) {
@@ -82,7 +88,8 @@ export class Layout {
   /** IDs for the top-left, top-right, bottom-right and bottom-left markers. */
   markerIds() {
     const papers = Object.keys(PAPERS);
-    const base = 4 * (BACKGROUNDS.indexOf(this.background) * papers.length + papers.indexOf(this.paper));
+    const base = 4 * (BACKGROUNDS.indexOf(this.background) * papers.length + papers.indexOf(this.paper)) +
+      (this.colorPatches ? COLOR_PATCH_ID_OFFSET : 0);
     return [base, base + 1, base + 2, base + 3];
   }
 
@@ -118,6 +125,20 @@ export class Layout {
     return { white: [w / 2 - 26, y, 24, 12, 255], grey: [w / 2 + 2, y, 24, 12, 128] };
   }
 
+  /** {name: [x, y, w, h, [r, g, b] 0-1]} coloured patches either side of the white and grey ones (empty if none). */
+  colorPatchesMm() {
+    if (!this.colorPatches) return {};
+    const w = this.sizeMm[0];
+    const y = this.marginMm + 2;
+    const xs = [w / 2 - 70, w / 2 - 56, w / 2 - 42, w / 2 + 30, w / 2 + 44, w / 2 + 58]; // 12 mm squares, 2 mm apart
+    return Object.fromEntries(Object.entries(COLOR_PATCHES).map(([name, rgb], i) => [name, [xs[i], y, 12, 12, [...rgb]]]));
+  }
+
+  /** File-name stem, e.g. mippr_white_grid_letter or mippr_white_grid_letter_color. */
+  get name() {
+    return `mippr_${this.background}_${this.paper}${this.colorPatches ? "_color" : ""}`;
+  }
+
   equals(other) {
     return other instanceof Layout && Object.keys(DEFAULTS).every((k) =>
       Array.isArray(this[k]) ? this[k].every((v, i) => v === other[k][i]) : this[k] === other[k]);
@@ -127,10 +148,12 @@ export class Layout {
 /** The Layout whose corner markers these IDs belong to (default box and line sizes). */
 export function layoutFromMarkerIds(ids) {
   const wanted = new Set(Array.from(ids, Number));
-  for (const background of BACKGROUNDS) {
-    for (const paper of Object.keys(PAPERS)) {
-      const lay = new Layout({ background, paper });
-      if (lay.markerIds().some((i) => wanted.has(i))) return lay;
+  for (const colorPatches of [false, true]) {
+    for (const background of BACKGROUNDS) {
+      for (const paper of Object.keys(PAPERS)) {
+        const lay = new Layout({ background, paper, colorPatches });
+        if (lay.markerIds().some((i) => wanted.has(i))) return lay;
+      }
     }
   }
   throw new Error(
@@ -147,7 +170,7 @@ function roundHalfEven(x) {
   return r - x === 0.5 && r % 2 ? r - 1 : r;
 }
 
-function toGray(cv, img) {
+export function toGray(cv, img) {
   if (img.channels() === 1) return img.clone();
   const gray = new cv.Mat();
   cv.cvtColor(img, gray, img.channels() === 4 ? cv.COLOR_RGBA2GRAY : cv.COLOR_BGR2GRAY);
@@ -509,14 +532,14 @@ function leastSquares(A, shift, mask) {
 
 // ── White balance (white_balance in calibration.py) ────────────────────────
 
-/** {patch name: [B, G, R] channel values} of the printed white and grey patches, from the marker homography. */
+/** {patch name: [B, G, R] channel values} of the printed patches (white, grey and any coloured ones), from the marker homography. */
 export function patchPixels(cv, sheet, img, inset = 2.0) {
   const bgr = toBgr(cv, img);
   const canvas = rectifySheet(cv, sheet, bgr);
   bgr.delete();
   const ppm = sheet.pxPerMm;
   const out = {};
-  for (const [name, [x, y, w, h]] of Object.entries(sheet.layout.patchesMm())) {
+  for (const [name, [x, y, w, h]] of Object.entries({ ...sheet.layout.patchesMm(), ...sheet.layout.colorPatchesMm() })) {
     const y0 = Math.trunc((y + inset) * ppm), y1 = Math.trunc((y + h - inset) * ppm);
     const x0 = Math.trunc((x + inset) * ppm), x1 = Math.trunc((x + w - inset) * ppm);
     const n = Math.max(0, y1 - y0) * Math.max(0, x1 - x0);
@@ -548,14 +571,18 @@ export function whiteBalance(cv, sheet, img) {
   const gains = white.map((v) => 240.0 / Math.max(v, 1.0));
   const grey = px.grey.map((a, i) => mean(a) * gains[i]);
   const r = (a, d) => a.map((v) => pyRound(v, d));
-  return {
-    gains,
-    report: {
-      white_patch_bgr: r(white, 1),
-      gains_bgr: r(gains, 3),
-      grey_patch_after_bgr: r(grey, 1),
-      grey_spread_after: Math.max(...grey) - Math.min(...grey),
-    },
+  const report = {
+    white_patch_bgr: r(white, 1),
+    gains_bgr: r(gains, 3),
+    grey_patch_after_bgr: r(grey, 1),
+    grey_spread_after: Math.max(...grey) - Math.min(...grey),
   };
+  // Coloured patches: their colour after white balance, to compare photos of one printout (no result uses them).
+  const colors = Object.keys(sheet.layout.colorPatchesMm());
+  if (colors.length) {
+    report.color_patches_after_bgr = Object.fromEntries(colors.map((k) =>
+      [k, r(px[k].map((a, i) => Math.min(255, Math.max(0, mean(a) * gains[i]))), 1)]));
+  }
+  return { gains, report };
 }
 

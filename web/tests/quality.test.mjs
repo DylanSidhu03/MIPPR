@@ -95,6 +95,10 @@ function photo(c) {
 function close(a, b, tol, what) {
   if (Array.isArray(b)) return b.forEach((v, i) => close(a[i], v, tol, `${what}[${i}]`));
   if (b === null || tol === undefined) return assert.deepEqual(a, b, what);
+  if (typeof b === "object") {
+    assert.deepEqual(Object.keys(a).sort(), Object.keys(b).sort(), `${what}: keys`);
+    return Object.keys(b).forEach((k) => close(a[k], b[k], tol, `${what}.${k}`));
+  }
   assert.ok(Math.abs(a - b) <= tol, `${what}: JS ${a}, Python ${b}`);
 }
 
@@ -126,7 +130,7 @@ for (const c of ref.cases) {
     if (sheet) {
       const { gains, report } = whiteBalance(cv, sheet, p);
       close(gains, c.whiteBalance.gains, 1e-3, "gains");
-      for (const [k, v] of Object.entries(c.whiteBalance.report)) close(report[k], v, k.startsWith("gains") ? 1e-3 : 0.1, k);
+      for (const [k, v] of Object.entries(c.whiteBalance.report)) close(report[k], v, k.startsWith("gains") ? 1e-3 : k === "color_patches_after_bgr" ? 0.15 : 0.1, k);
     }
     t.diagnostic(JSON.stringify(m));
     p.delete();

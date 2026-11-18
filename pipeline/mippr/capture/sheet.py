@@ -5,7 +5,9 @@ row letter and column number in the margin (box B4 = row B, column 4).
 Four ArUco markers in the corners give the scale and perspective, and their
 IDs say which background and paper size was printed, so a photo needs no
 other input. A 100 mm line checks printer scaling, and white and grey
-patches give the white balance.
+patches give the white balance. Each sheet also comes in a version with six
+coloured patches (red, yellow, green, cyan, blue, magenta); it has its own
+marker IDs, so the app knows the patches are there and records their colours.
 
 Everything is in mm on the sheet. `find_sheet` maps a photo back onto the
 sheet at a chosen px per mm, first with a homography from the markers, then
@@ -23,6 +25,12 @@ import numpy as np
 BACKGROUNDS = ("white_grid", "black_grid", "checkerboard")
 PAPERS = {"letter": (215.9, 279.4), "a4": (210.0, 297.0)}
 ARUCO_DICT = cv2.aruco.DICT_4X4_50
+COLOR_PATCH_ID_OFFSET = 24  # the coloured-patch sheets use marker IDs 24-47
+# Printer primaries and secondaries (RGB 0-1). Printers render them differently, so the
+# patches are a record and a consistency check between photos of one printout, not a
+# colour standard: nothing that changes the results uses them.
+COLOR_PATCHES = {"red": (1, 0, 0), "yellow": (1, 1, 0), "green": (0, 1, 0),
+                 "cyan": (0, 1, 1), "blue": (0, 0, 1), "magenta": (1, 0, 1)}
 LAYOUT_VERSION = 1
 
 
@@ -38,6 +46,7 @@ class Layout:
     gap_mm: float = 8.0  # between the markers' inner edge and the grid, room for labels
     box_labels: bool = True  # also print each box's label (e.g. B4) small in its top-left corner
     label_zone_mm: tuple = (6.5, 3.2)  # top-left corner kept for the label: longest label (M12) prints 4.5 x 2 mm from 0.85 mm in
+    color_patches: bool = False  # also print six coloured patches beside the white and grey ones
 
     def __post_init__(self):
         if self.background not in BACKGROUNDS:
@@ -72,6 +81,7 @@ class Layout:
     def marker_ids(self):
         """IDs for the top-left, top-right, bottom-right and bottom-left markers."""
         base = 4 * (BACKGROUNDS.index(self.background) * len(PAPERS) + list(PAPERS).index(self.paper))
+        base += COLOR_PATCH_ID_OFFSET if self.color_patches else 0
         return [base + i for i in range(4)]
 
     def marker_corners_mm(self):
@@ -97,14 +107,29 @@ class Layout:
         y = self.margin_mm + 2
         return {"white": (w / 2 - 26, y, 24, 12, 255), "grey": (w / 2 + 2, y, 24, 12, 128)}
 
+    def color_patches_mm(self):
+        """{name: (x, y, w, h, (r, g, b) 0-1)} coloured patches either side of the white and grey ones (empty if none)."""
+        if not self.color_patches:
+            return {}
+        w = self.size_mm[0]
+        y = self.margin_mm + 2
+        xs = [w / 2 - 70, w / 2 - 56, w / 2 - 42, w / 2 + 30, w / 2 + 44, w / 2 + 58]  # 12 mm squares, 2 mm apart
+        return {name: (x, y, 12, 12, rgb) for x, (name, rgb) in zip(xs, COLOR_PATCHES.items())}
+
+    @property
+    def name(self):
+        """File-name stem, e.g. mippr_white_grid_letter or mippr_white_grid_letter_color."""
+        return f"mippr_{self.background}_{self.paper}" + ("_color" if self.color_patches else "")
+
 
 def layout_from_marker_ids(ids):
     """The Layout whose corner markers these IDs belong to (default box and line sizes)."""
-    for bg in BACKGROUNDS:
-        for paper in PAPERS:
-            lay = Layout(bg, paper)
-            if set(ids) & set(lay.marker_ids()):
-                return lay
+    for color in (False, True):
+        for bg in BACKGROUNDS:
+            for paper in PAPERS:
+                lay = Layout(bg, paper, color_patches=color)
+                if set(ids) & set(lay.marker_ids()):
+                    return lay
     raise ValueError("No MIPPR sheet markers found in the photo. Photos must be taken on one of the printed "
                      "MIPPR backgrounds (white grid, black grid or checkerboard), with all four corner markers in view.")
 
@@ -177,9 +202,27 @@ def render(layout, dpi=600):
     for name, (x, y, pw, ph, level) in layout.patches_mm().items():
         img[p(y):p(y + ph), p(x):p(x + pw)] = level
         cv2.rectangle(img, (p(x), p(y)), (p(x + pw), p(y + ph)), 0, max(1, p(0.2)))
+    for name, (x, y, pw, ph, (r, g, b)) in layout.color_patches_mm().items():
+        img[p(y):p(y + ph), p(x):p(x + pw)] = int(round(255 * (0.299 * r + 0.587 * g + 0.114 * b)))
+        cv2.rectangle(img, (p(x), p(y)), (p(x + pw), p(y + ph)), 0, max(1, p(0.2)))
     w_mm = layout.size_mm[0]
-    text(f"MIPPR {layout.background.replace('_', ' ')} | {layout.paper} | {layout.box_mm:g} mm boxes | "
-         f"print at actual size (100%)", w_mm / 2, layout.margin_mm + 17, 0.55)
+    text(_title(layout), w_mm / 2, layout.margin_mm + 17, 0.55)
+    return img
+
+
+def _title(layout):
+    return (f"MIPPR {layout.background.replace('_', ' ')} | {layout.paper} | {layout.box_mm:g} mm boxes | "
+            + ("colour patches | " if layout.color_patches else "") + "print at actual size (100%)")
+
+
+def render_bgr(layout, dpi=600):
+    """The sheet as a colour image (BGR uint8) at `dpi`: `render` with the coloured patches in colour."""
+    img = cv2.cvtColor(render(layout, dpi), cv2.COLOR_GRAY2BGR)
+    ppm = dpi / 25.4
+    p = lambda v: int(round(v * ppm))  # noqa: E731
+    for name, (x, y, pw, ph, (r, g, b)) in layout.color_patches_mm().items():
+        img[p(y):p(y + ph), p(x):p(x + pw)] = (round(255 * b), round(255 * g), round(255 * r))
+        cv2.rectangle(img, (p(x), p(y)), (p(x + pw), p(y + ph)), (0, 0, 0), max(1, p(0.2)))
     return img
 
 
@@ -268,8 +311,10 @@ def render_pdf(layout):
     for name, (x, y, pw, ph, level) in layout.patches_mm().items():
         rect(x, y, pw, ph, level / 255)
         frame(x, y, pw, ph, 0.2)
-    text(f"MIPPR {layout.background.replace('_', ' ')} | {layout.paper} | {layout.box_mm:g} mm boxes | "
-         f"print at actual size (100%)", W / 2, layout.margin_mm + 17, big * 0.55)
+    for name, (x, y, pw, ph, (r, g, b)) in layout.color_patches_mm().items():
+        ops.append(f"{r:.3f} {g:.3f} {b:.3f} rg {x * k:.3f} {(H - y - ph) * k:.3f} {pw * k:.3f} {ph * k:.3f} re f")
+        frame(x, y, pw, ph, 0.2)
+    text(_title(layout), W / 2, layout.margin_mm + 17, big * 0.55)
 
     import zlib
     stream = zlib.compress("\n".join(ops).encode("latin-1"), 9)
@@ -296,7 +341,8 @@ def save_sheet(layout, path_png=None, path_pdf=None, dpi=600):
     """Write the sheet as a vector PDF and/or a PNG at `dpi`."""
     if path_png:
         from PIL import Image
-        Image.fromarray(render(layout, dpi)).save(path_png, dpi=(dpi, dpi))
+        img = render_bgr(layout, dpi)[..., ::-1] if layout.color_patches else render(layout, dpi)
+        Image.fromarray(img).save(path_png, dpi=(dpi, dpi))
     if path_pdf:
         with open(path_pdf, "wb") as f:
             f.write(render_pdf(layout))

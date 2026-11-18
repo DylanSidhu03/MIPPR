@@ -29,7 +29,7 @@ test("constants match Python", () => {
 
 for (const r of ref.layouts) {
   const o = r.options;
-  test(`layout ${o.background} ${o.paper} ${o.boxMm} mm boxes`, () => {
+  test(`layout ${o.background} ${o.paper} ${o.boxMm} mm boxes${o.colorPatches ? " colour patches" : ""}`, () => {
     const lay = new Layout(o);
     const name = `${o.background}/${o.paper}/${o.boxMm}`;
     close(lay.sizeMm, r.sizeMm, `${name}.sizeMm`);
@@ -43,6 +43,8 @@ for (const r of ref.layouts) {
     assert.deepEqual(labels, r.boxLabels);
     close(lay.scaleLineMm(), r.scaleLineMm, `${name}.scaleLineMm`);
     close(lay.patchesMm(), r.patchesMm, `${name}.patchesMm`);
+    close(lay.colorPatchesMm(), r.colorPatchesMm, `${name}.colorPatchesMm`);
+    assert.equal(lay.name, r.name);
   });
 }
 
@@ -52,8 +54,8 @@ test("marker IDs identify background and paper", () => {
       assert.throws(() => layoutFromMarkerIds([Number(id)]), /No MIPPR sheet markers/);
     } else {
       const lay = layoutFromMarkerIds([Number(id)]);
-      assert.deepEqual([lay.background, lay.paper], expected, `id ${id}`);
-      assert.ok(lay.equals(new Layout({ background: expected[0], paper: expected[1] })));
+      assert.deepEqual([lay.background, lay.paper, lay.colorPatches], expected, `id ${id}`);
+      assert.ok(lay.equals(new Layout({ background: expected[0], paper: expected[1], colorPatches: expected[2] })));
     }
   }
 });

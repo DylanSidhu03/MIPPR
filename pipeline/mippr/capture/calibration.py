@@ -14,28 +14,37 @@ from dataclasses import asdict, dataclass
 import cv2
 import numpy as np
 
-from .sheet import detect_markers, layout_from_marker_ids
+from .sheet import PAPERS, detect_markers, layout_from_marker_ids
 
 
 def _patch_pixels(sheet, photo, inset=2.0):
-    """{patch name: N x 3 BGR pixels} of the printed white and grey patches, from the marker homography."""
+    """{patch name: N x 3 BGR pixels} of the printed patches (white, grey and any coloured ones), from the marker homography."""
     canvas = sheet.rectify_sheet(photo)
     ppm = sheet.px_per_mm
     crops = {}
-    for name, (x, y, w, h, _) in sheet.layout.patches_mm().items():
+    for name, (x, y, w, h, _) in {**sheet.layout.patches_mm(), **sheet.layout.color_patches_mm()}.items():
         crop = canvas[int((y + inset) * ppm):int((y + h - inset) * ppm), int((x + inset) * ppm):int((x + w - inset) * ppm)]
         crops[name] = crop.reshape(-1, 3).astype(np.float64)
     return crops
 
 
 def white_balance(sheet, photo):
-    """Per-channel gains that make the printed white patch neutral, plus how neutral the grey patch came out."""
+    """Per-channel gains that make the printed white patch neutral, plus how neutral the grey patch came out.
+
+    On a sheet with coloured patches the report also records each one's colour after white
+    balance (`color_patches_after_bgr`), to compare photos of the same printout. Printers render
+    colours differently, so the patches don't change any result.
+    """
     means = {k: v.mean(axis=0) for k, v in _patch_pixels(sheet, photo).items()}
     gains = 240.0 / np.maximum(means["white"], 1.0)
     grey = means["grey"] * gains
-    return gains, {"white_patch_bgr": means["white"].round(1).tolist(), "gains_bgr": gains.round(3).tolist(),
-                   "grey_patch_after_bgr": grey.round(1).tolist(),
-                   "grey_spread_after": float(grey.max() - grey.min())}
+    report = {"white_patch_bgr": means["white"].round(1).tolist(), "gains_bgr": gains.round(3).tolist(),
+              "grey_patch_after_bgr": grey.round(1).tolist(),
+              "grey_spread_after": float(grey.max() - grey.min())}
+    colors = sheet.layout.color_patches_mm()
+    if colors:
+        report["color_patches_after_bgr"] = {k: np.clip(means[k] * gains, 0, 255).round(1).tolist() for k in colors}
+    return gains, report
 
 
 # ── Photo quality check ────────────────────────────────────────────────────
@@ -267,3 +276,195 @@ def check_quality(photo, sheet=None, limits=QualityLimits(), metrics=None):
                                  "balance. Use one kind of light (daylight or one lamp), not a mix.",
                                  m["grey_spread"], L.max_grey_spread))
     return probs
+
+
+# ── Printer scale from the paper's edges ───────────────────────────────────
+#
+# A printer set to "fit to page" shrinks the whole sheet, markers included, so every size comes
+# out too small by the same factor. Paper is made to a standard size whatever the printer, so
+# when all four paper edges are in the photo, the paper is a ruler that doesn't depend on the
+# printer. Width and height together also say which paper was used (Letter and A4 differ in
+# shape by 9%), so an A4 sheet fitted onto Letter paper is recognised.
+
+PRINTER_SCALE_TOL = 0.01  # correct the scale when the printer changed it by more than 1%
+PAPER_SEARCH_MM = 12.0  # how far outside the nominal paper edge to look (covers printing down to ~90%)
+PAPER_INSIDE_MM = 5.0  # and how far inside (printers offset the page by a few mm)
+EDGE_PPM = 4.0  # px per mm of the edge search
+MIN_EDGE_STEP = 25.0  # paper must be at least this many grey levels brighter than what it lies on
+MAX_EDGE_SPREAD_MM = 0.3  # the edge positions along one side must agree this well (median absolute deviation)
+MIN_EDGE_SHARE = 0.25  # and be found along at least this share of the side
+MAX_LENS_RMS_PX = 2.0  # skip the estimate if the lens model fits the crossings and markers worse than this
+
+
+def _edge_positions(profiles, rising, min_dark_px=4):
+    """Sub-pixel position (index) of the strongest step in each row of `profiles` (rows x n, NaN where
+    outside the photo), or NaN where there is no clear paper edge."""
+    p = profiles.astype(np.float64)
+    p = (p[:, :-2] + 2 * p[:, 1:-1] + p[:, 2:]) / 4  # light smoothing; NaN spreads by one pixel
+    g = (p[:, 2:] - p[:, :-2]) * (1 if rising else -1)  # g[i] is centred on p[i + 1]
+    out = np.full(len(p), np.nan)
+    for r in range(len(p)):
+        gr = g[r]
+        if not np.isfinite(gr).any():
+            continue
+        i = int(np.nanargmax(gr))
+        before, after = p[r, :i + 1], p[r, i + 2:]
+        dark, bright = (before, after) if rising else (after, before)
+        dark, bright = dark[np.isfinite(dark)], bright[np.isfinite(bright)]
+        if len(dark) < min_dark_px or len(bright) < min_dark_px or np.median(bright) - np.median(dark) < MIN_EDGE_STEP:
+            continue
+        d = 0.0
+        if 0 < i < len(gr) - 1 and np.isfinite(gr[i - 1]) and np.isfinite(gr[i + 1]):
+            a, b, c = gr[i - 1], gr[i], gr[i + 1]
+            den = a - 2 * b + c
+            d = 0.5 * (a - c) / den if den != 0 else 0.0
+        out[r] = i + 2 + d  # back to the unsmoothed profile's index
+    return out
+
+
+def lens_model(sheet, photo):
+    """(q, H, rms): radial lens distortion and the sheet -> photo mapping, fitted to the grid crossings and markers.
+
+    A point p in the photo has undistorted position u = c + (p - c)(1 + q r^2), r = |p - c| / (half the
+    photo width), c the photo centre; H maps sheet mm onto undistorted px. The paper edges lie outside the
+    markers, where the markers' homography alone is pulled off by barrel distortion, so it is modelled.
+    """
+    h, w = photo.shape[:2]
+    c, n = np.array([w / 2, h / 2]), w / 2
+    lay = sheet.layout
+    (gx, gy), b = lay.grid_origin_mm, lay.box_mm
+    jj, ii = np.mgrid[0:lay.rows + 1, 0:lay.cols + 1]
+    mm = [np.stack([gx + ii * b, gy + jj * b], -1).reshape(-1, 2)]
+    px = [sheet.crossings.reshape(-1, 2).astype(np.float64)]
+    expected = lay.marker_corners_mm()
+    for k, v in sorted(detect_markers(photo).items()):
+        if k in expected:
+            mm.append(expected[k])
+            px.append(v)
+    mm, px = np.vstack(mm), np.vstack(px)
+    keep = np.isfinite(px).all(axis=1)
+    mm, px = mm[keep], px[keep]
+
+    def fit(q):
+        u = c + (px - c) * (1 + q * (((px - c) / n) ** 2).sum(axis=1, keepdims=True))
+        H, _ = cv2.findHomography(mm, u, 0)
+        err = cv2.perspectiveTransform(mm[None], H)[0] - u
+        return float(np.sqrt((err ** 2).sum(axis=1).mean())), H
+
+    def search():  # golden-section search for the q with the smallest residual
+        lo, hi = -0.25, 0.25
+        g = (np.sqrt(5) - 1) / 2
+        a, d = hi - g * (hi - lo), lo + g * (hi - lo)
+        fa, fd = fit(a)[0], fit(d)[0]
+        for _ in range(40):
+            if fa < fd:
+                hi, d, fd = d, a, fa
+                a = hi - g * (hi - lo)
+                fa = fit(a)[0]
+            else:
+                lo, a, fa = a, d, fd
+                d = lo + g * (hi - lo)
+                fd = fit(d)[0]
+        return (lo + hi) / 2
+
+    q = search()
+    # A few crossings can be misplaced (e.g. a checkerboard corner that didn't converge): drop the
+    # points far off the first fit and fit again.
+    _, H = fit(q)
+    u = c + (px - c) * (1 + q * (((px - c) / n) ** 2).sum(axis=1, keepdims=True))
+    err = np.linalg.norm(cv2.perspectiveTransform(mm[None], H)[0] - u, axis=1)
+    good = err <= max(1.0, 3 * np.median(err))
+    if good.sum() >= 8 and not good.all():
+        mm, px = mm[good], px[good]
+        q = search()
+    rms, H = fit(q)
+    return q, H, rms
+
+
+def paper_edges(sheet, photo):
+    """{left, right, top, bottom}: where the paper's edges are, in sheet mm (None where not found).
+
+    The photo is flattened onto the sheet plus a band round it, through the lens model, and each
+    side's edge is the strongest dark-to-paper step along the rows (or columns) of that band.
+    """
+    lay = sheet.layout
+    W, H = lay.size_mm
+    E, I, k = PAPER_SEARCH_MM, PAPER_INSIDE_MM, EDGE_PPM
+    q, Hm, rms = lens_model(sheet, photo)
+    if rms > MAX_LENS_RMS_PX:
+        return {side: None for side in ("left", "right", "top", "bottom")}
+    gray = photo if photo.ndim == 2 else cv2.cvtColor(photo, cv2.COLOR_BGR2GRAY)
+    ph, pw = gray.shape
+    c, n = np.array([pw / 2, ph / 2]), pw / 2
+    size = (int(round((W + 2 * E) * k)), int(round((H + 2 * E) * k)))
+    yy, xx = np.indices((size[1], size[0]), dtype=np.float64)
+    mm = np.stack([(xx + 0.5) / k - E, (yy + 0.5) / k - E], -1).reshape(-1, 1, 2)
+    u = cv2.perspectiveTransform(mm, Hm).reshape(-1, 2)
+    p = u.copy()
+    for _ in range(8):  # invert u = c + (p - c)(1 + q r^2) for p
+        p = c + (u - c) / (1 + q * (((p - c) / n) ** 2).sum(axis=1, keepdims=True))
+    mx = p[:, 0].reshape(size[1], size[0]).astype(np.float32)
+    my = p[:, 1].reshape(size[1], size[0]).astype(np.float32)
+    canvas = cv2.remap(gray, mx - 0.5, my - 0.5, cv2.INTER_LINEAR, borderMode=cv2.BORDER_CONSTANT, borderValue=0)
+    valid = (mx >= 1) & (my >= 1) & (mx < pw - 1) & (my < ph - 1)
+    px = lambda v: int(round((v + E) * k))  # noqa: E731  sheet mm -> canvas px
+    clear = lay.margin_mm + lay.marker_mm + 4  # stay clear of the corner markers along each side
+    out = {}
+    for side in ("left", "right", "top", "bottom"):
+        if side in ("left", "right"):
+            a, b = px(clear), px(H - clear)
+            lo, hi = (px(-E), px(I)) if side == "left" else (px(W - I), px(W + E))
+            prof = np.where(valid[a:b, lo:hi], canvas[a:b, lo:hi], np.nan)
+        else:
+            a, b = px(clear), px(W - clear)
+            lo, hi = (px(-E), px(I)) if side == "top" else (px(H - I), px(H + E))
+            prof = np.where(valid[lo:hi, a:b], canvas[lo:hi, a:b], np.nan).T
+        pos = _edge_positions(prof, rising=side in ("left", "top"))
+        pos = pos[np.isfinite(pos)]
+        if len(pos) < MIN_EDGE_SHARE * len(prof):
+            out[side] = None
+            continue
+        med = float(np.median(pos))
+        if float(np.median(np.abs(pos - med))) / k > MAX_EDGE_SPREAD_MM:
+            out[side] = None
+            continue
+        out[side] = (lo + med) / k - E
+    return out
+
+
+def printer_scale(sheet, photo):
+    """How the printer scaled the sheet, from the paper's edges.
+
+    Returns {"scale", "paper", "scale_x", "scale_y", "edges_mm"}: `scale` is printed size / true
+    size (0.97 = printed at 97%), `paper` the paper the edges fit best. `scale` is None unless all
+    four edges were found and width and height agree on one paper size.
+    """
+    edges = paper_edges(sheet, photo)
+    out = {"scale": None, "paper": None, "scale_x": None, "scale_y": None,
+           "edges_mm": {k: None if v is None else round(v, 2) for k, v in edges.items()}}
+    if any(v is None for v in edges.values()):
+        return out
+    mw, mh = edges["right"] - edges["left"], edges["bottom"] - edges["top"]
+    best = None
+    for paper, (pw, ph) in PAPERS.items():
+        sx, sy = pw / mw, ph / mh
+        if best is None or abs(sx - sy) < abs(best[1] - best[2]):
+            best = (paper, sx, sy)
+    paper, sx, sy = best
+    out.update(paper=paper, scale_x=round(sx, 4), scale_y=round(sy, 4))
+    if abs(sx - sy) <= 0.01:  # a uniform scale on a real paper size
+        out["scale"] = round((sx + sy) / 2, 4)
+    return out
+
+
+def printer_problem(ps, line_mm=None):
+    """A Problem saying the printer scaled the sheet (and that sizes were corrected), or None."""
+    s = ps.get("scale")
+    if s is None or abs(s - 1) <= PRINTER_SCALE_TOL:
+        return None
+    if line_mm is not None:
+        return Problem("printer_scaled", f"The sheet looks printed at {100 * s:.0f}% of its size (from the paper's "
+                       f"edges), but the 100 mm line was entered as {line_mm:g} mm; the entered length was used.",
+                       s, PRINTER_SCALE_TOL)
+    return Problem("printer_scaled", f"The printer scaled the sheet to {100 * s:.0f}% of its size. Sizes were "
+                   "corrected from the paper's edges; to avoid this, print at actual size (100%).", s, PRINTER_SCALE_TOL)

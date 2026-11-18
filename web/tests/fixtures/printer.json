@@ -1,0 +1,119 @@
+{
+ "cases": [
+  {
+   "photo": "printer_white_grid_97.png",
+   "q": -0.039752528211752666,
+   "rms": 0.4920411885242604,
+   "printerScale": {
+    "scale": 0.9695,
+    "paper": "letter",
+    "scale_x": 0.9694,
+    "scale_y": 0.9697,
+    "edges_mm": {
+     "left": -3.44,
+     "right": 219.28,
+     "top": -4.45,
+     "bottom": 283.69
+    }
+   },
+   "problem": {
+    "code": "printer_scaled",
+    "message": "The printer scaled the sheet to 97% of its size. Sizes were corrected from the paper's edges; to avoid this, print at actual size (100%).",
+    "value": 0.9695,
+    "limit": 0.01
+   },
+   "problemWithLine": {
+    "code": "printer_scaled",
+    "message": "The sheet looks printed at 97% of its size (from the paper's edges), but the 100 mm line was entered as 98.5 mm; the entered length was used.",
+    "value": 0.9695,
+    "limit": 0.01
+   }
+  },
+  {
+   "photo": "printer_checkerboard_a4_on_letter.png",
+   "q": -0.03964517229153297,
+   "rms": 0.561263839724452,
+   "printerScale": {
+    "scale": 0.94,
+    "paper": "letter",
+    "scale_x": 0.9404,
+    "scale_y": 0.9396,
+    "edges_mm": {
+     "left": -9.72,
+     "right": 219.88,
+     "top": -0.06,
+     "bottom": 297.31
+    }
+   },
+   "problem": {
+    "code": "printer_scaled",
+    "message": "The printer scaled the sheet to 94% of its size. Sizes were corrected from the paper's edges; to avoid this, print at actual size (100%).",
+    "value": 0.94,
+    "limit": 0.01
+   },
+   "problemWithLine": {
+    "code": "printer_scaled",
+    "message": "The sheet looks printed at 94% of its size (from the paper's edges), but the 100 mm line was entered as 98.5 mm; the entered length was used.",
+    "value": 0.94,
+    "limit": 0.01
+   }
+  },
+  {
+   "photo": "quality_white_grid.png",
+   "q": -0.03001074418900179,
+   "rms": 0.36030080330350434,
+   "printerScale": {
+    "scale": 1.0,
+    "paper": "letter",
+    "scale_x": 0.9999,
+    "scale_y": 1.0,
+    "edges_mm": {
+     "left": -0.09,
+     "right": 215.82,
+     "top": -0.08,
+     "bottom": 279.31
+    }
+   },
+   "problem": null,
+   "problemWithLine": null
+  },
+  {
+   "photo": "quality_black_grid.png",
+   "q": -0.029988372706044996,
+   "rms": 0.3281399095327121,
+   "printerScale": {
+    "scale": 1.0001,
+    "paper": "letter",
+    "scale_x": 1.0003,
+    "scale_y": 0.9999,
+    "edges_mm": {
+     "left": -0.04,
+     "right": 215.79,
+     "top": -0.11,
+     "bottom": 279.32
+    }
+   },
+   "problem": null,
+   "problemWithLine": null
+  },
+  {
+   "photo": "quality_checkerboard.png",
+   "q": -0.02991517218113411,
+   "rms": 0.42522170417616584,
+   "printerScale": {
+    "scale": 1.0001,
+    "paper": "letter",
+    "scale_x": 1.0004,
+    "scale_y": 0.9999,
+    "edges_mm": {
+     "left": -0.05,
+     "right": 215.77,
+     "top": -0.12,
+     "bottom": 279.32
+    }
+   },
+   "problem": null,
+   "problemWithLine": null
+  }
+ ]
+}

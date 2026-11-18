@@ -24,7 +24,7 @@ The app describes particles that have already been hand-picked. It does not deci
 | `particles.csv` | One row per detected particle. This is the main output and the source of everything else. |
 | `summary.csv` | One row per sample, calculated only from `particles.csv`. This is what researchers usually report. |
 | `overlay.png` | The corrected photo with each particle outlined and labelled with its `particle_id` |
-| `run.json` | Settings, scale and versions for the run, and `quality`: the photo check's problems (code, message, value, limit) and the values it measured (edge width, white level, clipped share, glare, light ratio, grey spread) |
+| `run.json` | Settings, scale and versions for the run; `printer_scale` (the paper's edges, the paper they fit and the printer's scale, when all four edges are in the photo); `color_patches` and, on those sheets, `white_balance.color_patches_after_bgr`; and `quality`: the photo check's problems (code, message, value, limit) and the values it measured (edge width, white level, clipped share, glare, light ratio, grey spread) |
 | `NOTE.txt` | "Visual classification only. Whether a particle is plastic, and its polymer type, were not tested." |
 
 ## 3. Column types and who may change them
@@ -132,7 +132,7 @@ On the lab's fragment_area sample (24 particles) these match ImageJ's own result
 | `flag_edge` | The outline is within 3 px of the grid's outer edge or the photo's. The particle may be cut off. It is kept, not dropped, so the reviewer decides. | v1 |
 | `flag_merged` | Solidity < 0.75 (provisional). Particles sit one per box, so touching particles are rare; `flag_multi_blob` covers two blobs in a box. | v1 |
 | `flag_low_confidence` | Color or morphology confidence below the threshold. The **threshold is still to be decided** from v2/v3 data; empty until then. | v2 / v3 |
-| `flag_scale` | Markers not all found, or the user corrected the scale | v1 |
+| `flag_scale` | Markers not all found, or the scale was corrected (from the paper's edges or the 100 mm line) | v1 |
 | `flag_near_cutoff` | `length_mm` between 0.45 and 0.55 (±10% of the sieve size) | v1 |
 | `flag_min_width` | `width_mm` < 0.5, so the particle may have passed the 500 µm sieve | v1 |
 | `flag_low_contrast` | The particle barely differs from the background (contrast < 100 on a 0–255 scale, provisional), so the outline may be incomplete | v1 |
@@ -165,7 +165,7 @@ On the lab's fragment_area sample (24 particles) these match ImageJ's own result
 |---|---|---|---|
 | `background_type` | Recorded | `white_grid`, `black_grid` or `checkerboard`, read from the corner marker IDs. Every photo is on one of these three sheets; a photo without the markers is refused. | v1 |
 | `mm_per_px` | Recorded | Scale of the corrected image | v1 |
-| `scale_source` | Recorded | `markers`, or `user_corrected` when the printed 100 mm line measured differently and its true length was entered | v1 |
+| `scale_source` | Recorded | `markers`; `paper_edges` when the printer scaled the sheet by more than 1% and the scale was corrected from the paper's four edges (Letter and A4 are standard sizes whatever the printer); or `user_corrected` when the printed 100 mm line measured differently and its true length was entered (this wins over the paper edges) | v1 |
 | `app_version`, `color_rules_version`, `model_version` | Recorded | Versions of the code, color rules and model used. The last two are empty until v2/v3. | v1 |
 | `processed_at` | Recorded | Date and time of processing (UTC, ISO 8601) | v1 |
 
@@ -242,6 +242,7 @@ Column names stay the same across releases. Columns not yet available are left e
   - on grids, the merged flag uses solidity only
 - **November 12, 2026:** photos are always on one of the three printed sheets. The lab's old checkerboard is no longer an app input (it is kept in `validation/legacy/` to compare with the lab's ImageJ results), so `scale_source = checkerboard` and the area rule for `flag_merged` are gone.
 - **November 18, 2026:** ImageJ is the main guideline for every measurement. `perimeter_mm`, `circularity` and `aspect_ratio` are now ImageJ's (Perim., Circ., AR from the fitted ellipse); `roundness`, `major_mm`, `minor_mm` were added. The other methods are kept as `feret_ratio` (used by the rules), `perimeter_subpixel_mm` and `circularity_subpixel`, replacing `perimeter_imagej_mm` and `circularity_imagej`. Mean RGB and HSV were added back as `color_R` … `color_V`.
+- **November 18, 2026:** `scale_source = paper_edges`: when all four paper edges are in the photo, the app measures how the printer scaled the sheet and corrects the scale if it is off by more than 1% (a `printer_scaled` photo problem says so).
 - **November 12, 2026 (size check):** `length_mm_outer`, `length_mm_inner`, `width_mm_outer`, `width_mm_inner`, `size_uncertainty` and `flag_size_uncertain` added, so a size that depends strongly on where the edge is drawn is flagged for review.
 - **No "likely plastic" column:** it stays out of scope, unless the lab asks for it.
 

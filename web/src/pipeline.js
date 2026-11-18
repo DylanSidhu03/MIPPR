@@ -2,6 +2,7 @@
 // pipeline/mippr/cli.py run_grid: same steps, same settings, same output columns.
 import { findSheet, rectifyGrid, whiteBalance } from "./capture/sheet.js";
 import { checkQuality, measureQuality } from "./capture/quality.js";
+import { printerProblem, printerScale } from "./capture/printer.js";
 import { GRID_SEGMENT_DEFAULTS, segmentGrid } from "./segmentation/grid.js";
 import { buildRows } from "./export/csv.js";
 import { balance, makeMeasureContext, measureWith } from "./review/context.js";
@@ -79,6 +80,13 @@ export function runGrid(cv, img, {
   }
   const quality = measureQuality(cv, img, sheet);
   const problems = checkQuality(cv, img, sheet, { metrics: quality });
+  // Printer scaling, from the paper's edges when all four are in the photo (capture/printer.js).
+  const printer = printerScale(cv, sheet, img);
+  const pp = printerProblem(printer, lineMm);
+  if (pp) problems.push(pp);
+  const fromPaper = (lineMm === null || lineMm === undefined) && pp !== null; // correct the scale from the paper
+  const enteredLineMm = lineMm;
+  if (fromPaper) lineMm = 100.0 * printer.scale;
   const lay = sheet.layout, ppm = sheet.pxPerMm;
   const mats = [];
   const keep = (m) => (mats.push(m), m);
@@ -96,13 +104,14 @@ export function runGrid(cv, img, {
     const label = pictureLabel(sampleId, photo);
     const rows = buildRows(measured, {
       sampleId, pictureLabel: label, imageId, metadata, appVersion: APP_VERSION, mmPerPx, processedAt,
-      backgroundType: lay.background, scaleSource: corrected ? "user_corrected" : "markers",
+      backgroundType: lay.background, scaleSource: fromPaper ? "paper_edges" : corrected ? "user_corrected" : "markers",
       scaleFlag: corrected || sheet.markersFound < 4,
     });
     const run = {
       mode: "grid", sample_id: sampleId, picture_label: label, ...metadata, background_type: lay.background,
-      paper: lay.paper, layout: { box_mm: lay.boxMm, line_mm: lay.lineMm, rows: lay.rows, cols: lay.cols },
-      markers_found: sheet.markersFound, px_per_mm: ppm, mm_per_px: mmPerPx, printed_line_mm: lineMm,
+      paper: lay.paper, color_patches: lay.colorPatches, layout: { box_mm: lay.boxMm, line_mm: lay.lineMm, rows: lay.rows, cols: lay.cols },
+      markers_found: sheet.markersFound, px_per_mm: ppm, mm_per_px: mmPerPx, printed_line_mm: enteredLineMm ?? null,
+      printer_scale: printer,
       white_balance: wb, quality: { problems: problems.map((q) => q.asDict()), metrics: quality }, params: p,
     };
     const out = { rows, problems, quality, run, measured };

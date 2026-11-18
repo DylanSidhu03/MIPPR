@@ -19,7 +19,7 @@ create table images (
   picture_label   text not null,          -- e.g. S042-P01
   background_type text not null check (background_type in ('white_grid', 'black_grid', 'checkerboard')),
   mm_per_px       double precision not null,
-  scale_source    text not null check (scale_source in ('markers', 'user_corrected')),  -- user_corrected: 100 mm line entered
+  scale_source    text not null check (scale_source in ('markers', 'paper_edges', 'user_corrected')),  -- paper_edges: printer scaling corrected from the paper; user_corrected: 100 mm line entered
   storage_path    text,                   -- photo in Supabase Storage, if stored (9b)
   app_version     text not null,
   processed_at    timestamptz not null,

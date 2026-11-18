@@ -36,7 +36,7 @@
 ## 4. Take the photo
 
 - Hold the phone **flat above the sheet**, roughly overhead. Resting it on a stack of books helps.
-- Get the **whole sheet** in the frame: all four black corner squares, the 100 mm line and the grey and white patches. Fill the frame with the sheet as much as possible.
+- Get the **whole sheet** in the frame: all four black corner squares, the 100 mm line, the grey and white patches, and the **paper's four edges** against a darker surface (the app uses them to catch a printer that scaled the sheet). Fill the frame with the sheet as much as possible.
 - **Even, diffuse light, no flash.** No shadows from your hand or phone, and no shiny glare spots on the particles.
 - Tap to focus on the sheet. Check the photo is sharp before moving any particle.
 - Save the original photo file (no edits, filters or messaging-app compression). Name it so it matches the list, e.g. `EX_01_S01_white_grid_1.jpg`.
