@@ -23,7 +23,8 @@ Cloudflare's **Create** screen now defaults to Workers. A Worker project runs `n
 
 1. The Worker's name in the dashboard must match `"name"` in `wrangler.jsonc` (`mippr`); change either one.
 2. Worker → **Settings** → **Build** → **Build configuration**: Build command `node scripts/build_site.mjs`, Deploy command `npx wrangler deploy`, Root directory empty (`/`). Under **Build variables** add `NODE_VERSION` = `22`.
-3. **Deployments** → retry the build. The site is at `https://mippr.<your-subdomain>.workers.dev`.
+3. Set **Settings** → **Build** → **Branch control** → Production branch to the branch that has the app (`claude/repo-access-600pt5` until it is merged into `main`; `main` does not have `scripts/build_site.mjs` yet). Changing the branch does not start a build, and retrying an old build reuses its old commit: the next push to the branch builds it.
+4. Push to that branch (or retry a build made from it). The site is at `https://mippr.<your-subdomain>.workers.dev`.
 
 No secrets or environment variables are needed: the site has no backend yet (Supabase comes with part 9).
 
