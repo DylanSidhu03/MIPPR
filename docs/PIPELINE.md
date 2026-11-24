@@ -255,7 +255,7 @@ Folder: [web/](../web/README.md) (browser app; `src/` mirrors the pipeline parts
 - [x] Download particles.csv, summary.csv, run.json (with the review decisions) and NOTE.txt
 - [x] Download the overlay images (`overlays.zip`), the particle crops (`crops.zip`) and an HTML summary (`summary.html`: counts, flags, review progress, each photo's overlay)
 - [x] Prepare hosting on Cloudflare Pages ([HOSTING.md](HOSTING.md)): `scripts/build_site.mjs` builds `dist/` with OpenCV.js served with the site, the backgrounds, and `_headers` (strict security policy, caching); upload limits 60 MB / 60 MP (`web/src/limits.js`); CI runs the app on the built site under its headers. Stays on the user's GitHub and Cloudflare accounts (November 18).
-- [ ] Connect the repository in the Cloudflare dashboard (the owner's account; steps in HOSTING.md)
+- [x] Connect the repository in the Cloudflare dashboard (done November 24 as a Worker with static assets, `wrangler.jsonc`; live at https://mippr.dgsidhu.workers.dev, built from `claude/repo-access-600pt5`; steps in HOSTING.md)
 - [x] Keep the browser and Python versions within about a pixel; an exact match is not needed now (November 18)
 - [x] Run the tests on every push (GitHub Actions: pipeline, ruler reader, browser parity tests, plan in sync)
 - [ ] Add the licences (decided November 18: MIT for code, CC BY 4.0 for contributed photos and labels) and contribution notes

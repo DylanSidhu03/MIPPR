@@ -2,6 +2,8 @@
 
 The app is a static site: every photo is processed in the visitor's browser, so Cloudflare only serves files. It stays on the project owner's GitHub and Cloudflare accounts (decided November 18, 2026), and OpenCV.js is served with the site rather than from a CDN.
 
+**Live:** https://mippr.dgsidhu.workers.dev (since November 24, 2026; deployed as a Worker from `claude/repo-access-600pt5`, see below).
+
 ## One-time setup (Cloudflare dashboard)
 
 1. Cloudflare dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**, and pick this repository.
@@ -14,8 +16,6 @@ The app is a static site: every photo is processed in the visitor's browser, so 
    | Build command | `node scripts/build_site.mjs` |
    | Build output directory | `dist` |
    | Environment variable | `NODE_VERSION` = `22` |
-
-Live since November 24, 2026 (deployed as a Worker, see below): https://mippr.dgsidhu.workers.dev
 
 3. Save and deploy. Every push to the production branch publishes; other branches get preview URLs.
 
