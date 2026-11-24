@@ -102,7 +102,7 @@ Decided after reviewing the lab's records ([LAB_DATA.md](LAB_DATA.md)); the stan
 - **OpenCV.js** is served with the site, not from a CDN.
 - **Rubbery fragment:** its own class if the v3 model can tell it apart; otherwise fragment, with the reviewer marking rubbery. Decided by how it performs.
 - **Fibers on hold:** the advisor will send fiber photos, and the lab usually removes fibers by other methods. Do not change fiber logic for now.
-- **Tar-like:** not decided (stays a reviewer tag).
+- **Tar-like:** a reviewer tag (`tar_like`), not a class and not detected automatically (user, November 24, 2026).
 - **Split IDs:** B4-1, B4-2, …; the original combined row stays, marked rejected.
 - **Browser vs Python:** within about a pixel is enough; no exact port of the warp now.
 - **Licences:** MIT for code, CC BY 4.0 for contributed photos and labels.

@@ -67,7 +67,7 @@ The classes are **fragment, rubbery_fragment, fiber, film, foam, pellet**, plus 
 | **Other** | Doesn't clearly fit one class | Always goes to review |
 
 - **Example photos:** each class needs 2–3 labelled photos added here. These come from the stage 2 pilot batch.
-- **Tar-like particles.** The lab notes about 900 particles as tar-like. The app doesn't detect tar or judge material, but reviewers can tick a `tar_like` tag, saved as a column (decided November 11, 2026).
+- **Tar-like particles.** The lab notes about 900 particles as tar-like. The app doesn't detect tar or judge material, but reviewers can tick a `tar_like` tag, saved as a column (decided November 11, 2026; confirmed as a tag, not a class, November 24).
 - **Texture** (smooth vs weathered) is not recorded for now. It needs higher-resolution photos. It may be revisited later.
 
 ## 3. Color
