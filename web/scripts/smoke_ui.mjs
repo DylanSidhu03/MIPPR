@@ -46,7 +46,8 @@ function serve() {
     if (!file.startsWith(siteRoot) || !existsSync(file) || statSync(file).isDirectory()) return res.writeHead(404).end();
     const headers = { "content-type": TYPES[extname(file)] ?? "application/octet-stream" };
     for (const [pattern, h] of headerRules) {
-      if (pattern.endsWith("*") ? url.startsWith(pattern.slice(0, -1)) : url === pattern) Object.assign(headers, h);
+      if (!(pattern.endsWith("*") ? url.startsWith(pattern.slice(0, -1)) : url === pattern)) continue;
+      for (const [k, v] of Object.entries(h)) headers[k] = headers[k] ? `${headers[k]}, ${v}` : v; // joined, as Cloudflare does
     }
     res.writeHead(200, headers);
     createReadStream(file).pipe(res);
@@ -81,8 +82,9 @@ function blankPng(path, w = 400, h = 300) {
 }
 
 const { chromium } = createRequire(import.meta.url)("playwright");
-const server = await serve();
-const base = `http://127.0.0.1:${server.address().port}${appPath}${process.env.SMOKE_QUERY ?? ""}`; // SMOKE_QUERY="?worker=off": on the page
+// SMOKE_URL=https://... runs the test against a deployed site instead of a local server.
+const server = process.env.SMOKE_URL ? null : await serve();
+const base = (process.env.SMOKE_URL ?? `http://127.0.0.1:${server.address().port}${appPath}`) + (process.env.SMOKE_QUERY ?? ""); // SMOKE_QUERY="?worker=off": on the page
 const tmp = mkdtempSync(join(tmpdir(), "mippr-smoke-"));
 blankPng(join(tmp, "not_a_sheet.png"));
 const browser = await chromium.launch();
@@ -205,5 +207,5 @@ try {
   console.log("smoke test passed: measure, refuse a photo without a sheet, review with keys and clicks, split, merge, redraw, download");
 } finally {
   await browser.close();
-  server.close();
+  server?.close();
 }

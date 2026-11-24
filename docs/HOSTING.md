@@ -36,9 +36,9 @@ No secrets or environment variables are needed: the site has no backend yet (Sup
 - `index.html`, `style.css` and `src/`: the app, as in `web/`, with the background links pointing at `backgrounds/`
 - `vendor/opencv-4.10.0.js`: downloaded from the pinned npm package and checked against its sha256 (`web/scripts/fetch_opencv.mjs`); 10.4 MB, under Cloudflare's 25 MiB per-file limit
 - `backgrounds/*.pdf`: the printable sheets, plain and with colour patches
-- `_headers`: a strict Content-Security-Policy (only the site's own files; `'unsafe-eval'` and `'wasm-unsafe-eval'`, which OpenCV.js needs: its glue code builds functions from strings and it compiles WebAssembly), `nosniff`, no referrer, and caching (OpenCV.js a year, since its file name carries its version)
+- `_headers`: a strict Content-Security-Policy (only the site's own files; `'unsafe-eval'` and `'wasm-unsafe-eval'`, which OpenCV.js needs: its glue code builds functions from strings and it compiles WebAssembly), `nosniff`, no referrer, and caching (OpenCV.js a year, since its file name carries its version; the PDFs a day; the app's own files revalidated). Cloudflare joins the headers of every rule a path matches, so each path gets its `Cache-Control` from one rule only
 
-Try the built site locally: `node scripts/build_site.mjs && SMOKE_ROOT=dist node web/scripts/smoke_ui.mjs` runs the whole app in a browser with those headers applied (CI does the same).
+Try the built site locally: `node scripts/build_site.mjs && SMOKE_ROOT=dist node web/scripts/smoke_ui.mjs` runs the whole app in a browser with those headers applied (CI does the same). To test the deployed site itself: `SMOKE_URL=https://mippr.dgsidhu.workers.dev/ node web/scripts/smoke_ui.mjs` (passed November 24, 2026).
 
 ## Limits
 
