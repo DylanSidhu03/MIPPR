@@ -4,6 +4,9 @@
 {
   "name": "mippr",
   "compatibility_date": "2026-11-01",
+  // Serve at https://mippr.<subdomain>.workers.dev, and give each branch push its own preview URL.
+  "workers_dev": true,
+  "preview_urls": true,
   "assets": {
     "directory": "./dist"
   }

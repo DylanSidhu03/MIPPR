@@ -15,6 +15,8 @@ The app is a static site: every photo is processed in the visitor's browser, so 
    | Build output directory | `dist` |
    | Environment variable | `NODE_VERSION` = `22` |
 
+Live since November 24, 2026 (deployed as a Worker, see below): https://mippr.dgsidhu.workers.dev
+
 3. Save and deploy. Every push to the production branch publishes; other branches get preview URLs.
 
 ### If the project was created as a Worker instead
