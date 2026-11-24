@@ -1,0 +1,10 @@
+// Cloudflare Workers (static assets) config, for a project created under Workers rather than Pages.
+// Build command: node scripts/build_site.mjs   Deploy command: npx wrangler deploy
+// "name" must match the Worker's name in the Cloudflare dashboard. See docs/HOSTING.md.
+{
+  "name": "mippr",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist"
+  }
+}

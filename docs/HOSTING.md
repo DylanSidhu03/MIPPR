@@ -17,6 +17,14 @@ The app is a static site: every photo is processed in the visitor's browser, so 
 
 3. Save and deploy. Every push to the production branch publishes; other branches get preview URLs.
 
+### If the project was created as a Worker instead
+
+Cloudflare's **Create** screen now defaults to Workers. A Worker project runs `npx wrangler deploy` and skips the build unless one is set, failing with "Could not detect a directory containing static files". The repo's `wrangler.jsonc` makes it work as a Worker serving `dist/` (the `_headers` file applies there too):
+
+1. The Worker's name in the dashboard must match `"name"` in `wrangler.jsonc` (`mippr`); change either one.
+2. Worker → **Settings** → **Build** → **Build configuration**: Build command `node scripts/build_site.mjs`, Deploy command `npx wrangler deploy`, Root directory empty (`/`). Under **Build variables** add `NODE_VERSION` = `22`.
+3. **Deployments** → retry the build. The site is at `https://mippr.<your-subdomain>.workers.dev`.
+
 No secrets or environment variables are needed: the site has no backend yet (Supabase comes with part 9).
 
 ## What the build does
